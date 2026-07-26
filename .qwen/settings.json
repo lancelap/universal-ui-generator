@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ui-extension": {
+      "command": "node",
+      "args": [
+        "/Users/danilel/dev/gigacode-mcp/dist/src/main.js"
+      ],
+      "trust": true
+    }
+  },
+  "$version": 4
+}
