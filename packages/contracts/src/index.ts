@@ -6,6 +6,7 @@ export * from "./design-system-pack.js";
 export * from "./diagnostic.js";
 export * from "./generation-run.js";
 export * from "./resolution-plan.js";
+export * from "./resolution-plan-v2.js";
 export * from "./schema-utils.js";
 export * from "./stable-json.js";
 export * from "./ui-manifest.js";
