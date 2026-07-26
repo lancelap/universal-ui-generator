@@ -40,10 +40,17 @@ function dialog(
   node: DesignNode,
   children: DesignNode[],
 ): SemanticRecognition | undefined {
-  const evidence: WeightedEvidence[] = [];
-  add(evidence, node.type === "frame", "node-type", "frame", 0.15);
-  add(evidence, /modal|dialog/i.test(node.name), "layer-name", node.name, 0.3);
+  const explicitName = /\b(modal|dialog)\s*$/i.test(node.name);
   const headingChild = children.find(isHeadingLike);
+  const actionChild = children.find(isActionLike);
+  const hasDropShadow = node.appearance.shadows.length > 0;
+  if (!explicitName && !(headingChild && actionChild && hasDropShadow)) {
+    return undefined;
+  }
+
+  const evidence: WeightedEvidence[] = [];
+  add(evidence, node.type === "frame", "node-type", "frame", 0.25);
+  add(evidence, explicitName, "layer-name", node.name, 0.7);
   if (headingChild) {
     evidence.push({
       kind: "heading-child",
@@ -52,7 +59,6 @@ function dialog(
       sourceNodeId: headingChild.id,
     });
   }
-  const actionChild = children.find(isActionLike);
   if (actionChild) {
     evidence.push({
       kind: "action-child",
@@ -61,13 +67,7 @@ function dialog(
       sourceNodeId: actionChild.id,
     });
   }
-  add(
-    evidence,
-    node.appearance.shadows.length > 0,
-    "drop-shadow",
-    "present",
-    0.1,
-  );
+  add(evidence, hasDropShadow, "drop-shadow", "present", 0.1);
   return candidate(node, "overlay", "dialog", evidence);
 }
 

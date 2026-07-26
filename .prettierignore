@@ -2,5 +2,5 @@ node_modules/
 dist/
 coverage/
 .uig/
-fixtures/pixso/**/source.json
+fixtures/pixso/**/*.json
 docs/superpowers/

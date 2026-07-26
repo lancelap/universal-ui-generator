@@ -10,10 +10,12 @@
   "scripts": {
     "uig": "tsx apps/cli/src/main.ts",
     "test": "vitest run",
+    "test:acceptance": "vitest run apps/cli/src/offline-acceptance.test.ts",
     "typecheck": "tsc --project tsconfig.base.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify": "pnpm format:check && pnpm typecheck && pnpm test"
+    "verify:fixtures": "node scripts/verify-fixture-provenance.mjs",
+    "verify": "pnpm format:check && pnpm typecheck && pnpm verify:fixtures && pnpm test"
   },
   "devDependencies": {
     "@types/node": "^24.13.3",

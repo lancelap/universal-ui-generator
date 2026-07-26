@@ -1,0 +1,210 @@
+{
+  "diagnostics": [
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#BDBDBD"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "nodeId": "4:314"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": 16,
+        "property": "radii.topLeft",
+        "tokenName": "radius.dialog",
+        "tokenValue": 4
+      },
+      "message": "radii.topLeft differs from design-system token radius.dialog",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "nodeId": "4:314"
+      },
+      "stage": "appearance-comparison"
+    }
+  ],
+  "nodes": [
+    {
+      "bindings": [
+        {
+          "componentId": "mui.Dialog",
+          "export": "Dialog",
+          "exportKind": "named",
+          "package": "@mui/material"
+        },
+        {
+          "componentId": "mui.DialogTitle",
+          "export": "DialogTitle",
+          "exportKind": "named",
+          "package": "@mui/material"
+        },
+        {
+          "componentId": "mui.DialogContent",
+          "export": "DialogContent",
+          "exportKind": "named",
+          "package": "@mui/material"
+        },
+        {
+          "componentId": "mui.DialogActions",
+          "export": "DialogActions",
+          "exportKind": "named",
+          "package": "@mui/material"
+        }
+      ],
+      "confidence": 1,
+      "decision": "compose",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "node-type",
+          "value": "frame",
+          "weight": 0.25
+        },
+        {
+          "kind": "layer-name",
+          "value": "Modal",
+          "weight": 0.7
+        },
+        {
+          "kind": "drop-shadow",
+          "value": "present",
+          "weight": 0.1
+        },
+        {
+          "kind": "semantic-role",
+          "value": "dialog"
+        }
+      ],
+      "manifestNodeId": "ui_dialog_4-314",
+      "props": {},
+      "semanticRole": "dialog"
+    },
+    {
+      "binding": {
+        "componentId": "mui.TextField",
+        "export": "TextField",
+        "exportKind": "named",
+        "package": "@mui/material"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "component-key",
+          "value": "a99d4a9824294745ee8916049622bed62f077fbb",
+          "weight": 1
+        },
+        {
+          "kind": "component-variant",
+          "value": "StateFilled",
+          "weight": 1
+        },
+        {
+          "kind": "source-node",
+          "value": "4:316"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "combobox"
+        }
+      ],
+      "manifestNodeId": "ui_combobox_4-316",
+      "props": {},
+      "semanticRole": "combobox"
+    },
+    {
+      "binding": {
+        "componentId": "mui.Stack",
+        "export": "Stack",
+        "exportKind": "named",
+        "package": "@mui/material"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "component-key",
+          "value": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
+          "weight": 1
+        },
+        {
+          "kind": "component-variant",
+          "value": "VariantDefault",
+          "weight": 1
+        },
+        {
+          "kind": "source-node",
+          "value": "4:317"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "actionGroup"
+        }
+      ],
+      "manifestNodeId": "ui_actionGroup_4-317",
+      "props": {},
+      "semanticRole": "actionGroup"
+    },
+    {
+      "binding": {
+        "componentId": "mui.Typography",
+        "export": "Typography",
+        "exportKind": "named",
+        "package": "@mui/material"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "component-key",
+          "value": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",
+          "weight": 1
+        },
+        {
+          "kind": "component-variant",
+          "value": "StepsOFF",
+          "weight": 1
+        },
+        {
+          "kind": "source-node",
+          "value": "4:315"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "heading"
+        }
+      ],
+      "manifestNodeId": "ui_heading_4-315",
+      "props": {},
+      "semanticRole": "heading"
+    }
+  ],
+  "schema": "resolution-plan/v1",
+  "sourceManifestId": "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105",
+  "summary": {
+    "blocked": 0,
+    "compose": 1,
+    "fallback": 0,
+    "reuse": 3
+  },
+  "target": {
+    "designSystem": "material-ui",
+    "framework": "react",
+    "language": "typescript"
+  }
+}

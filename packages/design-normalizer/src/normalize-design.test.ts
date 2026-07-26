@@ -45,7 +45,7 @@ describe("normalizePixsoDesign", () => {
 
   it("rejects duplicate normalized node IDs", () => {
     const root = fixtureRoot();
-    (root.childNode[1] as Record<string, unknown>).guid = "4:315";
+    (root.childNode[1] as Record<string, unknown>).guid = "4:314";
 
     expect(() =>
       normalizePixsoDesign({
@@ -59,6 +59,95 @@ describe("normalizePixsoDesign", () => {
         code: "DESIGN_DSL_UNSUPPORTED",
       }),
     );
+  });
+
+  it("selects the requested design root when Pixso includes dependency roots", () => {
+    const dependency = fixtureRoot();
+    dependency.guid = "dependency-root";
+    dependency.name = "Exported dependency";
+    const requested = fixtureRoot();
+
+    const result = normalizePixsoDesign({
+      artifactId,
+      rootNodeId: "4:314",
+      rawDsl: {
+        dsl: {
+          ...minimalPixsoDsl.dsl,
+          pixTreeDslNodes: [dependency, requested],
+        },
+      },
+    });
+
+    expect(result.rootNodeId).toBe("4:314");
+    expect(result.nodes["dependency-root"]).toBeUndefined();
+  });
+
+  it("rejects multiple Pixso design roots without an explicit selector", () => {
+    expect(() =>
+      normalizePixsoDesign({
+        artifactId,
+        rawDsl: {
+          dsl: {
+            ...minimalPixsoDsl.dsl,
+            pixTreeDslNodes: [fixtureRoot(), fixtureRoot()],
+          },
+        },
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "DESIGN_DSL_UNSUPPORTED",
+        message: expect.stringContaining("rootNodeId"),
+      }),
+    );
+  });
+
+  it("assigns contextual IDs to repeated guidless component override nodes", () => {
+    const root = fixtureRoot();
+    const override = {
+      componentId: "Component/Row",
+      pathString: "Component/Row",
+      type: "SYMBOL",
+      name: "Row item",
+      left: 0,
+      top: 0,
+      width: 100,
+      height: 20,
+    };
+    root.props = [structuredClone(override), structuredClone(override)];
+
+    const result = normalizePixsoDesign({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:314"]?.children).toContain("Component/Row");
+    expect(result.nodes["4:314"]?.children).toContain("Component/Row@4:314/4");
+  });
+
+  it("ignores non-visual Pixso property overrides without geometry", () => {
+    const root = fixtureRoot();
+    root.props = [
+      {
+        componentId: "Component/Text",
+        pathString: "Instance/Component/Text",
+        type: "TEXT",
+        nodeText: "Property override only",
+      },
+    ];
+
+    const result = normalizePixsoDesign({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:314"]?.children).toHaveLength(3);
+    expect(
+      result.nodes["Component/Text/Instance/Component/Text"],
+    ).toBeUndefined();
   });
 
   it("rejects non-finite geometry", () => {

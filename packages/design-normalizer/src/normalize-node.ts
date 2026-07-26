@@ -13,17 +13,28 @@ import {
 export interface NormalizeNodeContext {
   artifactId: string;
   diagnostics: Diagnostic[];
+  nodeId?: string;
 }
 
 type TextContent = NonNullable<DesignNode["text"]>;
 type ComponentReference = NonNullable<DesignNode["component"]>;
 
 export function pixsoNodeId(node: PixsoRecord): string {
-  for (const field of ["guid", "componentId", "pathString"] as const) {
-    const value = node[field];
-    if (typeof value === "string" && value.length > 0) {
-      return value;
+  if (typeof node.guid === "string" && node.guid.length > 0) {
+    return node.guid;
+  }
+  if (typeof node.componentId === "string" && node.componentId.length > 0) {
+    if (
+      typeof node.pathString === "string" &&
+      node.pathString.length > 0 &&
+      node.pathString !== node.componentId
+    ) {
+      return `${node.componentId}/${node.pathString}`;
     }
+    return node.componentId;
+  }
+  if (typeof node.pathString === "string" && node.pathString.length > 0) {
+    return node.pathString;
   }
   throw unsupported(
     "Pixso node does not contain guid, componentId, or pathString",
@@ -35,10 +46,10 @@ export function normalizePixsoNode(
   childIds: string[],
   context: NormalizeNodeContext,
 ): DesignNode {
-  const id = pixsoNodeId(node);
+  const id = context.nodeId ?? pixsoNodeId(node);
   const radius = finiteNumber(node.cornerRadius, "cornerRadius", 0);
   const appearance: Appearance = {
-    fills: normalizeFills(node.fills, {
+    fills: normalizeFills(node.fills ?? node.fillPaints, {
       artifactId: context.artifactId,
       nodeId: id,
       diagnostics: context.diagnostics,

@@ -1,0 +1,2184 @@
+{
+  "diagnostics": [],
+  "dslVersion": "2.1.15",
+  "nodes": {
+    "3:118/4:456": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 5,
+        "width": 560,
+        "x": 0,
+        "y": 20
+      },
+      "id": "3:118/4:456",
+      "name": "",
+      "source": {
+        "nodeId": "3:118/4:456",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:119/4:456/3:119": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 1,
+        "width": 560,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:119/4:456/3:119",
+      "name": "",
+      "source": {
+        "nodeId": "3:119/4:456/3:119",
+        "provider": "pixso"
+      },
+      "type": "rectangle",
+      "visible": true
+    },
+    "3:259/4:460/4:556": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 16,
+        "y": 8
+      },
+      "id": "3:259/4:460/4:556",
+      "name": "",
+      "source": {
+        "nodeId": "3:259/4:460/4:556",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:259/4:461/4:598": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 16,
+        "y": 8
+      },
+      "id": "3:259/4:461/4:598",
+      "name": "",
+      "source": {
+        "nodeId": "3:259/4:461/4:598",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:286/4:461/4:600": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 8,
+        "x": 105,
+        "y": 12
+      },
+      "id": "3:286/4:461/4:600",
+      "name": "",
+      "source": {
+        "nodeId": "3:286/4:461/4:600",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:287/4:461/4:600/3:287": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:287/4:461/4:600/3:287",
+      "name": "",
+      "source": {
+        "nodeId": "3:287/4:461/4:600/3:287",
+        "provider": "pixso"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "3:290/4:460/4:558": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 8,
+        "x": 105,
+        "y": 12
+      },
+      "id": "3:290/4:460/4:558",
+      "name": "",
+      "source": {
+        "nodeId": "3:290/4:460/4:558",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:291/4:460/4:558/3:291": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 8,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:291/4:460/4:558/3:291",
+      "name": "",
+      "source": {
+        "nodeId": "3:291/4:460/4:558/3:291",
+        "provider": "pixso"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "3:294/4:460/4:556/3:260": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:294/4:460/4:556/3:260",
+      "name": "",
+      "source": {
+        "nodeId": "3:294/4:460/4:556/3:260",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:294/4:461/4:598/3:260": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:294/4:461/4:598/3:260",
+      "name": "",
+      "source": {
+        "nodeId": "3:294/4:461/4:598/3:260",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:295/4:461/4:598/3:260/3:295": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 20.000006,
+        "width": 20.000004,
+        "x": 1.999996,
+        "y": 2
+      },
+      "id": "3:295/4:461/4:598/3:260/3:295",
+      "name": "",
+      "source": {
+        "nodeId": "3:295/4:461/4:598/3:260/3:295",
+        "provider": "pixso"
+      },
+      "type": "vector",
+      "visible": true
+    },
+    "3:313/4:377/4:417/3:62": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:313/4:377/4:417/3:62",
+      "name": "",
+      "source": {
+        "nodeId": "3:313/4:377/4:417/3:62",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:320/3:47/3:65/3:87": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:320/3:47/3:65/3:87",
+      "name": "",
+      "source": {
+        "nodeId": "3:320/3:47/3:65/3:87",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:320/3:48/3:65/3:87": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:320/3:48/3:65/3:87",
+      "name": "",
+      "source": {
+        "nodeId": "3:320/3:48/3:65/3:87",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:320/4:382/3:65/3:87": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:320/4:382/3:65/3:87",
+      "name": "",
+      "source": {
+        "nodeId": "3:320/4:382/3:65/3:87",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:43": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 64,
+        "width": 560,
+        "x": 20,
+        "y": 20
+      },
+      "id": "3:43",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 20,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        }
+      },
+      "name": "",
+      "source": {
+        "nodeId": "3:43",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:432/4:377/4:417/3:62/3:314": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:432/4:377/4:417/3:62/3:314",
+      "name": "",
+      "source": {
+        "nodeId": "3:432/4:377/4:417/3:62/3:314",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:44": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 560,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:44",
+      "name": "",
+      "source": {
+        "nodeId": "3:44",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "3:45": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 524,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:45",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 0,
+        "mode": "none",
+        "padding": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        }
+      },
+      "name": "",
+      "source": {
+        "nodeId": "3:45",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Переформирование поручения"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "3:46": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 536,
+        "y": 0
+      },
+      "id": "3:46",
+      "name": "",
+      "source": {
+        "nodeId": "3:46",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "3:49": {
+      "appearance": {
+        "borders": [],
+        "fills": [
+          {
+            "color": "#1F1433",
+            "opacity": 0.48999999999999994,
+            "type": "solid"
+          }
+        ],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 560,
+        "x": 0,
+        "y": 28
+      },
+      "id": "3:49",
+      "name": "",
+      "source": {
+        "nodeId": "3:49",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Текущая задача будет завершена, а поручение - переформировано"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "3:60/4:377/4:417": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:60/4:377/4:417",
+      "name": "",
+      "source": {
+        "nodeId": "3:60/4:377/4:417",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:61/4:377/4:417/3:61": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 48,
+        "width": 48,
+        "x": -16,
+        "y": -16
+      },
+      "id": "3:61/4:377/4:417/3:61",
+      "name": "",
+      "source": {
+        "nodeId": "3:61/4:377/4:417/3:61",
+        "provider": "pixso"
+      },
+      "type": "rectangle",
+      "visible": true
+    },
+    "3:63/3:47": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:63/3:47",
+      "name": "",
+      "source": {
+        "nodeId": "3:63/3:47",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:63/3:48": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:63/3:48",
+      "name": "",
+      "source": {
+        "nodeId": "3:63/3:48",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:63/4:382": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 530,
+        "y": 6
+      },
+      "id": "3:63/4:382",
+      "name": "",
+      "source": {
+        "nodeId": "3:63/4:382",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:64/3:47/3:64": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 48,
+        "width": 48,
+        "x": -12,
+        "y": -12
+      },
+      "id": "3:64/3:47/3:64",
+      "name": "",
+      "source": {
+        "nodeId": "3:64/3:47/3:64",
+        "provider": "pixso"
+      },
+      "type": "rectangle",
+      "visible": true
+    },
+    "3:64/3:48/3:64": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 48,
+        "width": 48,
+        "x": -12,
+        "y": -12
+      },
+      "id": "3:64/3:48/3:64",
+      "name": "",
+      "source": {
+        "nodeId": "3:64/3:48/3:64",
+        "provider": "pixso"
+      },
+      "type": "rectangle",
+      "visible": true
+    },
+    "3:64/4:382/3:64": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 48,
+        "width": 48,
+        "x": -12,
+        "y": -12
+      },
+      "id": "3:64/4:382/3:64",
+      "name": "",
+      "source": {
+        "nodeId": "3:64/4:382/3:64",
+        "provider": "pixso"
+      },
+      "type": "rectangle",
+      "visible": true
+    },
+    "3:86/3:47/3:65": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:86/3:47/3:65",
+      "name": "",
+      "source": {
+        "nodeId": "3:86/3:47/3:65",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:86/3:48/3:65": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:86/3:48/3:65",
+      "name": "",
+      "source": {
+        "nodeId": "3:86/3:48/3:65",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:86/4:382/3:65": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": "3:86/4:382/3:65",
+      "name": "",
+      "source": {
+        "nodeId": "3:86/4:382/3:65",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "3:89/3:47/3:65/3:87/3:89": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 20.000006,
+        "width": 20.000004,
+        "x": 1.999996,
+        "y": 2
+      },
+      "id": "3:89/3:47/3:65/3:87/3:89",
+      "name": "",
+      "source": {
+        "nodeId": "3:89/3:47/3:65/3:87/3:89",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "3:91/3:48/3:65/3:87/3:91": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 12.00989,
+        "width": 12.011597,
+        "x": 5.994202,
+        "y": 5.995908
+      },
+      "id": "3:91/3:48/3:65/3:87/3:91",
+      "name": "",
+      "source": {
+        "nodeId": "3:91/3:48/3:65/3:87/3:91",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "3:91/4:460/4:556/3:260/3:91": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 12.00989,
+        "width": 12.011597,
+        "x": 5.994202,
+        "y": 5.995908
+      },
+      "id": "3:91/4:460/4:556/3:260/3:91",
+      "name": "",
+      "source": {
+        "nodeId": "3:91/4:460/4:556/3:260/3:91",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:314": {
+      "appearance": {
+        "borders": [
+          {
+            "color": "#1F1433",
+            "opacity": 0.12,
+            "position": "inside",
+            "style": "solid",
+            "width": {
+              "bottom": 1,
+              "left": 1,
+              "right": 1,
+              "top": 1
+            }
+          }
+        ],
+        "fills": [
+          {
+            "color": "#FFFFFF",
+            "opacity": 1,
+            "type": "solid"
+          }
+        ],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 16,
+          "bottomRight": 16,
+          "topLeft": 16,
+          "topRight": 16
+        },
+        "shadows": [
+          {
+            "blur": 24,
+            "color": "#0B0B1E",
+            "opacity": 0.160784,
+            "spread": 0,
+            "type": "drop",
+            "x": 0,
+            "y": 12
+          },
+          {
+            "blur": 2,
+            "color": "#0B0B1E",
+            "opacity": 0.039216,
+            "spread": 0,
+            "type": "drop",
+            "x": 0,
+            "y": 1
+          }
+        ]
+      },
+      "children": [
+        "4:316",
+        "4:317",
+        "4:315"
+      ],
+      "geometry": {
+        "height": 267,
+        "width": 600,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:314",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 20,
+          "left": 20,
+          "right": 20,
+          "top": 20
+        }
+      },
+      "name": "Modal",
+      "source": {
+        "nodeId": "4:314",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:315": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [
+        "3:43",
+        "3:45",
+        "3:49",
+        "3:44",
+        "3:46",
+        "3:63/3:47",
+        "3:63/3:48",
+        "3:64/3:47/3:64",
+        "3:64/3:48/3:64",
+        "3:86/3:47/3:65",
+        "3:86/3:48/3:65",
+        "3:320/3:47/3:65/3:87",
+        "3:320/3:48/3:65/3:87",
+        "3:89/3:47/3:65/3:87/3:89",
+        "3:91/3:48/3:65/3:87/3:91"
+      ],
+      "component": {
+        "key": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",
+        "variant": "StepsOFF"
+      },
+      "geometry": {
+        "height": 64,
+        "width": 600,
+        "x": 20,
+        "y": 20
+      },
+      "id": "4:315",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 20,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        }
+      },
+      "name": "Steps=OFF",
+      "source": {
+        "nodeId": "4:315",
+        "provider": "pixso"
+      },
+      "type": "instance",
+      "visible": true
+    },
+    "4:316": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [
+        "4:373",
+        "4:375",
+        "4:381",
+        "4:383",
+        "4:433/4:380/4:433",
+        "4:374",
+        "4:418/4:376",
+        "4:416/4:377",
+        "4:378",
+        "4:379",
+        "4:432/4:380",
+        "3:63/4:382",
+        "3:64/4:382/3:64",
+        "3:86/4:382/3:65",
+        "3:60/4:377/4:417",
+        "4:422/4:376/4:419",
+        "3:61/4:377/4:417/3:61",
+        "3:313/4:377/4:417/3:62",
+        "3:320/4:382/3:65/3:87",
+        "4:423/4:376/4:419/4:423",
+        "4:424/4:376/4:419/4:424",
+        "3:432/4:377/4:417/3:62/3:314",
+        "4:444/4:382/3:65/3:87/4:444",
+        "4:426/4:377/4:417/3:62/3:314/4:426",
+        "4:427/4:377/4:417/3:62/3:314/4:427",
+        "4:428/4:377/4:417/3:62/3:314/4:428",
+        "4:429/4:377/4:417/3:62/3:314/4:429",
+        "4:430/4:377/4:417/3:62/3:314/4:430"
+      ],
+      "component": {
+        "key": "a99d4a9824294745ee8916049622bed62f077fbb",
+        "variant": "StateFilled"
+      },
+      "geometry": {
+        "height": 60,
+        "width": 256,
+        "x": 20,
+        "y": 84
+      },
+      "id": "4:316",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        }
+      },
+      "name": "Autocomplete",
+      "source": {
+        "nodeId": "4:316",
+        "provider": "pixso"
+      },
+      "type": "instance",
+      "visible": true
+    },
+    "4:317": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [
+        "4:455",
+        "4:457",
+        "4:557/4:460/4:557",
+        "4:599/4:461/4:599",
+        "3:287/4:461/4:600/3:287",
+        "3:291/4:460/4:558/3:291",
+        "3:118/4:456",
+        "4:458",
+        "4:459",
+        "4:555/4:460",
+        "4:597/4:461",
+        "3:119/4:456/3:119",
+        "3:259/4:460/4:556",
+        "3:290/4:460/4:558",
+        "3:259/4:461/4:598",
+        "3:286/4:461/4:600",
+        "3:294/4:460/4:556/3:260",
+        "3:294/4:461/4:598/3:260",
+        "3:91/4:460/4:556/3:260/3:91",
+        "3:295/4:461/4:598/3:260/3:295"
+      ],
+      "component": {
+        "key": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
+        "variant": "VariantDefault"
+      },
+      "geometry": {
+        "height": 81,
+        "width": 600,
+        "x": 20,
+        "y": 166
+      },
+      "id": "4:317",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 20
+        }
+      },
+      "name": "Variant=Default",
+      "source": {
+        "nodeId": "4:317",
+        "provider": "pixso"
+      },
+      "type": "instance",
+      "visible": true
+    },
+    "4:373": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 82,
+        "width": 560,
+        "x": 20,
+        "y": 84
+      },
+      "id": "4:373",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 0
+        }
+      },
+      "name": "Autocomplete",
+      "source": {
+        "nodeId": "4:373",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:374": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 560,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:374",
+      "name": "",
+      "source": {
+        "nodeId": "4:374",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:375": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 560,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:375",
+      "name": "",
+      "source": {
+        "nodeId": "4:375",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Выберите к чему применить реквизиты"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:378": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 36,
+        "width": 560,
+        "x": 0,
+        "y": 24
+      },
+      "id": "4:378",
+      "name": "",
+      "source": {
+        "nodeId": "4:378",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:379": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 24,
+        "width": 522,
+        "x": 8,
+        "y": 6
+      },
+      "id": "4:379",
+      "name": "",
+      "source": {
+        "nodeId": "4:379",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:381": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 522,
+        "x": 0,
+        "y": 4
+      },
+      "id": "4:381",
+      "name": "",
+      "source": {
+        "nodeId": "4:381",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "К неторговой операции"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:383": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 14,
+        "width": 560,
+        "x": 0,
+        "y": 68
+      },
+      "id": "4:383",
+      "name": "",
+      "source": {
+        "nodeId": "4:383",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Данный вариант приведет к переформированию поручения"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:416/4:377": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 240,
+        "y": 0
+      },
+      "id": "4:416/4:377",
+      "name": "",
+      "source": {
+        "nodeId": "4:416/4:377",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:418/4:376": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 220,
+        "y": 0
+      },
+      "id": "4:418/4:376",
+      "name": "",
+      "source": {
+        "nodeId": "4:418/4:376",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:422/4:376/4:419": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:422/4:376/4:419",
+      "name": "",
+      "source": {
+        "nodeId": "4:422/4:376/4:419",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:423/4:376/4:419/4:423": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 12,
+        "width": 12,
+        "x": 2,
+        "y": 2
+      },
+      "id": "4:423/4:376/4:419/4:423",
+      "name": "",
+      "source": {
+        "nodeId": "4:423/4:376/4:419/4:423",
+        "provider": "pixso"
+      },
+      "type": "vector",
+      "visible": true
+    },
+    "4:424/4:376/4:419/4:424": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 14.001112,
+        "width": 14.000715,
+        "x": 0.999268,
+        "y": 0.999939
+      },
+      "id": "4:424/4:376/4:419/4:424",
+      "name": "",
+      "source": {
+        "nodeId": "4:424/4:376/4:419/4:424",
+        "provider": "pixso"
+      },
+      "type": "vector",
+      "visible": true
+    },
+    "4:426/4:377/4:417/3:62/3:314/4:426": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:426/4:377/4:417/3:62/3:314/4:426",
+      "name": "",
+      "source": {
+        "nodeId": "4:426/4:377/4:417/3:62/3:314/4:426",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:427/4:377/4:417/3:62/3:314/4:427": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:427/4:377/4:417/3:62/3:314/4:427",
+      "name": "",
+      "source": {
+        "nodeId": "4:427/4:377/4:417/3:62/3:314/4:427",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:428/4:377/4:417/3:62/3:314/4:428": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 4.4,
+        "width": 3.149593,
+        "x": 6.425325,
+        "y": 4.438428
+      },
+      "id": "4:428/4:377/4:417/3:62/3:314/4:428",
+      "name": "",
+      "source": {
+        "nodeId": "4:428/4:377/4:417/3:62/3:314/4:428",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:429/4:377/4:417/3:62/3:314/4:429": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 2,
+        "width": 2,
+        "x": 7,
+        "y": 10.557617
+      },
+      "id": "4:429/4:377/4:417/3:62/3:314/4:429",
+      "name": "",
+      "source": {
+        "nodeId": "4:429/4:377/4:417/3:62/3:314/4:429",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:430/4:377/4:417/3:62/3:314/4:430": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 16,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:430/4:377/4:417/3:62/3:314/4:430",
+      "name": "",
+      "source": {
+        "nodeId": "4:430/4:377/4:417/3:62/3:314/4:430",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:432/4:380": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 28,
+        "x": 0,
+        "y": 4
+      },
+      "id": "4:432/4:380",
+      "name": "",
+      "source": {
+        "nodeId": "4:432/4:380",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:433/4:380/4:433": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 28,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:433/4:380/4:433",
+      "name": "",
+      "source": {
+        "nodeId": "4:433/4:380/4:433",
+        "provider": "pixso"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:444/4:382/3:65/3:87/4:444": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 6.246591,
+        "width": 10.541597,
+        "x": 6.729239,
+        "y": 8.876705
+      },
+      "id": "4:444/4:382/3:65/3:87/4:444",
+      "name": "",
+      "source": {
+        "nodeId": "4:444/4:382/3:65/3:87/4:444",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:455": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 81,
+        "width": 560,
+        "x": 20,
+        "y": 166
+      },
+      "id": "4:455",
+      "layout": {
+        "alignItems": "unspecified",
+        "gap": 10,
+        "mode": "vertical",
+        "padding": {
+          "bottom": 0,
+          "left": 0,
+          "right": 0,
+          "top": 20
+        }
+      },
+      "name": "",
+      "source": {
+        "nodeId": "4:455",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:457": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 600,
+        "x": 0,
+        "y": 41
+      },
+      "id": "4:457",
+      "name": "",
+      "source": {
+        "nodeId": "4:457",
+        "provider": "pixso"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:458": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 40,
+        "width": 560,
+        "x": 0,
+        "y": 41
+      },
+      "id": "4:458",
+      "name": "",
+      "source": {
+        "nodeId": "4:458",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:459": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 40,
+        "width": 560,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:459",
+      "name": "",
+      "source": {
+        "nodeId": "4:459",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:555/4:460": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 40,
+        "width": 114,
+        "x": 207,
+        "y": 0
+      },
+      "id": "4:555/4:460",
+      "name": "",
+      "source": {
+        "nodeId": "4:555/4:460",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:557/4:460/4:557": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 50,
+        "x": 48,
+        "y": 12
+      },
+      "id": "4:557/4:460/4:557",
+      "name": "",
+      "source": {
+        "nodeId": "4:557/4:460/4:557",
+        "provider": "pixso"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:597/4:461": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 40,
+        "width": 231,
+        "x": 329,
+        "y": 0
+      },
+      "id": "4:597/4:461",
+      "name": "",
+      "source": {
+        "nodeId": "4:597/4:461",
+        "provider": "pixso"
+      },
+      "type": "symbol",
+      "visible": true
+    },
+    "4:599/4:461/4:599": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 16,
+        "width": 167,
+        "x": 48,
+        "y": 12
+      },
+      "id": "4:599/4:461/4:599",
+      "name": "",
+      "source": {
+        "nodeId": "4:599/4:461/4:599",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Подтвердить и закончить"
+      },
+      "type": "text",
+      "visible": true
+    }
+  },
+  "rootNodeId": "4:314",
+  "schema": "design-ir/v1",
+  "sourceArtifactId": "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105"
+}

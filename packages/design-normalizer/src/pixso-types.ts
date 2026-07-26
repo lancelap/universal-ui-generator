@@ -49,8 +49,8 @@ export function readPixsoEnvelope(value: unknown): PixsoDslEnvelope {
     throw unsupported("Pixso DSL envelope has an unsupported shape");
   }
 
-  if (dsl.pixTreeDslNodes.length !== 1) {
-    throw unsupported("Slice 1 requires exactly one Pixso design root");
+  if (dsl.pixTreeDslNodes.length === 0) {
+    throw unsupported("Pixso DSL must contain at least one design root");
   }
 
   return {

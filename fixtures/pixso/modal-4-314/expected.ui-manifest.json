@@ -1,0 +1,111 @@
+{
+  "diagnostics": [],
+  "root": {
+    "children": [
+      {
+        "children": [],
+        "confidence": 1,
+        "evidence": [
+          {
+            "kind": "component-key",
+            "value": "a99d4a9824294745ee8916049622bed62f077fbb",
+            "weight": 1
+          },
+          {
+            "kind": "component-variant",
+            "value": "StateFilled",
+            "weight": 1
+          },
+          {
+            "kind": "source-node",
+            "value": "4:316"
+          }
+        ],
+        "id": "ui_combobox_4-316",
+        "kind": "control",
+        "role": "combobox",
+        "sourceNodeIds": [
+          "4:316"
+        ]
+      },
+      {
+        "children": [],
+        "confidence": 1,
+        "evidence": [
+          {
+            "kind": "component-key",
+            "value": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
+            "weight": 1
+          },
+          {
+            "kind": "component-variant",
+            "value": "VariantDefault",
+            "weight": 1
+          },
+          {
+            "kind": "source-node",
+            "value": "4:317"
+          }
+        ],
+        "id": "ui_actionGroup_4-317",
+        "kind": "group",
+        "role": "actionGroup",
+        "sourceNodeIds": [
+          "4:317"
+        ]
+      },
+      {
+        "children": [],
+        "confidence": 1,
+        "evidence": [
+          {
+            "kind": "component-key",
+            "value": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",
+            "weight": 1
+          },
+          {
+            "kind": "component-variant",
+            "value": "StepsOFF",
+            "weight": 1
+          },
+          {
+            "kind": "source-node",
+            "value": "4:315"
+          }
+        ],
+        "id": "ui_heading_4-315",
+        "kind": "content",
+        "role": "heading",
+        "sourceNodeIds": [
+          "4:315"
+        ]
+      }
+    ],
+    "confidence": 1,
+    "evidence": [
+      {
+        "kind": "node-type",
+        "value": "frame",
+        "weight": 0.25
+      },
+      {
+        "kind": "layer-name",
+        "value": "Modal",
+        "weight": 0.7
+      },
+      {
+        "kind": "drop-shadow",
+        "value": "present",
+        "weight": 0.1
+      }
+    ],
+    "id": "ui_dialog_4-314",
+    "kind": "overlay",
+    "role": "dialog",
+    "sourceNodeIds": [
+      "4:314"
+    ]
+  },
+  "schema": "ui-manifest/v1",
+  "sourceArtifactId": "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105"
+}

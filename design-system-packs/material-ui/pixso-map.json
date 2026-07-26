@@ -14,6 +14,24 @@
       "role": "secondaryAction"
     },
     { "componentKey": "MuiTextField", "kind": "control", "role": "textInput" },
-    { "componentKey": "MuiDialog", "kind": "overlay", "role": "dialog" }
+    { "componentKey": "MuiDialog", "kind": "overlay", "role": "dialog" },
+    {
+      "componentKey": "a99d4a9824294745ee8916049622bed62f077fbb",
+      "variant": "StateFilled",
+      "kind": "control",
+      "role": "combobox"
+    },
+    {
+      "componentKey": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
+      "variant": "VariantDefault",
+      "kind": "group",
+      "role": "actionGroup"
+    },
+    {
+      "componentKey": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",
+      "variant": "StepsOFF",
+      "kind": "content",
+      "role": "heading"
+    }
   ]
 }

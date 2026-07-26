@@ -26,8 +26,8 @@ export function buildUiManifest(input: {
     if (!node) {
       throw new Error(`Design node does not exist: ${nodeId}`);
     }
-    const recognized =
-      exact.recognize(node) ?? recognizeStructure(node, input.ir);
+    const exactRecognition = exact.recognize(node);
+    const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;
     const role = accepted ? recognized.role : "unresolved";
@@ -81,9 +81,11 @@ export function buildUiManifest(input: {
       ...(node.text?.value
         ? { content: { text: node.text.value, label: node.text.value } }
         : {}),
-      children: node.children.flatMap((childId) =>
-        input.ir.nodes[childId] ? [build(childId)] : [],
-      ),
+      children: exactRecognition
+        ? []
+        : node.children.flatMap((childId) =>
+            input.ir.nodes[childId] ? [build(childId)] : [],
+          ),
     };
   };
 

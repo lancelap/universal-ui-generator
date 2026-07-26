@@ -49,6 +49,7 @@ export async function planFromSnapshot(
     });
   const designIr = normalizePixsoDesign({
     artifactId: input.artifactId,
+    rootNodeId: snapshot.source.nodeId,
     rawDsl,
   });
   const designSummary = buildDesignSummary({ ir: designIr });

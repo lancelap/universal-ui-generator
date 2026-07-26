@@ -1,0 +1,538 @@
+{
+  "artifactId": "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105",
+  "notableNodes": [
+    {
+      "componentName": "a99d4a9824294745ee8916049622bed62f077fbb",
+      "id": "4:316",
+      "reason": "component-instance"
+    },
+    {
+      "id": "4:375",
+      "reason": "text",
+      "text": "Выберите к чему применить реквизиты"
+    },
+    {
+      "id": "4:381",
+      "reason": "text",
+      "text": "К неторговой операции"
+    },
+    {
+      "id": "4:383",
+      "reason": "text",
+      "text": "Данный вариант приведет к переформированию поручения"
+    },
+    {
+      "componentName": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
+      "id": "4:317",
+      "reason": "component-instance"
+    },
+    {
+      "id": "4:599/4:461/4:599",
+      "reason": "text",
+      "text": "Подтвердить и закончить"
+    },
+    {
+      "componentName": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",
+      "id": "4:315",
+      "reason": "component-instance"
+    },
+    {
+      "id": "3:45",
+      "reason": "text",
+      "text": "Переформирование поручения"
+    },
+    {
+      "id": "3:49",
+      "reason": "text",
+      "text": "Текущая задача будет завершена, а поручение - переформировано"
+    }
+  ],
+  "outline": [
+    {
+      "childCount": 3,
+      "depth": 0,
+      "id": "4:314",
+      "name": "Modal",
+      "type": "frame"
+    },
+    {
+      "childCount": 28,
+      "depth": 1,
+      "id": "4:316",
+      "name": "Autocomplete",
+      "type": "instance"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:373",
+      "name": "Autocomplete",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:375",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:381",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:383",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:433/4:380/4:433",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:374",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:418/4:376",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:416/4:377",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:378",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:379",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:432/4:380",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:63/4:382",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:64/4:382/3:64",
+      "name": "",
+      "type": "rectangle"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:86/4:382/3:65",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:60/4:377/4:417",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:422/4:376/4:419",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:61/4:377/4:417/3:61",
+      "name": "",
+      "type": "rectangle"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:313/4:377/4:417/3:62",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:320/4:382/3:65/3:87",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:423/4:376/4:419/4:423",
+      "name": "",
+      "type": "vector"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:424/4:376/4:419/4:424",
+      "name": "",
+      "type": "vector"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:432/4:377/4:417/3:62/3:314",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:444/4:382/3:65/3:87/4:444",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:426/4:377/4:417/3:62/3:314/4:426",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:427/4:377/4:417/3:62/3:314/4:427",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:428/4:377/4:417/3:62/3:314/4:428",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:429/4:377/4:417/3:62/3:314/4:429",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:430/4:377/4:417/3:62/3:314/4:430",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 20,
+      "depth": 1,
+      "id": "4:317",
+      "name": "Variant=Default",
+      "type": "instance"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:455",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:457",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:557/4:460/4:557",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:599/4:461/4:599",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:287/4:461/4:600/3:287",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:291/4:460/4:558/3:291",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:118/4:456",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:458",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:459",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:555/4:460",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "4:597/4:461",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:119/4:456/3:119",
+      "name": "",
+      "type": "rectangle"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:259/4:460/4:556",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:290/4:460/4:558",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:259/4:461/4:598",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:286/4:461/4:600",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:294/4:460/4:556/3:260",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:294/4:461/4:598/3:260",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:91/4:460/4:556/3:260/3:91",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:295/4:461/4:598/3:260/3:295",
+      "name": "",
+      "type": "vector"
+    },
+    {
+      "childCount": 15,
+      "depth": 1,
+      "id": "4:315",
+      "name": "Steps=OFF",
+      "type": "instance"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:43",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:45",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:49",
+      "name": "",
+      "type": "text"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:44",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:46",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:63/3:47",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:63/3:48",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:64/3:47/3:64",
+      "name": "",
+      "type": "rectangle"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:64/3:48/3:64",
+      "name": "",
+      "type": "rectangle"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:86/3:47/3:65",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:86/3:48/3:65",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:320/3:47/3:65/3:87",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:320/3:48/3:65/3:87",
+      "name": "",
+      "type": "symbol"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:89/3:47/3:65/3:87/3:89",
+      "name": "",
+      "type": "frame"
+    },
+    {
+      "childCount": 0,
+      "depth": 2,
+      "id": "3:91/3:48/3:65/3:87/3:91",
+      "name": "",
+      "type": "frame"
+    }
+  ],
+  "root": {
+    "id": "4:314",
+    "name": "Modal",
+    "size": {
+      "height": 267,
+      "width": 600
+    },
+    "type": "frame"
+  },
+  "schema": "design-summary/v1",
+  "statistics": {
+    "componentInstanceCount": 3,
+    "nodeCount": 67,
+    "textNodeCount": 6,
+    "visibleNodeCount": 67
+  },
+  "truncated": false
+}

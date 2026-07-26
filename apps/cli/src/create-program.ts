@@ -53,10 +53,16 @@ export function createProgram(dependencies: {
     .argument("<artifact-id>")
     .action(async (artifactId: string) => {
       const store = createArtifactStore(join(dependencies.cwd(), ".uig"));
-      const rawDsl = JSON.parse(
-        new TextDecoder().decode(await store.read(artifactId)),
-      );
-      const designIr = normalizePixsoDesign({ artifactId, rawDsl });
+      const [bytes, metadata] = await Promise.all([
+        store.read(artifactId),
+        store.describe(artifactId),
+      ]);
+      const rawDsl = JSON.parse(new TextDecoder().decode(bytes));
+      const designIr = normalizePixsoDesign({
+        artifactId,
+        rootNodeId: metadata.nodeId,
+        rawDsl,
+      });
       const destination = join(dependencies.cwd(), ".uig", "design-ir.json");
       await mkdir(join(dependencies.cwd(), ".uig"), { recursive: true });
       await atomicJson(destination, designIr);
@@ -112,11 +118,14 @@ export function createProgram(dependencies: {
     .action(
       async (options: { artifact: string; node: string; include: string }) => {
         const store = createArtifactStore(join(dependencies.cwd(), ".uig"));
-        const rawDsl = JSON.parse(
-          new TextDecoder().decode(await store.read(options.artifact)),
-        );
+        const [bytes, metadata] = await Promise.all([
+          store.read(options.artifact),
+          store.describe(options.artifact),
+        ]);
+        const rawDsl = JSON.parse(new TextDecoder().decode(bytes));
         const ir = normalizePixsoDesign({
           artifactId: options.artifact,
+          rootNodeId: metadata.nodeId,
           rawDsl,
         });
         const result = queryDesignContext(ir, {
