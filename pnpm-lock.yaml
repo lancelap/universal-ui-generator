@@ -89,6 +89,21 @@ importers:
         specifier: workspace:*
         version: link:../contracts
 
+  packages/generator-react:
+    dependencies:
+      "@uig/component-catalog":
+        specifier: workspace:*
+        version: link:../component-catalog
+      "@uig/contracts":
+        specifier: workspace:*
+        version: link:../contracts
+      "@uig/design-context":
+        specifier: workspace:*
+        version: link:../design-context
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/provider-pixso:
     dependencies:
       "@modelcontextprotocol/client":
