@@ -6,16 +6,19 @@ independent of Sber Space UI and Material UI.
 
 ## Required files
 
-`pack.json` declares six relative files:
+`pack.json` declares the core resolution files and, in v2 packs, React
+generation files:
 
-| File                     | Responsibility                                                                                                               |
-| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------- |
-| `catalog.json`           | Component IDs, packages, exports, export kinds, semantic roles, capabilities, adapters, companions, defaults, and provenance |
-| `semantic-policy.json`   | Allowed decisions, candidate IDs, native-fallback policy, and unresolved code per role                                       |
-| `pixso-map.json`         | Exact Pixso component key/variant to semantic kind/role mappings                                                             |
-| `composition-rules.json` | Root and slot bindings for multi-component patterns                                                                          |
-| `tokens.json`            | Pack-owned color, dimension, number, and string tokens                                                                       |
-| `verification.json`      | Explicit verified/unverified status and evidence source for every usable component                                           |
+| File                        | Responsibility                                                                                                               |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `catalog.json`              | Component IDs, packages, exports, export kinds, semantic roles, capabilities, adapters, companions, defaults, and provenance |
+| `semantic-policy.json`      | Allowed decisions, candidate IDs, native-fallback policy, and unresolved code per role                                       |
+| `pixso-map.json`            | Exact Pixso component key/variant to semantic kind/role mappings                                                             |
+| `composition-rules.json`    | Root and slot bindings for multi-component patterns                                                                          |
+| `tokens.json`               | Pack-owned color, dimension, number, and string tokens                                                                       |
+| `verification.json`         | Explicit verified/unverified status and evidence source for every usable component                                           |
+| `react-render-recipes.json` | Closed component props, content/state/event mappings, composition slots, and render-only values                              |
+| `react-style-policy.json`   | Component-specific layout/appearance transfer and wrapper policy                                                             |
 
 All paths must remain inside the pack directory. The loader rejects absolute
 paths, path traversal, invalid schemas, missing references, duplicate
@@ -74,3 +77,20 @@ pnpm verify
 Do not copy Sber component IDs, imports, props, tokens, or fallback policy into
 another pack merely to satisfy validation. The same neutral manifest must be
 resolved independently by each pack.
+
+## Render-only recipes
+
+Recipe v2 `staticProps` may contain only `literal`, `empty-array`, and `noop`.
+`noop` is accepted only for a declared event target. Every such prop is exposed
+by the v2 generation report. The Sber `base.Autocomplete` recipe, for example,
+owns the verified `mode`, `value`, `options`, and `onChange` render shape; the
+generic generator contains no Sber or combobox branch.
+
+`render-only-optional` permits an already proven structural group to stay empty
+and produces `GENERATION_RENDER_ONLY_CHILDREN_MISSING`. It never authorizes
+synthetic buttons or callbacks.
+
+The neutral Sber acceptance currently follows the verified Field composition
+and therefore renders empty `FormControl` and `FormLabel` slots when no
+separate semantic children exist. This is reviewed presentation evidence, not
+a claim of complete form integration.

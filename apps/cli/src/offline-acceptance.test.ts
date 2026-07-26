@@ -12,6 +12,14 @@ import { describe, expect, it } from "vitest";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const fixtureDir = join(repoRoot, "fixtures", "pixso", "modal-4-314");
+const generatedFixtureDir = join(
+  repoRoot,
+  "fixtures",
+  "react-generation",
+  "pixso-4-314",
+  "sber-space-ui",
+  "generated",
+);
 const artifactId = "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105";
 
 describe("offline real-Pixso acceptance", () => {
@@ -54,6 +62,25 @@ describe("offline real-Pixso acceptance", () => {
     ).toBeLessThanOrEqual(20_000);
     expect(stableStringify(muiPlan)).not.toContain("@sber-space-ui");
     expect(stableStringify(sberPlan)).not.toContain("@mui/material");
+
+    const generationReport = JSON.parse(
+      await readFile(
+        join(generatedFixtureDir, "generation-report.json"),
+        "utf8",
+      ),
+    );
+    expect(generationReport).toMatchObject({
+      schema: "react-generation-report/v2",
+      status: "generated",
+      validation: { targetTypecheck: "not-run" },
+      renderOnlyProps: [
+        {
+          manifestNodeId: "ui_combobox_4-316",
+          componentId: "base.Autocomplete",
+          propNames: ["mode", "onChange", "options", "value"],
+        },
+      ],
+    });
   });
 
   it.each([

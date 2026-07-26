@@ -77,3 +77,19 @@ pnpm verify
 ```
 
 Refreshing source bytes without reviewing derived goldens is not accepted.
+
+React candidates are generated with:
+
+```bash
+pnpm generate:react-acceptance-candidates
+```
+
+The script defaults to a fresh OS temporary directory and rejects destinations
+inside `fixtures/`. Its output is limited to component name, import packages,
+external and render-only prop names, diagnostic codes, CSS rule count, file
+hashes, and candidate directory. It never prints raw Pixso DSL or tokens.
+
+After manual review, accepted React fixture hashes are recorded in
+`fixtures/react-generation/README.md` and checked by
+`pnpm verify:fixtures`. The real `4:314` generated golden is derived from the
+unchanged lossless `fixtures/pixso/modal-4-314/source.json`.

@@ -38,7 +38,7 @@
         }
       ],
       "eventProps": [],
-      "semanticChildrenPolicy": "required",
+      "semanticChildrenPolicy": "optional",
       "wrapper": "allowed",
       "provenance": {
         "kind": "canonical-library-doc",

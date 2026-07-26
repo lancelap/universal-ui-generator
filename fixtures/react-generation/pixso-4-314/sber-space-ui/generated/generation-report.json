@@ -1,0 +1,131 @@
+{
+  "componentName": "GeneratedModal",
+  "designSystem": "sber-space-ui",
+  "diagnostics": [
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#D0D3D8"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "nodeId": "4:314"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
+      "evidence": {
+        "manifestNodeId": "ui_actionGroup_4-317",
+        "semanticRole": "actionGroup"
+      },
+      "message": "Render-only structural group has no semantic children",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "property": "background",
+        "semanticRole": "dialog"
+      },
+      "message": "Style background is not permitted for ui_dialog_4-314",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "property": "border",
+        "semanticRole": "dialog"
+      },
+      "message": "Style border is not permitted for ui_dialog_4-314",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "property": "borderRadius",
+        "semanticRole": "dialog"
+      },
+      "message": "Style borderRadius is not permitted for ui_dialog_4-314",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_dialog_4-314",
+        "property": "boxShadow",
+        "semanticRole": "dialog"
+      },
+      "message": "Style boxShadow is not permitted for ui_dialog_4-314",
+      "severity": "warning",
+      "stage": "react-generation"
+    }
+  ],
+  "files": [
+    {
+      "byteLength": 202,
+      "kind": "css-module",
+      "path": "GeneratedModal.module.css",
+      "sha256": "bc23a69219643487f01e612e94e8f69629de1b02ca97117d0da9e037d08ed4e2"
+    },
+    {
+      "byteLength": 859,
+      "kind": "tsx",
+      "path": "GeneratedModal.tsx",
+      "sha256": "4bfda90a859c940f38917797b6edbbc2823fd79ee800516e4a7ae119236e4c51"
+    }
+  ],
+  "renderOnlyProps": [
+    {
+      "componentId": "base.Autocomplete",
+      "manifestNodeId": "ui_combobox_4-316",
+      "propNames": [
+        "mode",
+        "onChange",
+        "options",
+        "value"
+      ]
+    }
+  ],
+  "schema": "react-generation-report/v2",
+  "sourceRunId": "run_acceptance_pixso_4_314",
+  "statistics": {
+    "cssRules": 3,
+    "fallbackComponents": 0,
+    "filesByKind": {
+      "cssModule": 1,
+      "fallbackCssModule": 0,
+      "fallbackTsx": 0,
+      "tsx": 1
+    },
+    "generatedProps": 0,
+    "imports": 7,
+    "manifestNodes": 4,
+    "sourceByteLength": 1061
+  },
+  "status": "generated",
+  "validation": {
+    "inputContracts": "passed",
+    "pack": "passed",
+    "syntax": "passed",
+    "targetTypecheck": "not-run"
+  }
+}

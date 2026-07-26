@@ -1,6 +1,6 @@
 # Artifact contracts
 
-Slice 1 has five public transformation boundaries. Each boundary is versioned,
+The pipeline has versioned public transformation boundaries. Each boundary is
 closed to unknown properties, validated before handoff, and serialized with
 stable key ordering. This keeps raw design facts separate from semantic intent
 and concrete library choices.
@@ -79,5 +79,36 @@ diagnostic codes, and full diagnostics.
 
 `generation-run/v1` is the operator-facing index over the five boundaries. It
 records each stage status and relative artifact filenames. It contains no
-generated TSX. A run may be `completed`, `completed-with-warnings`, or
+generated TSX itself. A run may be `completed`, `completed-with-warnings`, or
 `blocked`; blocked runs remain inspectable.
+
+## V2 planning contracts
+
+`design-ir/v2` adds explicit flow/absolute positioning evidence.
+`ui-manifest/v2` adds a required `layoutSourceNodeId` and optional typed
+interactions. `resolution-plan/v2` records immutable SHA-256 references to the
+exact DesignIR and manifest plus the loaded pack version and SHA-256. The v1
+contracts remain readable historical formats; new generation consumes v2.
+
+For exactly recognized content or action boundaries, semantic planning may
+project the first visible direct text child in source order into `content`.
+It does not recurse through an exact component boundary and does not invent
+content when no direct text evidence exists.
+
+## React recipe, report, and bundle versions
+
+`react-render-recipes/v1`, `react-generation-report/v1`, and historical v1
+bundles remain readable closed contracts. New packs and generation use v2.
+Recipe v2 adds required `staticProps` with only three closed value opcodes:
+
+- `literal` emits an escaped literal;
+- `empty-array` emits `{[]}`;
+- `noop` emits the generator-owned fixed `{() => undefined}`.
+
+Every static value has reason `render-only`; packs cannot inject expressions or
+function bodies. `semanticChildrenPolicy: "render-only-optional"` permits a
+proven structural group with no semantic children but never invents them.
+
+`react-generation-report/v2` discloses sorted render-only prop names and keeps
+`targetTypecheck: "not-run"`. `react-generation-bundle/v2` contains the report
+and exact TSX/CSS bytes. Slice 2 emits v2 only.

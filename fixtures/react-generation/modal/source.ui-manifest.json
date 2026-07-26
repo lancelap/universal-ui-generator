@@ -1,0 +1,103 @@
+{
+  "diagnostics": [],
+  "root": {
+    "children": [
+      {
+        "children": [],
+        "confidence": 1,
+        "content": { "label": "Создать заявку", "text": "Создать заявку" },
+        "evidence": [{ "kind": "acceptance", "value": "heading" }],
+        "id": "ui_heading",
+        "kind": "content",
+        "layoutSourceNodeId": "neutral:heading",
+        "role": "heading",
+        "sourceNodeIds": ["neutral:heading"]
+      },
+      {
+        "children": [
+          {
+            "children": [],
+            "confidence": 1,
+            "content": {
+              "label": "Заполните данные заявки",
+              "text": "Заполните данные заявки"
+            },
+            "evidence": [{ "kind": "acceptance", "value": "body copy" }],
+            "id": "ui_body_copy",
+            "kind": "content",
+            "layoutSourceNodeId": "neutral:body-copy",
+            "role": "heading",
+            "sourceNodeIds": ["neutral:body-copy"]
+          }
+        ],
+        "confidence": 1,
+        "evidence": [{ "kind": "acceptance", "value": "content" }],
+        "id": "ui_content",
+        "kind": "group",
+        "layoutSourceNodeId": "neutral:body",
+        "role": "verticalGroup",
+        "sourceNodeIds": ["neutral:body"]
+      },
+      {
+        "children": [],
+        "confidence": 1,
+        "content": { "label": "Название заявки", "value": "" },
+        "evidence": [{ "kind": "acceptance", "value": "text input" }],
+        "id": "ui_text_input",
+        "kind": "control",
+        "layoutSourceNodeId": "neutral:field",
+        "role": "textInput",
+        "sourceNodeIds": ["neutral:field"],
+        "state": { "placeholder": "Введите название" }
+      },
+      {
+        "children": [
+          {
+            "children": [],
+            "confidence": 1,
+            "content": { "label": "Отмена", "text": "Отмена" },
+            "evidence": [{ "kind": "acceptance", "value": "cancel" }],
+            "id": "ui_cancel",
+            "interactions": [
+              { "event": "activate", "key": "cancel", "valueType": "void" }
+            ],
+            "kind": "action",
+            "layoutSourceNodeId": "neutral:cancel",
+            "role": "secondaryAction",
+            "sourceNodeIds": ["neutral:cancel"]
+          },
+          {
+            "children": [],
+            "confidence": 1,
+            "content": { "label": "Создать", "text": "Создать" },
+            "evidence": [{ "kind": "acceptance", "value": "submit" }],
+            "id": "ui_submit",
+            "interactions": [
+              { "event": "activate", "key": "submit", "valueType": "void" }
+            ],
+            "kind": "action",
+            "layoutSourceNodeId": "neutral:submit",
+            "role": "primaryAction",
+            "sourceNodeIds": ["neutral:submit"]
+          }
+        ],
+        "confidence": 1,
+        "evidence": [{ "kind": "acceptance", "value": "actions" }],
+        "id": "ui_actions",
+        "kind": "group",
+        "layoutSourceNodeId": "neutral:actions",
+        "role": "actionGroup",
+        "sourceNodeIds": ["neutral:actions"]
+      }
+    ],
+    "confidence": 1,
+    "evidence": [{ "kind": "acceptance", "value": "dialog" }],
+    "id": "ui_dialog",
+    "kind": "overlay",
+    "layoutSourceNodeId": "neutral:dialog",
+    "role": "dialog",
+    "sourceNodeIds": ["neutral:dialog"]
+  },
+  "schema": "ui-manifest/v2",
+  "sourceArtifactId": "acceptance_neutral_modal"
+}

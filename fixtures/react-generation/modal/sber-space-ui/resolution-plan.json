@@ -1,0 +1,257 @@
+{
+  "diagnostics": [],
+  "nodes": [
+    {
+      "bindings": [
+        {
+          "componentId": "base.Modal",
+          "export": "Modal",
+          "exportKind": "named",
+          "package": "@sber-space-ui/modal"
+        },
+        {
+          "componentId": "base.ModalHeader",
+          "export": "ModalHeader",
+          "exportKind": "named",
+          "package": "@sber-space-ui/modal"
+        },
+        {
+          "componentId": "base.ModalBody",
+          "export": "ModalBody",
+          "exportKind": "named",
+          "package": "@sber-space-ui/modal"
+        },
+        {
+          "componentId": "base.ModalFooter",
+          "export": "ModalFooter",
+          "exportKind": "named",
+          "package": "@sber-space-ui/modal"
+        }
+      ],
+      "confidence": 1,
+      "decision": "compose",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "dialog"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "dialog"
+        }
+      ],
+      "manifestNodeId": "ui_dialog",
+      "props": {},
+      "semanticRole": "dialog"
+    },
+    {
+      "binding": {
+        "componentId": "base.Typography",
+        "export": "Typography",
+        "exportKind": "named",
+        "package": "@sber-space-ui/atom"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "heading"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "heading"
+        }
+      ],
+      "manifestNodeId": "ui_heading",
+      "props": {},
+      "semanticRole": "heading"
+    },
+    {
+      "binding": {
+        "componentId": "base.Stack",
+        "export": "Stack",
+        "exportKind": "named",
+        "package": "@sber-space-ui/atom"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "content"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "verticalGroup"
+        }
+      ],
+      "manifestNodeId": "ui_content",
+      "props": {},
+      "semanticRole": "verticalGroup"
+    },
+    {
+      "binding": {
+        "componentId": "base.Typography",
+        "export": "Typography",
+        "exportKind": "named",
+        "package": "@sber-space-ui/atom"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "body copy"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "heading"
+        }
+      ],
+      "manifestNodeId": "ui_body_copy",
+      "props": {},
+      "semanticRole": "heading"
+    },
+    {
+      "bindings": [
+        {
+          "componentId": "base.Field",
+          "export": "Field",
+          "exportKind": "named",
+          "package": "@sber-space-ui/field"
+        },
+        {
+          "componentId": "base.FormControl",
+          "export": "FormControl",
+          "exportKind": "named",
+          "package": "@sber-space-ui/form-control"
+        },
+        {
+          "componentId": "base.FormLabel",
+          "export": "FormLabel",
+          "exportKind": "named",
+          "package": "@sber-space-ui/form-control"
+        }
+      ],
+      "confidence": 1,
+      "decision": "compose",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "text input"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "textInput"
+        }
+      ],
+      "manifestNodeId": "ui_text_input",
+      "props": {},
+      "semanticRole": "textInput"
+    },
+    {
+      "binding": {
+        "componentId": "base.Stack",
+        "export": "Stack",
+        "exportKind": "named",
+        "package": "@sber-space-ui/atom"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "actions"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "actionGroup"
+        }
+      ],
+      "manifestNodeId": "ui_actions",
+      "props": {},
+      "semanticRole": "actionGroup"
+    },
+    {
+      "binding": {
+        "componentId": "base.Button",
+        "export": "Button",
+        "exportKind": "named",
+        "package": "@sber-space-ui/button"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "cancel"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "secondaryAction"
+        }
+      ],
+      "manifestNodeId": "ui_cancel",
+      "props": {},
+      "semanticRole": "secondaryAction"
+    },
+    {
+      "binding": {
+        "componentId": "base.Button",
+        "export": "Button",
+        "exportKind": "named",
+        "package": "@sber-space-ui/button"
+      },
+      "confidence": 1,
+      "decision": "reuse",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "acceptance",
+          "value": "submit"
+        },
+        {
+          "kind": "semantic-role",
+          "value": "primaryAction"
+        }
+      ],
+      "manifestNodeId": "ui_submit",
+      "props": {},
+      "semanticRole": "primaryAction"
+    }
+  ],
+  "schema": "resolution-plan/v2",
+  "source": {
+    "designIr": {
+      "artifactId": "acceptance_neutral_modal",
+      "schema": "design-ir/v2",
+      "sha256": "73b9305340d7212effcf0e558792978dd68cd5db7b0201a08aabaf62cb053025"
+    },
+    "uiManifest": {
+      "artifactId": "acceptance_neutral_modal",
+      "schema": "ui-manifest/v2",
+      "sha256": "14a981d4271ed0ecf74b126d74421d5dc2e9f1cc2bad53c7adcab8ccfc6d0e9b"
+    }
+  },
+  "summary": {
+    "blocked": 0,
+    "compose": 2,
+    "fallback": 0,
+    "reuse": 6
+  },
+  "target": {
+    "designSystem": "sber-space-ui",
+    "designSystemVersion": "2.0.0",
+    "framework": "react",
+    "language": "typescript",
+    "packSha256": "17d47b405f794c857c009cba899a834a40f76846fd96da37933d0b3d587c9e64"
+  }
+}

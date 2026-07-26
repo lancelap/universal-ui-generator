@@ -1,0 +1,43 @@
+{
+  "componentName": "GeneratedModal",
+  "designSystem": "sber-space-ui",
+  "diagnostics": [],
+  "files": [
+    {
+      "byteLength": 233,
+      "kind": "css-module",
+      "path": "GeneratedModal.module.css",
+      "sha256": "f873fab384d81779f5cb5161ea07420442731b6745b520fdcb3b381e01b479aa"
+    },
+    {
+      "byteLength": 1432,
+      "kind": "tsx",
+      "path": "GeneratedModal.tsx",
+      "sha256": "3d879b95340cd707815c31126e084f2329d3fa922f68903f4926f547f3ef082c"
+    }
+  ],
+  "renderOnlyProps": [],
+  "schema": "react-generation-report/v2",
+  "sourceRunId": "run_acceptance_neutral_modal",
+  "statistics": {
+    "cssRules": 7,
+    "fallbackComponents": 0,
+    "filesByKind": {
+      "cssModule": 1,
+      "fallbackCssModule": 0,
+      "fallbackTsx": 0,
+      "tsx": 1
+    },
+    "generatedProps": 2,
+    "imports": 10,
+    "manifestNodes": 8,
+    "sourceByteLength": 1665
+  },
+  "status": "generated",
+  "validation": {
+    "inputContracts": "passed",
+    "pack": "passed",
+    "syntax": "passed",
+    "targetTypecheck": "not-run"
+  }
+}

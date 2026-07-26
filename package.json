@@ -10,7 +10,8 @@
   "scripts": {
     "uig": "node --import tsx apps/cli/src/main.ts",
     "test": "vitest run",
-    "test:acceptance": "vitest run apps/cli/src/offline-acceptance.test.ts",
+    "test:acceptance": "vitest run apps/cli/src/offline-acceptance.test.ts apps/cli/src/react-generation-acceptance.test.ts",
+    "generate:react-acceptance-candidates": "node --import tsx scripts/generate-react-acceptance-candidates.ts",
     "typecheck": "tsc --project tsconfig.base.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

@@ -81,6 +81,58 @@ describe("buildUiManifestV2", () => {
     expect(manifest.root.interactions).toBeUndefined();
   });
 
+  it("projects the first visible direct text child from an exact content boundary", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ModalHeader" };
+    design.nodes["4:314"]!.children = ["4:319", "4:320", "4:321"];
+    design.nodes["4:319"] = textNode("4:319", "Hidden", false);
+    design.nodes["4:320"] = textNode("4:320", "Modal title", true);
+    design.nodes["4:321"] = textNode("4:321", "Supporting copy", true);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ModalHeader",
+          kind: "content",
+          role: "heading",
+        },
+      ],
+    });
+
+    expect(manifest.root).toMatchObject({
+      role: "heading",
+      content: { text: "Modal title", label: "Modal title" },
+      children: [],
+    });
+  });
+
+  it("does not invent content for an exact content boundary without direct text", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ModalHeader" };
+    design.nodes["4:314"]!.children = ["4:319"];
+    design.nodes["4:319"] = {
+      ...structuredClone(design.nodes["4:316"]!),
+      id: "4:319",
+      name: "Nested container",
+      children: [],
+      source: { provider: "pixso", nodeId: "4:319" },
+    };
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ModalHeader",
+          kind: "content",
+          role: "heading",
+        },
+      ],
+    });
+
+    expect(manifest.root.content).toBeUndefined();
+  });
+
   it("blocks different semantic roles that normalize to one interaction key", () => {
     const design = structuredClone(designFixture);
     design.nodes["4:318"] = {
@@ -124,4 +176,28 @@ function allNodes(root: UiNodeV2): UiNodeV2[] {
 
 function findRole(root: UiNodeV2, role: string): UiNodeV2 | undefined {
   return allNodes(root).find((node) => node.role === role);
+}
+
+function textNode(
+  id: string,
+  value: string,
+  visible: boolean,
+): DesignIRV2["nodes"][string] {
+  return {
+    id,
+    type: "text",
+    name: "",
+    visible,
+    children: [],
+    geometry: { x: 0, y: 0, width: 100, height: 24 },
+    appearance: {
+      fills: [],
+      borders: [],
+      radii: { topLeft: 0, topRight: 0, bottomRight: 0, bottomLeft: 0 },
+      shadows: [],
+      opacity: 1,
+    },
+    text: { value },
+    source: { provider: "pixso", nodeId: id },
+  };
 }

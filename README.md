@@ -2,15 +2,15 @@
 
 Universal UI Generator turns a selected Pixso node into a deterministic,
 design-system-neutral `UiManifest`, then resolves that same manifest against a
-validated design-system pack. Slice 1 stops at a reviewable `ResolutionPlan`:
-it does not generate production TSX and does not use an LLM, Qwen workflow, or
-an MCP server of its own.
+validated design-system pack. Slice 2 can compile a completed v2 run into an
+isolated, deterministic React/TypeScript source bundle. It does not use an LLM
+to select components and does not implement application behavior.
 
 The implemented path is:
 
 ```text
 Pixso URL → cached raw DSL → DesignIR → DesignSummary → UiManifest
-          → Sber Space UI or Material UI ResolutionPlan
+          → Sber Space UI or Material UI ResolutionPlan → React bundle
 ```
 
 ## Requirements and setup
@@ -73,6 +73,19 @@ The command prints a path such as `.uig/runs/<run-id>`. A blocked resolution is
 still written in full and exits with code `2`; provider, input, or pack failures
 exit with code `1`.
 
+Generate from the newly planned run without contacting Pixso:
+
+```bash
+pnpm uig -- generate --run "<run-id>"
+```
+
+The structured result reports `generated` or `blocked` and names
+`.uig/runs/<run-id>/generated`. A generated directory contains the root TSX,
+its CSS Module, any separately generated fallback TSX/CSS pairs, and
+`generation-report.json`. Repeating generation with the same inputs is
+byte-identical. A run whose recorded pack SHA-256 no longer matches the loaded
+pack is stale and fails closed; re-run `plan` instead of bypassing the proof.
+
 The live fetch can also be separated from offline planning:
 
 ```bash
@@ -116,8 +129,9 @@ run.json
 ```
 
 Use `pnpm test:acceptance` for a fully offline replay of the three recorded
-Pixso nodes and the reviewed Sber/MUI goldens. Fixture provenance and hashes are
-documented in `fixtures/pixso/README.md`.
+Pixso nodes, the neutral Sber/MUI generation goldens, and the reviewed real
+`4:314` Sber generation. Fixture provenance and hashes are documented in
+`fixtures/pixso/README.md` and `fixtures/react-generation/README.md`.
 
 ## Slice 1 acceptance evidence
 
@@ -143,6 +157,7 @@ Further details:
 - [Diagnostics](docs/diagnostics.md)
 - [Fixture policy](docs/fixture-policy.md)
 
-Slice 2 is the separate React/TypeScript generation slice. Slice 3 will migrate
-the broader layout and library rules; neither responsibility is hidden inside
-Slice 1.
+Generated code is presentation-only. `targetTypecheck` remains `"not-run"`;
+the generator does not install dependencies, mutate a target project, create
+state, load option data, call APIs, integrate a form library, or supply business
+callbacks. Those are later integration concerns.

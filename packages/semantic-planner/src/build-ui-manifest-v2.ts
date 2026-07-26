@@ -33,6 +33,12 @@ export function buildUiManifestV2(input: {
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;
     const role = accepted ? recognized.role : "unresolved";
+    const exactText =
+      exactRecognition &&
+      (exactRecognition.kind === "content" ||
+        exactRecognition.kind === "action")
+        ? firstVisibleDirectText(node.children, input.ir)
+        : undefined;
     const baseId = `ui_${role}_${sanitize(node.id)}`;
     const collision = (ids.get(baseId) ?? 0) + 1;
     ids.set(baseId, collision);
@@ -81,8 +87,13 @@ export function buildUiManifestV2(input: {
         ? recognized.confidence
         : (recognized?.confidence ?? 0),
       evidence: recognized?.evidence ?? [],
-      ...(node.text?.value
-        ? { content: { text: node.text.value, label: node.text.value } }
+      ...(node.text?.value || exactText
+        ? {
+            content: {
+              text: node.text?.value ?? exactText!,
+              label: node.text?.value ?? exactText!,
+            },
+          }
         : {}),
       children: exactRecognition
         ? []
@@ -106,4 +117,17 @@ export function buildUiManifestV2(input: {
 
 function sanitize(value: string): string {
   return value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function firstVisibleDirectText(
+  childIds: string[],
+  ir: DesignIRV2,
+): string | undefined {
+  for (const childId of childIds) {
+    const child = ir.nodes[childId];
+    if (child?.visible && child.text?.value) {
+      return child.text.value;
+    }
+  }
+  return undefined;
 }

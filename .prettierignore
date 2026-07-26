@@ -3,4 +3,5 @@ dist/
 coverage/
 .uig/
 fixtures/pixso/**/*.json
+fixtures/react-generation/**
 docs/superpowers/

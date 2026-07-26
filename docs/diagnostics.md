@@ -75,3 +75,19 @@ Pack-validation errors stop before semantic resolution.
 
 `diagnosticCodes` on each resolution node mirrors the blocking decision code;
 the top-level `diagnostics` array contains the reader-facing detail.
+
+## React generation
+
+| Code                                      | Blocking | Meaning                                                                               |
+| ----------------------------------------- | -------- | ------------------------------------------------------------------------------------- |
+| `GENERATION_RENDER_ONLY_CHILDREN_MISSING` | no       | A proven `render-only-optional` group has no semantic children; none were synthesized |
+| `GENERATION_INPUT_INVALID`                | yes      | V2 artifacts, their hashes, run identity, or pack proof do not match                  |
+| `GENERATION_INPUT_INCOMPLETE`             | yes      | Required semantic content/children or a complete resolution is absent                 |
+| `GENERATION_RECIPE_MISSING`               | yes      | A resolved binding has no validated render recipe                                     |
+| `GENERATION_STYLE_OVERRIDE_FORBIDDEN`     | no       | A design style was reviewed but pack policy did not authorize emitting it             |
+| `GENERATION_SOURCE_INVALID`               | yes      | Emitted TSX/CSS or report/bundle integrity validation failed                          |
+| `GENERATION_OUTPUT_CONFLICT`              | yes      | The immutable generated destination already exists with different bytes               |
+
+Render-only props and the missing-children warning do not mean interaction is
+implemented. The generated report intentionally keeps target-project
+typechecking at `"not-run"`.

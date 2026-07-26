@@ -1,0 +1,186 @@
+{
+  "diagnostics": [],
+  "dslVersion": "acceptance/v1",
+  "nodes": {
+    "neutral:actions": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": ["neutral:cancel", "neutral:submit"],
+      "geometry": { "height": 40, "width": 280, "x": 0, "y": 160 },
+      "id": "neutral:actions",
+      "name": "Actions",
+      "source": { "nodeId": "neutral:actions", "provider": "pixso" },
+      "type": "frame",
+      "visible": true
+    },
+    "neutral:body": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": ["neutral:body-copy"],
+      "geometry": { "height": 24, "width": 400, "x": 0, "y": 56 },
+      "id": "neutral:body",
+      "name": "Content",
+      "source": { "nodeId": "neutral:body", "provider": "pixso" },
+      "type": "frame",
+      "visible": true
+    },
+    "neutral:body-copy": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": { "height": 24, "width": 400, "x": 0, "y": 56 },
+      "id": "neutral:body-copy",
+      "name": "Body copy",
+      "source": { "nodeId": "neutral:body-copy", "provider": "pixso" },
+      "text": { "value": "Заполните данные заявки" },
+      "type": "text",
+      "visible": true
+    },
+    "neutral:cancel": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": { "height": 40, "width": 120, "x": 0, "y": 160 },
+      "id": "neutral:cancel",
+      "name": "Cancel",
+      "source": { "nodeId": "neutral:cancel", "provider": "pixso" },
+      "text": { "value": "Отмена" },
+      "type": "instance",
+      "visible": true
+    },
+    "neutral:dialog": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [
+        "neutral:heading",
+        "neutral:body",
+        "neutral:field",
+        "neutral:actions"
+      ],
+      "geometry": { "height": 240, "width": 480, "x": 0, "y": 0 },
+      "id": "neutral:dialog",
+      "name": "Neutral modal",
+      "source": { "nodeId": "neutral:dialog", "provider": "pixso" },
+      "type": "frame",
+      "visible": true
+    },
+    "neutral:field": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": { "height": 40, "width": 400, "x": 0, "y": 96 },
+      "id": "neutral:field",
+      "name": "Name field",
+      "source": { "nodeId": "neutral:field", "provider": "pixso" },
+      "type": "instance",
+      "visible": true
+    },
+    "neutral:heading": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": { "height": 32, "width": 400, "x": 0, "y": 0 },
+      "id": "neutral:heading",
+      "name": "Heading",
+      "source": { "nodeId": "neutral:heading", "provider": "pixso" },
+      "text": { "value": "Создать заявку" },
+      "type": "text",
+      "visible": true
+    },
+    "neutral:submit": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": { "height": 40, "width": 140, "x": 140, "y": 160 },
+      "id": "neutral:submit",
+      "name": "Submit",
+      "source": { "nodeId": "neutral:submit", "provider": "pixso" },
+      "text": { "value": "Создать" },
+      "type": "instance",
+      "visible": true
+    }
+  },
+  "rootNodeId": "neutral:dialog",
+  "schema": "design-ir/v2",
+  "sourceArtifactId": "acceptance_neutral_modal"
+}
