@@ -287,7 +287,6 @@ describe("validateGeneratedTsx", () => {
       "    function DialogPreview() { return <Dialog />; }\n    return (",
     );
     const unexpectedReexport = `${valid}\nexport { DialogPreview as Extra };\n`;
-
     for (const source of [
       missingComponentExport,
       missingPropsExport,
@@ -302,6 +301,24 @@ describe("validateGeneratedTsx", () => {
       );
     }
   });
+
+  it.each([
+    ["class", "class DialogPreview {}"],
+    ["type alias", "type DialogPreviewProps = {};"],
+    ["enum", "enum DialogPreview {}"],
+    ["module", "namespace DialogPreviewProps {}"],
+  ])(
+    "rejects a non-exported %s declaration that collides with an expected binding",
+    (_kind, declaration) => {
+      const source = `${emitTsx(model(), "DialogPreview")}\n${declaration}\n`;
+
+      expect(() => validateGeneratedTsx(source, expectation)).toThrowError(
+        expect.objectContaining<Partial<ReactGenerationError>>({
+          code: "GENERATION_SOURCE_INVALID",
+        }),
+      );
+    },
+  );
 
   it("rejects a source that omits an expected JSX component despite retaining its imports", () => {
     const source = [

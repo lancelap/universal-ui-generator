@@ -266,6 +266,29 @@ describe("generateReactBundle", () => {
     expect(rootTsx).not.toContain('import { Stack } from "./fallbacks/Stack";');
   });
 
+  it("reserves fallback names that collide with generated root bindings", () => {
+    const colliding = withFallbackChildren(input, [
+      {
+        manifestNodeId: "ui_props_collision",
+        designNodeId: "4:406",
+        localComponentName: "GeneratedModalProps",
+      },
+    ]);
+
+    const result = generateReactBundle(colliding);
+    const rootTsx = source(result, "GeneratedModal.tsx");
+
+    expect(result.files.map((file) => file.path)).toContain(
+      "fallbacks/GeneratedModalProps_8f8cf89d.tsx",
+    );
+    expect(rootTsx).toContain(
+      'import { GeneratedModalProps_8f8cf89d } from "./fallbacks/GeneratedModalProps_8f8cf89d";',
+    );
+    expect(rootTsx).toContain("export interface GeneratedModalProps");
+    expect(rootTsx).toContain("<GeneratedModalProps_8f8cf89d />");
+    expect(() => assertReactGenerationBundleIntegrity(result)).not.toThrow();
+  });
+
   it("counts grouped named component imports by binding", () => {
     const grouped = withReuseWarningChild(input);
 

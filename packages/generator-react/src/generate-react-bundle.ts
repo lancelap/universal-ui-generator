@@ -414,6 +414,8 @@ function reserveFallbackComponentNames(
 ): ReactGenerationModel {
   const reserved = new Set<string>([
     rootComponentName,
+    `${rootComponentName}Props`,
+    ...(rootUsesStyles(model.root) ? ["styles"] : []),
     ...model.imports.flatMap((item) =>
       item.kind === "default"
         ? [item.local]

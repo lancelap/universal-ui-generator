@@ -185,16 +185,12 @@ function validateExportedDeclarations(
   file: ts.SourceFile,
   expected: GeneratedExportedDeclarationExpectation[],
 ): void {
-  const topLevelDeclarations = file.statements.flatMap(declarationRecords);
+  const topLevelDeclarations = file.statements.flatMap(
+    topLevelDeclarationRecords,
+  );
   const allDeclarations: DeclarationRecord[] = [];
   const collect = (node: ts.Node): void => {
-    if (
-      ts.isFunctionDeclaration(node) ||
-      ts.isInterfaceDeclaration(node) ||
-      ts.isVariableStatement(node)
-    ) {
-      allDeclarations.push(...declarationRecords(node));
-    }
+    allDeclarations.push(...bindingDeclarationRecords(node));
     ts.forEachChild(node, collect);
   };
   collect(file);
@@ -232,63 +228,100 @@ interface DeclarationRecord {
   defaultExport: boolean;
 }
 
-function declarationRecords(statement: ts.Statement): DeclarationRecord[] {
+function topLevelDeclarationRecords(
+  statement: ts.Statement,
+): DeclarationRecord[] {
   if (ts.isExportDeclaration(statement) || ts.isExportAssignment(statement)) {
     invalid("Generated TSX contains an unsupported export declaration");
   }
-  const exported = hasModifier(statement, ts.SyntaxKind.ExportKeyword);
-  const defaultExport = hasModifier(statement, ts.SyntaxKind.DefaultKeyword);
-  if (ts.isFunctionDeclaration(statement) && statement.name) {
-    return [
-      {
-        kind: "function",
-        name: statement.name.text,
-        exported,
-        defaultExport,
-      },
-    ];
-  }
-  if (ts.isInterfaceDeclaration(statement)) {
-    return [
-      {
-        kind: "interface",
-        name: statement.name.text,
-        exported,
-        defaultExport,
-      },
-    ];
-  }
   if (ts.isVariableStatement(statement)) {
     return statement.declarationList.declarations.flatMap((declaration) =>
-      ts.isIdentifier(declaration.name)
-        ? [
-            {
-              kind: "other" as const,
-              name: declaration.name.text,
-              exported,
-              defaultExport,
-            },
-          ]
-        : [],
+      declarationRecord(
+        declaration.name,
+        "other",
+        hasModifier(statement, ts.SyntaxKind.ExportKeyword),
+        hasModifier(statement, ts.SyntaxKind.DefaultKeyword),
+      ),
     );
   }
-  const named = statement as ts.Statement & {
-    name?: ts.Identifier;
-  };
-  if (named.name && ts.isIdentifier(named.name)) {
-    return [
-      {
-        kind: "other",
-        name: named.name.text,
-        exported,
-        defaultExport,
-      },
-    ];
-  }
-  if (exported) {
+  const records = bindingDeclarationRecords(statement);
+  if (
+    records.length === 0 &&
+    hasModifier(statement, ts.SyntaxKind.ExportKeyword)
+  ) {
     invalid("Generated TSX contains an unsupported export declaration");
   }
+  return records;
+}
+
+function bindingDeclarationRecords(node: ts.Node): DeclarationRecord[] {
+  if (ts.isImportDeclaration(node)) {
+    return importedBindingNames(node.importClause).map((name) => ({
+      kind: "other",
+      name,
+      exported: false,
+      defaultExport: false,
+    }));
+  }
+  if (ts.isImportEqualsDeclaration(node)) {
+    return declarationRecord(node.name, "other", false, false);
+  }
+  if (ts.isVariableDeclaration(node) || ts.isBindingElement(node)) {
+    return declarationRecord(node.name, "other", false, false);
+  }
+  const exported = hasModifier(node, ts.SyntaxKind.ExportKeyword);
+  const defaultExport = hasModifier(node, ts.SyntaxKind.DefaultKeyword);
+  if (
+    (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) &&
+    node.name
+  ) {
+    return declarationRecord(node.name, "function", exported, defaultExport);
+  }
+  if (ts.isInterfaceDeclaration(node)) {
+    return declarationRecord(node.name, "interface", exported, defaultExport);
+  }
+  if (
+    ts.isClassDeclaration(node) ||
+    ts.isClassExpression(node) ||
+    ts.isTypeAliasDeclaration(node) ||
+    ts.isEnumDeclaration(node) ||
+    ts.isModuleDeclaration(node)
+  ) {
+    return node.name && ts.isIdentifier(node.name)
+      ? declarationRecord(node.name, "other", exported, defaultExport)
+      : [];
+  }
   return [];
+}
+
+function declarationRecord(
+  name: ts.BindingName,
+  kind: DeclarationRecord["kind"],
+  exported: boolean,
+  defaultExport: boolean,
+): DeclarationRecord[] {
+  if (ts.isIdentifier(name)) {
+    return [{ kind, name: name.text, exported, defaultExport }];
+  }
+  return name.elements.flatMap((element) =>
+    ts.isOmittedExpression(element)
+      ? []
+      : declarationRecord(element.name, kind, exported, defaultExport),
+  );
+}
+
+function importedBindingNames(clause: ts.ImportClause | undefined): string[] {
+  if (!clause) {
+    return [];
+  }
+  return [
+    ...(clause.name ? [clause.name.text] : []),
+    ...(clause.namedBindings
+      ? ts.isNamespaceImport(clause.namedBindings)
+        ? [clause.namedBindings.name.text]
+        : clause.namedBindings.elements.map((specifier) => specifier.name.text)
+      : []),
+  ];
 }
 
 function hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {

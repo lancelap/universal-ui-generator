@@ -3,10 +3,11 @@ import {
   lstat,
   mkdir,
   readFile,
+  readlink,
   readdir,
-  rename,
   rmdir,
   rm,
+  symlink,
   writeFile,
 } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, sep } from "node:path";
@@ -25,34 +26,38 @@ export async function writeGeneratedBundleAtomically(input: {
   /** @internal Deterministic concurrency coordination for filesystem tests. */
   testHooks?: {
     afterReservationAcquired?: () => Promise<void>;
+    beforePublish?: () => Promise<void>;
   };
 }): Promise<"written" | "identical"> {
   assertReactGenerationBundleIntegrity(input.bundle);
   const parent = dirname(input.destination);
-  const temporary = join(
-    parent,
-    `${basename(input.destination)}.tmp-${randomUUID()}`,
-  );
+  const contentName = `${basename(input.destination)}.content-${randomUUID()}`;
+  const content = join(parent, contentName);
   const reservation = join(parent, `${basename(input.destination)}.lock`);
-  await mkdir(temporary);
+  await mkdir(content);
   let installed = false;
   let reservationHeld = false;
   try {
-    await writeBundleMap(temporary, input.bundle);
+    await writeBundleMap(content, input.bundle);
     await acquireReservation(reservation);
     reservationHeld = true;
     await input.testHooks?.afterReservationAcquired?.();
-    if (await exists(input.destination)) {
-      return await compareOrConflict(temporary, input.destination);
+    await input.testHooks?.beforePublish?.();
+    try {
+      await symlink(contentName, input.destination, "dir");
+    } catch (error) {
+      if (!hasCode(error, "EEXIST")) {
+        throw error;
+      }
+      return await compareOrConflict(content, input.destination);
     }
-    await rename(temporary, input.destination);
     installed = true;
     return "written";
   } finally {
     await Promise.all([
       reservationHeld ? rmdir(reservation) : Promise.resolve(),
       !installed
-        ? rm(temporary, { recursive: true, force: true })
+        ? rm(content, { recursive: true, force: true })
         : Promise.resolve(),
     ]);
   }
@@ -120,14 +125,42 @@ async function compareOrConflict(
   expectedRoot: string,
   destination: string,
 ): Promise<"identical"> {
+  const installedRoot = await resolveInstalledRoot(destination);
   const [expected, actual] = await Promise.all([
     readByteMap(expectedRoot),
-    readByteMap(destination),
+    readByteMap(installedRoot),
   ]);
   if (!sameByteMap(expected, actual)) {
     conflict(`Generated output already differs at ${destination}`);
   }
   return "identical";
+}
+
+async function resolveInstalledRoot(destination: string): Promise<string> {
+  const metadata = await lstat(destination);
+  if (metadata.isDirectory() && !metadata.isSymbolicLink()) {
+    return destination;
+  }
+  if (!metadata.isSymbolicLink()) {
+    conflict(`Generated output path is not a directory link: ${destination}`);
+  }
+  const target = await readlink(destination);
+  const expectedPrefix = `${basename(destination)}.content-`;
+  const uuidPattern =
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+  if (
+    !target.startsWith(expectedPrefix) ||
+    !uuidPattern.test(target.slice(expectedPrefix.length)) ||
+    basename(target) !== target
+  ) {
+    conflict(`Generated output link has an unsafe target: ${destination}`);
+  }
+  const content = join(dirname(destination), target);
+  const contentMetadata = await lstat(content);
+  if (!contentMetadata.isDirectory() || contentMetadata.isSymbolicLink()) {
+    conflict(`Generated output link target is not an ordinary directory`);
+  }
+  return content;
 }
 
 async function readByteMap(root: string): Promise<Map<string, Buffer>> {
@@ -172,18 +205,6 @@ function sameByteMap(
       ([path, bytes]) => right.has(path) && bytes.equals(right.get(path)!),
     )
   );
-}
-
-async function exists(path: string): Promise<boolean> {
-  try {
-    await lstat(path);
-    return true;
-  } catch (error) {
-    if (hasCode(error, "ENOENT")) {
-      return false;
-    }
-    throw error;
-  }
 }
 
 function hasCode(error: unknown, code: string): boolean {

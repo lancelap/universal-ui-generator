@@ -1,7 +1,9 @@
 import {
   mkdir,
   mkdtemp,
+  lstat,
   readFile,
+  readlink,
   readdir,
   rename,
   rm,
@@ -117,7 +119,7 @@ describe("generateFromRun", () => {
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
-  it("fails closed when the selected run is rebound before installation", async () => {
+  it("stays anchored when the selected run is rebound after worker identity verification", async () => {
     const fixture = await runFixture(roots);
     const originalRun = `${fixture.runDir}.original`;
     const outsideRun = join(fixture.workspace, "outside-run");
@@ -134,15 +136,24 @@ describe("generateFromRun", () => {
           },
         },
       }),
-    ).rejects.toMatchObject({
-      code: "GENERATION_INPUT_INVALID",
+    ).resolves.toEqual({
+      outputPath: `.uig/runs/${fixture.run.runId}/generated`,
+      status: "generated",
+      writeStatus: "written",
     });
     await expect(
       readFile(join(outsideRun, "generated", "generation-report.json")),
     ).rejects.toMatchObject({ code: "ENOENT" });
-    await expect(
-      readFile(join(originalRun, "generated", "generation-report.json")),
-    ).rejects.toMatchObject({ code: "ENOENT" });
+    expect(
+      JSON.parse(
+        await readFile(
+          join(originalRun, "generated", "generation-report.json"),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      sourceRunId: fixture.run.runId,
+    });
   });
 
   it("requires the exact plan pack ID, version, and hash", async () => {
@@ -243,6 +254,15 @@ describe("writeGeneratedBundleAtomically", () => {
       "GeneratedModal.tsx",
       "generation-report.json",
     ]);
+    expect((await lstat(destination)).isSymbolicLink()).toBe(true);
+    const installedTarget = await readlink(destination);
+    expect(installedTarget).toMatch(/^generated\.content-[0-9a-f-]{36}$/);
+    expect(
+      (await lstat(join(fixture.runDir, installedTarget))).isDirectory(),
+    ).toBe(true);
+    expect(await generatedContentSiblings(fixture.runDir)).toEqual([
+      installedTarget,
+    ]);
   });
 
   it("leaves a conflicting destination untouched and cleans its temporary sibling", async () => {
@@ -267,6 +287,7 @@ describe("writeGeneratedBundleAtomically", () => {
         name.startsWith("generated.tmp-"),
       ),
     ).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toHaveLength(1);
   });
 
   it("rejects a tampered bundle before creating a destination", async () => {
@@ -295,7 +316,7 @@ describe("writeGeneratedBundleAtomically", () => {
         destination,
         bundle,
         testHooks: {
-          afterReservationAcquired: async () => {
+          beforePublish: async () => {
             await mkdir(destination);
           },
         },
@@ -305,6 +326,54 @@ describe("writeGeneratedBundleAtomically", () => {
     });
     expect(await readdir(destination)).toEqual([]);
     expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toEqual([]);
+  });
+
+  it("does not replace destination data created in the final publication window", async () => {
+    const fixture = await runFixture(roots);
+    const destination = join(fixture.runDir, "generated");
+    const bundle = generateReactBundle(fixture.generationInput);
+
+    await expect(
+      writeGeneratedBundleAtomically({
+        destination,
+        bundle,
+        testHooks: {
+          beforePublish: async () => {
+            await mkdir(destination);
+            await writeFile(join(destination, "owner.txt"), "external\n");
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: "GENERATION_OUTPUT_CONFLICT",
+    });
+    expect(await readFile(join(destination, "owner.txt"), "utf8")).toBe(
+      "external\n",
+    );
+    expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toEqual([]);
+  });
+
+  it("never follows an attacker-controlled destination link", async () => {
+    const fixture = await runFixture(roots);
+    const destination = join(fixture.runDir, "generated");
+    const outside = join(fixture.workspace, "outside-generated");
+    const bundle = generateReactBundle(fixture.generationInput);
+    await mkdir(outside);
+    await writeFile(join(outside, "owner.txt"), "external\n");
+    await symlink(outside, destination);
+
+    await expect(
+      writeGeneratedBundleAtomically({ destination, bundle }),
+    ).rejects.toMatchObject({
+      code: "GENERATION_OUTPUT_CONFLICT",
+    });
+    expect(await readFile(join(outside, "owner.txt"), "utf8")).toBe(
+      "external\n",
+    );
+    expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toEqual([]);
   });
 
   it("serializes concurrent identical writers and converges without clobbering", async () => {
@@ -332,6 +401,7 @@ describe("writeGeneratedBundleAtomically", () => {
       "identical",
     ]);
     expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toHaveLength(1);
   });
 
   it("preserves the winner when a concurrent writer conflicts", async () => {
@@ -369,6 +439,7 @@ describe("writeGeneratedBundleAtomically", () => {
       "generation-report.json",
     ]);
     expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+    expect(await generatedContentSiblings(fixture.runDir)).toHaveLength(1);
   });
 });
 
@@ -403,6 +474,12 @@ async function generatedSiblings(runDir: string): Promise<string[]> {
     .filter(
       (name) => name.startsWith("generated.tmp-") || name === "generated.lock",
     )
+    .sort();
+}
+
+async function generatedContentSiblings(runDir: string): Promise<string[]> {
+  return (await readdir(runDir))
+    .filter((name) => name.startsWith("generated.content-"))
     .sort();
 }
 
