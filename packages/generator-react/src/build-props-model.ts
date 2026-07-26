@@ -71,6 +71,7 @@ export function buildPropsModel(
     }
     if (recipe.content.target === "children") {
       textChild = { kind: "text", value };
+      removeElementProp(elementProps, recipe.content.target);
       renderOnlyNames.delete(recipe.content.target);
     } else {
       setHigherPrecedenceProp(elementProps, renderOnlyNames, {
@@ -199,6 +200,13 @@ function setElementProp(props: ReactPropModel[], prop: ReactPropModel): void {
     props.splice(existing, 1);
   }
   props.push(prop);
+}
+
+function removeElementProp(props: ReactPropModel[], name: string): void {
+  const existing = props.findIndex((item) => item.name === name);
+  if (existing >= 0) {
+    props.splice(existing, 1);
+  }
 }
 
 function setHigherPrecedenceProp(

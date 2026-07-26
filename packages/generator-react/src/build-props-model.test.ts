@@ -63,6 +63,42 @@ describe("buildPropsModel", () => {
     expect(result.renderOnlyPropNames).toEqual(["options", "value"]);
   });
 
+  it("replaces a static children prop with semantic text content", () => {
+    const result = buildPropsModel(
+      actionNode({ content: { label: "Continue" } }),
+      reuseResolution({}),
+      recipeWithStaticProps({
+        staticProps: [
+          {
+            target: "children",
+            value: { kind: "literal", value: "render-only placeholder" },
+            reason: "render-only",
+          },
+        ],
+        content: { source: "content.label", target: "children" },
+      }),
+    );
+
+    expect(result.elementProps).toEqual([]);
+    expect(result.renderOnlyPropNames).toEqual([]);
+    expect(result.textChild).toEqual({ kind: "text", value: "Continue" });
+  });
+
+  it("replaces a resolution-default children prop with semantic text content", () => {
+    const result = buildPropsModel(
+      actionNode({ content: { label: "Continue" } }),
+      reuseResolution({ children: "resolution placeholder" }),
+      recipeWithStaticProps({
+        staticProps: [],
+        content: { source: "content.label", target: "children" },
+      }),
+    );
+
+    expect(result.elementProps).toEqual([]);
+    expect(result.renderOnlyPropNames).toEqual([]);
+    expect(result.textChild).toEqual({ kind: "text", value: "Continue" });
+  });
+
   it("lowers defaults, text children, typed state, callbacks, and class hooks", () => {
     const node = actionNode({
       content: { label: "Continue" },
