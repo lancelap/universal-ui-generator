@@ -1,8 +1,10 @@
 import ts from "typescript";
 
 import type {
+  FallbackComponentModel,
   GeneratedPropModel,
   ReactElementModel,
+  ReactGeneratedRelativeImportModel,
   ReactGenerationModel,
   ReactPropModel,
   ReactPropValueModel,
@@ -13,13 +15,126 @@ const factory = ts.factory;
 export function emitTsx(
   model: ReactGenerationModel,
   componentName: string,
+  generatedRelativeImports: ReactGeneratedRelativeImportModel[] = [],
 ): string {
   const needsStyles = containsClassName(model.root);
   const statements: ts.Statement[] = [
-    ...emitImports(model, componentName, needsStyles),
+    ...emitImports(model, componentName, needsStyles, generatedRelativeImports),
     emitPropsInterface(componentName, model.externalProps),
     emitComponent(componentName, model.externalProps, model.root),
   ];
+  return printStatements(statements);
+}
+
+export function emitFallbackTsx(fallback: FallbackComponentModel): string {
+  const componentName = fallback.localComponentName;
+  const propsName = `${componentName}Props`;
+  const statements: ts.Statement[] = [
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        true,
+        undefined,
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier("ReactNode"),
+          ),
+        ]),
+      ),
+      factory.createStringLiteral("react"),
+      undefined,
+    ),
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        false,
+        factory.createIdentifier("styles"),
+        undefined,
+      ),
+      factory.createStringLiteral(`./${componentName}.module.css`),
+      undefined,
+    ),
+    factory.createInterfaceDeclaration(
+      [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      factory.createIdentifier(propsName),
+      undefined,
+      undefined,
+      [
+        factory.createPropertySignature(
+          undefined,
+          factory.createIdentifier("children"),
+          factory.createToken(ts.SyntaxKind.QuestionToken),
+          factory.createTypeReferenceNode("ReactNode", undefined),
+        ),
+      ],
+    ),
+    factory.createFunctionDeclaration(
+      [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+      undefined,
+      factory.createIdentifier(componentName),
+      undefined,
+      [
+        factory.createParameterDeclaration(
+          undefined,
+          undefined,
+          factory.createObjectBindingPattern([
+            factory.createBindingElement(
+              undefined,
+              undefined,
+              factory.createIdentifier("children"),
+              undefined,
+            ),
+          ]),
+          undefined,
+          factory.createTypeReferenceNode(propsName, undefined),
+          undefined,
+        ),
+      ],
+      undefined,
+      factory.createBlock(
+        [
+          factory.createReturnStatement(
+            factory.createParenthesizedExpression(
+              factory.createJsxElement(
+                factory.createJsxOpeningElement(
+                  factory.createIdentifier("div"),
+                  undefined,
+                  factory.createJsxAttributes([
+                    factory.createJsxAttribute(
+                      factory.createIdentifier("className"),
+                      factory.createJsxExpression(
+                        undefined,
+                        factory.createElementAccessExpression(
+                          factory.createIdentifier("styles"),
+                          factory.createStringLiteral(fallback.className),
+                        ),
+                      ),
+                    ),
+                  ]),
+                ),
+                [
+                  factory.createJsxExpression(
+                    undefined,
+                    factory.createIdentifier("children"),
+                  ),
+                ],
+                factory.createJsxClosingElement(
+                  factory.createIdentifier("div"),
+                ),
+              ),
+            ),
+          ),
+        ],
+        true,
+      ),
+    ),
+  ];
+  return printStatements(statements);
+}
+
+function printStatements(statements: ts.Statement[]): string {
   const file = factory.updateSourceFile(
     factory.createSourceFile(
       statements,
@@ -41,6 +156,7 @@ function emitImports(
   model: ReactGenerationModel,
   componentName: string,
   needsStyles: boolean,
+  generatedRelativeImports: ReactGeneratedRelativeImportModel[],
 ): ts.ImportDeclaration[] {
   const imports = model.imports.map((item) => {
     const importClause =
@@ -72,6 +188,44 @@ function emitImports(
       undefined,
     );
   });
+  imports.push(
+    ...[...generatedRelativeImports]
+      .sort(
+        (left, right) =>
+          left.path.localeCompare(right.path) ||
+          JSON.stringify(left.specifiers).localeCompare(
+            JSON.stringify(right.specifiers),
+          ),
+      )
+      .map((item) =>
+        factory.createImportDeclaration(
+          undefined,
+          factory.createImportClause(
+            false,
+            undefined,
+            factory.createNamedImports(
+              [...item.specifiers]
+                .sort(
+                  (left, right) =>
+                    left.local.localeCompare(right.local) ||
+                    left.imported.localeCompare(right.imported),
+                )
+                .map((specifier) =>
+                  factory.createImportSpecifier(
+                    false,
+                    specifier.imported === specifier.local
+                      ? undefined
+                      : factory.createIdentifier(specifier.imported),
+                    factory.createIdentifier(specifier.local),
+                  ),
+                ),
+            ),
+          ),
+          factory.createStringLiteral(item.path),
+          undefined,
+        ),
+      ),
+  );
   if (needsStyles) {
     imports.push(
       factory.createImportDeclaration(

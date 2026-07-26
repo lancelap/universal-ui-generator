@@ -141,6 +141,64 @@ describe("uig CLI", () => {
     ).rejects.toThrow(/Exactly one/);
   });
 
+  it.each([
+    {
+      result: {
+        outputPath: ".uig/runs/run_fixture/generated",
+        status: "generated" as const,
+        writeStatus: "written" as const,
+      },
+      exitCode: 0,
+    },
+    {
+      result: {
+        outputPath: ".uig/runs/run_fixture/generated",
+        status: "generated" as const,
+        writeStatus: "identical" as const,
+      },
+      exitCode: 0,
+    },
+    {
+      result: {
+        outputPath: ".uig/runs/run_fixture/generated",
+        status: "blocked" as const,
+        writeStatus: "written" as const,
+      },
+      exitCode: 2,
+    },
+  ])(
+    "prints one structured generate line and exits $exitCode for $result.status/$result.writeStatus",
+    async ({ result, exitCode }) => {
+      const written = output();
+      const createClient = vi.fn(() => {
+        throw new Error("generate must not construct a Pixso client");
+      });
+      const program = createProgram({
+        cwd: () => "/workspace",
+        now: fixedNow,
+        createPixsoClient: createClient,
+        generateFromRun: async () => result,
+        stdout: written.stream,
+        stderr: output().stream,
+      });
+
+      await program.parseAsync(["generate", "--run", "run_fixture"], {
+        from: "user",
+      });
+
+      expect(written.text).toBe(
+        `${JSON.stringify({
+          outputPath: result.outputPath,
+          runId: "run_fixture",
+          status: result.status,
+          writeStatus: result.writeStatus,
+        })}\n`,
+      );
+      expect(program.exitCode).toBe(exitCode);
+      expect(createClient).not.toHaveBeenCalled();
+    },
+  );
+
   it.each(["sber-space-ui", "material-ui"])(
     "validates the %s pack",
     async (packId) => {

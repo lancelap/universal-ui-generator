@@ -4,10 +4,33 @@ import { ReactGenerationError } from "./errors.js";
 
 export interface GeneratedTsxExpectation {
   componentName: string;
-  packages: string[];
-  importedLocalNames: string[];
+  externalImports: GeneratedExternalImportExpectation[];
+  cssModuleImport?: GeneratedCssModuleImportExpectation;
+  generatedRelativeImports: GeneratedRelativeImportExpectation[];
   jsxNames: string[];
   localComponentNames: string[];
+}
+
+export interface GeneratedExternalImportExpectation {
+  source: string;
+  specifiers: GeneratedImportSpecifierExpectation[];
+  typeOnly: boolean;
+}
+
+export interface GeneratedImportSpecifierExpectation {
+  kind: "default" | "named";
+  imported: string;
+  local: string;
+}
+
+export interface GeneratedCssModuleImportExpectation {
+  source: string;
+  localName: string;
+}
+
+export interface GeneratedRelativeImportExpectation {
+  source: string;
+  specifiers: GeneratedImportSpecifierExpectation[];
 }
 
 export function validateGeneratedTsx(
@@ -34,14 +57,19 @@ export function validateGeneratedTsx(
     );
   }
 
-  const expectedPackages = new Set(expectation.packages);
-  const expectedImportedNames = new Set(expectation.importedLocalNames);
+  const expectedExternalSources = new Set(
+    expectation.externalImports.map((item) => item.source),
+  );
+  const expectedGeneratedSources = new Set(
+    expectation.generatedRelativeImports.map((item) => item.source),
+  );
   const expectedJsxNames = new Set(expectation.jsxNames);
   const expectedLocalComponentNames = new Set(expectation.localComponentNames);
-  const importedPackages = new Set<string>();
-  const importedNames = new Set<string>();
+  const externalImports: GeneratedExternalImportExpectation[] = [];
+  const generatedRelativeImports: GeneratedRelativeImportExpectation[] = [];
   const jsxNames = new Set<string>();
   const localComponentNames = new Set<string>();
+  let cssModuleImport: GeneratedCssModuleImportExpectation | undefined;
   let componentFound = false;
 
   const visit = (node: ts.Node): void => {
@@ -49,17 +77,43 @@ export function validateGeneratedTsx(
       const packageName = ts.isStringLiteral(node.moduleSpecifier)
         ? node.moduleSpecifier.text
         : undefined;
-      if (packageName === `./${expectation.componentName}.module.css`) {
-        if (node.importClause?.name?.text !== "styles") {
-          invalid("CSS Module import must use the local name styles");
+      if (!packageName) {
+        invalid("Import module specifier must be a string literal");
+      }
+      const localNames = importedLocalNames(node.importClause).sort();
+      const specifiers = importedSpecifiers(node.importClause);
+      if (packageName === expectation.cssModuleImport?.source) {
+        if (
+          localNames.length !== 1 ||
+          localNames[0] !== expectation.cssModuleImport.localName ||
+          node.importClause?.name?.text !==
+            expectation.cssModuleImport.localName ||
+          node.importClause.namedBindings
+        ) {
+          invalid("CSS Module import does not match expectation");
         }
-      } else if (!packageName || !expectedPackages.has(packageName)) {
-        invalid(`Unexpected import package ${JSON.stringify(packageName)}`);
+        cssModuleImport = {
+          source: packageName,
+          localName: expectation.cssModuleImport.localName,
+        };
+      } else if (expectedGeneratedSources.has(packageName)) {
+        if (node.importClause?.isTypeOnly) {
+          invalid(
+            `Generated relative import ${packageName} cannot be type-only`,
+          );
+        }
+        generatedRelativeImports.push({
+          source: packageName,
+          specifiers,
+        });
+      } else if (expectedExternalSources.has(packageName)) {
+        externalImports.push({
+          source: packageName,
+          specifiers,
+          typeOnly: node.importClause?.isTypeOnly ?? false,
+        });
       } else {
-        importedPackages.add(packageName);
-        for (const localName of importedLocalNames(node.importClause)) {
-          importedNames.add(localName);
-        }
+        invalid(`Unexpected import source ${JSON.stringify(packageName)}`);
       }
     }
     if (
@@ -88,14 +142,34 @@ export function validateGeneratedTsx(
   if (!componentFound) {
     invalid(`Missing component function ${expectation.componentName}`);
   }
-  if (!sameSet(importedPackages, expectedPackages)) {
+  if (
+    JSON.stringify(sortExternalImports(externalImports)) !==
+    JSON.stringify(sortExternalImports(expectation.externalImports))
+  ) {
     invalid(
-      `Imported packages do not match expectation: received ${[...importedPackages].sort().join(", ")}`,
+      `External imports do not match expectation: received ${JSON.stringify(
+        sortExternalImports(externalImports),
+      )}`,
     );
   }
-  if (!sameSet(importedNames, expectedImportedNames)) {
+  if (
+    JSON.stringify(sortGeneratedImports(generatedRelativeImports)) !==
+    JSON.stringify(sortGeneratedImports(expectation.generatedRelativeImports))
+  ) {
     invalid(
-      `Imported local names do not match expectation: received ${[...importedNames].sort().join(", ")}`,
+      `Generated relative imports do not match expectation: received ${JSON.stringify(
+        sortGeneratedImports(generatedRelativeImports),
+      )}`,
+    );
+  }
+  if (
+    JSON.stringify(cssModuleImport) !==
+    JSON.stringify(expectation.cssModuleImport)
+  ) {
+    invalid(
+      `CSS Module import does not match expectation: received ${JSON.stringify(
+        cssModuleImport,
+      )}`,
     );
   }
   if (!sameSet(jsxNames, expectedJsxNames)) {
@@ -108,6 +182,83 @@ export function validateGeneratedTsx(
       `Local component declarations do not match expectation: received ${[...localComponentNames].sort().join(", ")}`,
     );
   }
+}
+
+function sortExternalImports(
+  imports: GeneratedExternalImportExpectation[],
+): GeneratedExternalImportExpectation[] {
+  return imports
+    .map((item) => ({
+      ...item,
+      specifiers: sortImportSpecifiers(item.specifiers),
+    }))
+    .sort(
+      (left, right) =>
+        left.source.localeCompare(right.source) ||
+        JSON.stringify(left.specifiers).localeCompare(
+          JSON.stringify(right.specifiers),
+        ) ||
+        Number(left.typeOnly) - Number(right.typeOnly),
+    );
+}
+
+function sortGeneratedImports(
+  imports: GeneratedRelativeImportExpectation[],
+): GeneratedRelativeImportExpectation[] {
+  return imports
+    .map((item) => ({
+      ...item,
+      specifiers: sortImportSpecifiers(item.specifiers),
+    }))
+    .sort(
+      (left, right) =>
+        left.source.localeCompare(right.source) ||
+        JSON.stringify(left.specifiers).localeCompare(
+          JSON.stringify(right.specifiers),
+        ),
+    );
+}
+
+function sortImportSpecifiers(
+  specifiers: GeneratedImportSpecifierExpectation[],
+): GeneratedImportSpecifierExpectation[] {
+  return [...specifiers].sort(
+    (left, right) =>
+      left.kind.localeCompare(right.kind) ||
+      left.imported.localeCompare(right.imported) ||
+      left.local.localeCompare(right.local),
+  );
+}
+
+function importedSpecifiers(
+  importClause: ts.ImportClause | undefined,
+): GeneratedImportSpecifierExpectation[] {
+  if (!importClause) {
+    return [];
+  }
+  const specifiers: GeneratedImportSpecifierExpectation[] = importClause.name
+    ? [
+        {
+          kind: "default",
+          imported: "default",
+          local: importClause.name.text,
+        },
+      ]
+    : [];
+  const bindings = importClause.namedBindings;
+  if (bindings && ts.isNamespaceImport(bindings)) {
+    invalid("Namespace imports are not supported in generated TSX");
+  }
+  if (bindings && ts.isNamedImports(bindings)) {
+    specifiers.push(
+      ...bindings.elements.map((element) => ({
+        kind: "named" as const,
+        imported: element.propertyName?.text ?? element.name.text,
+        local: element.name.text,
+      })),
+    );
+  }
+  return sortImportSpecifiers(specifiers);
 }
 
 function importedLocalNames(

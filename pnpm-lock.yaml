@@ -40,6 +40,9 @@ importers:
       "@uig/design-normalizer":
         specifier: workspace:*
         version: link:../../packages/design-normalizer
+      "@uig/generator-react":
+        specifier: workspace:*
+        version: link:../../packages/generator-react
       "@uig/provider-pixso":
         specifier: workspace:*
         version: link:../../packages/provider-pixso

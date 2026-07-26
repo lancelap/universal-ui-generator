@@ -12,6 +12,7 @@
     "@uig/contracts": "workspace:*",
     "@uig/design-context": "workspace:*",
     "@uig/design-normalizer": "workspace:*",
+    "@uig/generator-react": "workspace:*",
     "@uig/provider-pixso": "workspace:*",
     "@uig/semantic-planner": "workspace:*",
     "commander": "^14.0.3"

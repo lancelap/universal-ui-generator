@@ -1,6 +1,5 @@
 import { mkdir } from "node:fs/promises";
 import { join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { loadDesignSystemPack } from "@uig/component-catalog";
 import { stableStringify } from "@uig/contracts";
@@ -9,8 +8,10 @@ import { normalizePixsoDesign } from "@uig/design-normalizer";
 import { fetchPixsoSnapshot, type PixsoDslClient } from "@uig/provider-pixso";
 import { Command } from "commander";
 
+import { generateFromRun } from "./generate-from-run.js";
 import { planFromSnapshot } from "./plan-from-snapshot.js";
 import { planFromUrl } from "./plan-from-url.js";
+import { resolveDesignSystemPackPath } from "./resolve-design-system-pack.js";
 import { atomicJson } from "./write-run-artifacts.js";
 
 export interface UigCommand extends Command {
@@ -21,6 +22,7 @@ export function createProgram(dependencies: {
   cwd: () => string;
   now: () => Date;
   createPixsoClient: () => PixsoDslClient;
+  generateFromRun?: typeof generateFromRun;
   stdout: Pick<NodeJS.WriteStream, "write">;
   stderr: Pick<NodeJS.WriteStream, "write">;
 }): UigCommand {
@@ -86,7 +88,7 @@ export function createProgram(dependencies: {
             "Exactly one of --url or --snapshot must be provided",
           );
         }
-        const packPath = resolvePackPath(options.designSystem);
+        const packPath = resolveDesignSystemPackPath(options.designSystem);
         const run = options.url
           ? await planFromUrl({
               url: options.url,
@@ -105,6 +107,29 @@ export function createProgram(dependencies: {
         program.exitCode = run.status === "blocked" ? 2 : 0;
       },
     );
+
+  program
+    .command("generate")
+    .requiredOption("--run <run-id>")
+    .option("--design-system-pack <path>")
+    .action(async (options: { run: string; designSystemPack?: string }) => {
+      const result = await (dependencies.generateFromRun ?? generateFromRun)({
+        runId: options.run,
+        workspaceDir: dependencies.cwd(),
+        ...(options.designSystemPack
+          ? { explicitPackPath: options.designSystemPack }
+          : {}),
+      });
+      dependencies.stdout.write(
+        `${JSON.stringify({
+          outputPath: result.outputPath,
+          runId: options.run,
+          status: result.status,
+          writeStatus: result.writeStatus,
+        })}\n`,
+      );
+      program.exitCode = result.status === "blocked" ? 2 : 0;
+    });
 
   program
     .command("inspect")
@@ -163,14 +188,4 @@ export function createProgram(dependencies: {
     });
 
   return program;
-}
-
-function resolvePackPath(value: string): string {
-  if (value.includes("/") || value.startsWith(".")) {
-    return value;
-  }
-  const packsRoot = fileURLToPath(
-    new URL("../../../design-system-packs", import.meta.url),
-  );
-  return join(packsRoot, value);
 }

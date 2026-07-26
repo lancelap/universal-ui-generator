@@ -92,7 +92,7 @@ export function buildReactGenerationModel(
         kind: "fallback",
         nodeId: node.id,
         sourceNodeIds: node.sourceNodeIds,
-        localComponentName: resolution.localComponentName,
+        localComponentName: fallback.localComponentName,
         children,
       };
     }

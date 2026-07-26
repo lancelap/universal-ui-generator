@@ -58,6 +58,17 @@ export interface ReactDefaultImportModel {
 
 export type ReactImportModel = ReactNamedImportModel | ReactDefaultImportModel;
 
+export interface ReactGeneratedRelativeImportSpecifierModel {
+  imported: string;
+  local: string;
+}
+
+export interface ReactGeneratedRelativeImportModel {
+  kind: "generated-relative";
+  path: string;
+  specifiers: ReactGeneratedRelativeImportSpecifierModel[];
+}
+
 export type ReactPropValueModel =
   | { kind: "literal"; value: string | number | boolean | null }
   | { kind: "empty-array" }

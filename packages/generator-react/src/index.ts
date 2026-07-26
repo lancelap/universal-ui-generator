@@ -5,6 +5,7 @@ export * from "./emit-css-module.js";
 export * from "./emit-tsx.js";
 export * from "./errors.js";
 export * from "./generation-model.js";
+export * from "./generate-react-bundle.js";
 export * from "./place-composition-slots.js";
 export * from "./validate-generation-input.js";
 export * from "./validate-generated-source.js";

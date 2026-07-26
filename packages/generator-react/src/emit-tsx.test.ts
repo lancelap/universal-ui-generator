@@ -1,9 +1,15 @@
-import type { ReactGenerationModel } from "./generation-model.js";
+import type {
+  FallbackComponentModel,
+  ReactGenerationModel,
+} from "./generation-model.js";
 import { describe, expect, it } from "vitest";
 
-import { emitTsx } from "./emit-tsx.js";
+import { emitFallbackTsx, emitTsx } from "./emit-tsx.js";
 import { ReactGenerationError } from "./errors.js";
-import { validateGeneratedTsx } from "./validate-generated-source.js";
+import {
+  type GeneratedTsxExpectation,
+  validateGeneratedTsx,
+} from "./validate-generated-source.js";
 
 describe("emitTsx", () => {
   it("emits a render-only component with escaped text, slots, and fixed opcodes", () => {
@@ -41,13 +47,75 @@ describe("emitTsx", () => {
       emitTsx(model(), "DialogPreview"),
     );
   });
+
+  it("AST-imports generated fallbacks from stable relative paths", () => {
+    const source = emitTsx(modelWithFallback(), "DialogPreview", [
+      {
+        kind: "generated-relative",
+        path: "./fallbacks/GeneratedWarning",
+        specifiers: [
+          {
+            imported: "GeneratedWarning",
+            local: "GeneratedWarning",
+          },
+        ],
+      },
+    ]);
+
+    expect(source).toContain(
+      'import { GeneratedWarning } from "./fallbacks/GeneratedWarning";',
+    );
+    expect(source).toContain("<GeneratedWarning>");
+    expect(source).not.toContain("function GeneratedWarning");
+  });
+});
+
+describe("emitFallbackTsx", () => {
+  it("exports a children-preserving intrinsic fallback with its own CSS module", () => {
+    const source = emitFallbackTsx(fallbackModel());
+
+    expect(source).toContain('import type { ReactNode } from "react";');
+    expect(source).toContain(
+      'import styles from "./GeneratedWarning.module.css";',
+    );
+    expect(source).toContain("export interface GeneratedWarningProps {");
+    expect(source).toContain("children?: ReactNode;");
+    expect(source).toContain(
+      "export function GeneratedWarning({ children }: GeneratedWarningProps)",
+    );
+    expect(source).toContain(
+      '<div className={styles["ui_warning"]}>{children}</div>',
+    );
+  });
 });
 
 describe("validateGeneratedTsx", () => {
-  const expectation = {
+  const expectation: GeneratedTsxExpectation = {
     componentName: "DialogPreview",
-    packages: ["@ui/assets", "@ui/core"],
-    importedLocalNames: ["Dialog", "DialogBody", "Logo"],
+    externalImports: [
+      {
+        source: "@ui/assets",
+        specifiers: [{ kind: "default", imported: "default", local: "Logo" }],
+        typeOnly: false,
+      },
+      {
+        source: "@ui/core",
+        specifiers: [
+          { kind: "named", imported: "Dialog", local: "Dialog" },
+          {
+            kind: "named",
+            imported: "DialogBody",
+            local: "DialogBody",
+          },
+        ],
+        typeOnly: false,
+      },
+    ],
+    cssModuleImport: {
+      source: "./DialogPreview.module.css",
+      localName: "styles",
+    },
+    generatedRelativeImports: [],
     jsxNames: ["Dialog", "DialogBody", "Logo"],
     localComponentNames: [],
   };
@@ -58,10 +126,10 @@ describe("validateGeneratedTsx", () => {
     ).not.toThrow();
   });
 
-  it("accepts a locally declared fallback component without treating it as an import", () => {
+  it("accepts an exact generated-relative fallback import", () => {
     const source = [
       'import { Dialog } from "@ui/core";',
-      "function GeneratedWarning() { return <div />; }",
+      'import { GeneratedWarning } from "./fallbacks/GeneratedWarning";',
       "export function DialogPreview() { return <Dialog><GeneratedWarning /></Dialog>; }",
       "",
     ].join("\n");
@@ -69,10 +137,125 @@ describe("validateGeneratedTsx", () => {
     expect(() =>
       validateGeneratedTsx(source, {
         componentName: "DialogPreview",
-        packages: ["@ui/core"],
-        importedLocalNames: ["Dialog"],
+        externalImports: [
+          {
+            source: "@ui/core",
+            specifiers: [
+              { kind: "named", imported: "Dialog", local: "Dialog" },
+            ],
+            typeOnly: false,
+          },
+        ],
+        generatedRelativeImports: [
+          {
+            source: "./fallbacks/GeneratedWarning",
+            specifiers: [
+              {
+                kind: "named",
+                imported: "GeneratedWarning",
+                local: "GeneratedWarning",
+              },
+            ],
+          },
+        ],
         jsxNames: ["Dialog", "GeneratedWarning"],
-        localComponentNames: ["GeneratedWarning"],
+        localComponentNames: [],
+      }),
+    ).not.toThrow();
+  });
+
+  it("rejects generated-relative and external imports with wrong exported bindings", () => {
+    const generatedAlias = [
+      'import { Dialog } from "@ui/core";',
+      'import { Wrong as GeneratedWarning } from "./fallbacks/GeneratedWarning";',
+      "export function DialogPreview() { return <Dialog><GeneratedWarning /></Dialog>; }",
+      "",
+    ].join("\n");
+    const externalAlias = [
+      'import { Wrong as Dialog } from "@ui/core";',
+      "export function DialogPreview() { return <Dialog />; }",
+      "",
+    ].join("\n");
+
+    expect(() =>
+      validateGeneratedTsx(generatedAlias, {
+        componentName: "DialogPreview",
+        externalImports: [
+          {
+            source: "@ui/core",
+            specifiers: [
+              { kind: "named", imported: "Dialog", local: "Dialog" },
+            ],
+            typeOnly: false,
+          },
+        ],
+        generatedRelativeImports: [
+          {
+            source: "./fallbacks/GeneratedWarning",
+            specifiers: [
+              {
+                kind: "named",
+                imported: "GeneratedWarning",
+                local: "GeneratedWarning",
+              },
+            ],
+          },
+        ],
+        jsxNames: ["Dialog", "GeneratedWarning"],
+        localComponentNames: [],
+      }),
+    ).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_SOURCE_INVALID",
+      }),
+    );
+    expect(() =>
+      validateGeneratedTsx(externalAlias, {
+        componentName: "DialogPreview",
+        externalImports: [
+          {
+            source: "@ui/core",
+            specifiers: [
+              { kind: "named", imported: "Dialog", local: "Dialog" },
+            ],
+            typeOnly: false,
+          },
+        ],
+        generatedRelativeImports: [],
+        jsxNames: ["Dialog"],
+        localComponentNames: [],
+      }),
+    ).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_SOURCE_INVALID",
+      }),
+    );
+  });
+
+  it("accepts the exact type and CSS imports emitted for a fallback file", () => {
+    expect(() =>
+      validateGeneratedTsx(emitFallbackTsx(fallbackModel()), {
+        componentName: "GeneratedWarning",
+        externalImports: [
+          {
+            source: "react",
+            specifiers: [
+              {
+                kind: "named",
+                imported: "ReactNode",
+                local: "ReactNode",
+              },
+            ],
+            typeOnly: true,
+          },
+        ],
+        cssModuleImport: {
+          source: "./GeneratedWarning.module.css",
+          localName: "styles",
+        },
+        generatedRelativeImports: [],
+        jsxNames: [],
+        localComponentNames: [],
       }),
     ).not.toThrow();
   });
@@ -195,5 +378,39 @@ function model(): ReactGenerationModel {
       ],
       children: [],
     },
+  };
+}
+
+function modelWithFallback(): ReactGenerationModel {
+  return {
+    ...model(),
+    imports: [],
+    externalProps: [],
+    styles: [],
+    fallbacks: [fallbackModel()],
+    root: {
+      kind: "fallback",
+      nodeId: "ui_warning",
+      sourceNodeIds: ["4:314"],
+      localComponentName: "GeneratedWarning",
+      children: [
+        {
+          kind: "intrinsic-wrapper",
+          nodeId: "ui_child",
+          sourceNodeIds: ["4:315"],
+          tag: "div",
+          className: "ui_child",
+          children: [],
+        },
+      ],
+    },
+  };
+}
+
+function fallbackModel(): FallbackComponentModel {
+  return {
+    nodeId: "ui_warning",
+    localComponentName: "GeneratedWarning",
+    className: "ui_warning",
   };
 }
