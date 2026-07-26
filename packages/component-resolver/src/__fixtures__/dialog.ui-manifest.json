@@ -1,0 +1,66 @@
+{
+  "schema": "ui-manifest/v1",
+  "sourceArtifactId": "pixso_dialog_0123456789ab",
+  "root": {
+    "id": "ui_dialog_root",
+    "kind": "overlay",
+    "role": "dialog",
+    "sourceNodeIds": ["root"],
+    "confidence": 0.9,
+    "evidence": [{ "kind": "structure", "value": "dialog" }],
+    "children": [
+      {
+        "id": "ui_heading_title",
+        "kind": "content",
+        "role": "heading",
+        "sourceNodeIds": ["title"],
+        "confidence": 0.9,
+        "evidence": [{ "kind": "text", "value": "Создать заявку" }],
+        "content": { "text": "Создать заявку" },
+        "children": []
+      },
+      {
+        "id": "ui_textInput_name",
+        "kind": "control",
+        "role": "textInput",
+        "sourceNodeIds": ["field"],
+        "confidence": 0.9,
+        "evidence": [{ "kind": "structure", "value": "field" }],
+        "requiredCapabilities": ["label", "value"],
+        "formAdapter": "controlled",
+        "children": []
+      },
+      {
+        "id": "ui_actionGroup_footer",
+        "kind": "group",
+        "role": "actionGroup",
+        "sourceNodeIds": ["actions"],
+        "confidence": 0.9,
+        "evidence": [{ "kind": "layout", "value": "horizontal" }],
+        "children": [
+          {
+            "id": "ui_secondaryAction_cancel",
+            "kind": "action",
+            "role": "secondaryAction",
+            "sourceNodeIds": ["cancel"],
+            "confidence": 1,
+            "evidence": [{ "kind": "component-key", "value": "button" }],
+            "content": { "label": "Отмена" },
+            "children": []
+          },
+          {
+            "id": "ui_primaryAction_submit",
+            "kind": "action",
+            "role": "primaryAction",
+            "sourceNodeIds": ["submit"],
+            "confidence": 1,
+            "evidence": [{ "kind": "component-key", "value": "button" }],
+            "content": { "label": "Создать" },
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "diagnostics": []
+}
