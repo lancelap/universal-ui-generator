@@ -37,6 +37,12 @@ describe("content-addressed artifact storage", () => {
       /^pixso_WSLukjrKancvZG0zbaMnyA_4_314_[a-f0-9]{12}$/,
     );
     expect(await store.read(first.artifactId)).toEqual(bytes);
+    expect(await store.describe(first.artifactId)).toEqual({
+      ...first,
+      provider: "pixso",
+      documentId: "WSLukjrKancvZG0zbaMnyA",
+      nodeId: "4:314",
+    });
     expect(await readdir(join(root, "cache", "sha256"))).toHaveLength(1);
 
     const metadataText = await readFile(

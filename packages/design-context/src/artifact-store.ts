@@ -16,6 +16,12 @@ export interface StoredArtifact {
   byteLength: number;
 }
 
+export interface StoredSourceArtifact extends StoredArtifact {
+  provider: "pixso";
+  documentId: string;
+  nodeId: string;
+}
+
 export interface ArtifactStore {
   put(input: {
     provider: "pixso";
@@ -24,13 +30,10 @@ export interface ArtifactStore {
     bytes: Uint8Array;
   }): Promise<StoredArtifact>;
   read(artifactId: string): Promise<Uint8Array>;
+  describe(artifactId: string): Promise<StoredSourceArtifact>;
 }
 
-interface ArtifactMetadata extends StoredArtifact {
-  provider: "pixso";
-  documentId: string;
-  nodeId: string;
-}
+type ArtifactMetadata = StoredSourceArtifact;
 
 export type ArtifactStoreErrorCode =
   "ARTIFACT_ID_INVALID" | "ARTIFACT_METADATA_INVALID";
@@ -90,22 +93,28 @@ export function createArtifactStore(rootDir: string): ArtifactStore {
     },
 
     async read(artifactId): Promise<Uint8Array> {
-      assertArtifactId(artifactId);
-
-      const metadataPath = join(metadataDir, `${artifactId}.json`);
-      const metadata = parseMetadata(await readFile(metadataPath, "utf8"));
-
-      if (metadata.artifactId !== artifactId) {
-        throw new ArtifactStoreError(
-          "ARTIFACT_METADATA_INVALID",
-          `Artifact metadata ID does not match ${artifactId}`,
-        );
-      }
-
+      const metadata = await readMetadata(artifactId);
       const bytes = await readFile(join(contentDir, metadata.sha256));
       return new Uint8Array(bytes);
     },
+
+    describe: readMetadata,
   };
+
+  async function readMetadata(
+    artifactId: string,
+  ): Promise<StoredSourceArtifact> {
+    assertArtifactId(artifactId);
+    const metadataPath = join(metadataDir, `${artifactId}.json`);
+    const metadata = parseMetadata(await readFile(metadataPath, "utf8"));
+    if (metadata.artifactId !== artifactId) {
+      throw new ArtifactStoreError(
+        "ARTIFACT_METADATA_INVALID",
+        `Artifact metadata ID does not match ${artifactId}`,
+      );
+    }
+    return metadata;
+  }
 }
 
 function assertArtifactId(artifactId: string): void {
