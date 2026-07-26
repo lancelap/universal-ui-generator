@@ -86,3 +86,56 @@ export interface ReactPropsBuildResult {
   externalProps: GeneratedPropModel[];
   textChild?: ReactTextChildModel;
 }
+
+interface ReactElementBaseModel {
+  nodeId: string;
+  sourceNodeIds: string[];
+  children: ReactElementModel[];
+}
+
+export interface ReactReuseElementModel extends ReactElementBaseModel {
+  kind: "reuse";
+  componentId: string;
+  localName: string;
+  props: ReactPropModel[];
+  textChild?: ReactTextChildModel;
+}
+
+export interface ReactCompositionSlotModel {
+  name: string;
+  componentId: string;
+  localName: string;
+  children: ReactElementModel[];
+}
+
+export interface ReactComposeElementModel extends ReactElementBaseModel {
+  kind: "compose";
+  componentId: string;
+  localName: string;
+  props: ReactPropModel[];
+  textChild?: ReactTextChildModel;
+  slots: ReactCompositionSlotModel[];
+}
+
+export interface ReactFallbackElementModel extends ReactElementBaseModel {
+  kind: "fallback";
+  localComponentName: string;
+}
+
+export interface ReactIntrinsicWrapperModel extends ReactElementBaseModel {
+  kind: "intrinsic-wrapper";
+  tag: "div";
+  className: string;
+}
+
+export type ReactElementModel =
+  | ReactReuseElementModel
+  | ReactComposeElementModel
+  | ReactFallbackElementModel
+  | ReactIntrinsicWrapperModel;
+
+export interface ReactGenerationModel {
+  imports: ReactImportModel[];
+  externalProps: GeneratedPropModel[];
+  root: ReactElementModel;
+}
