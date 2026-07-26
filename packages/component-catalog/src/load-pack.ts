@@ -2,16 +2,24 @@ import { readFile, realpath } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 
 import {
+  type ComponentCatalog,
   ComponentCatalogSchema,
   type ComponentCatalogEntry,
   CompositionRulesSchema,
   type CompositionRules,
   DesignSystemPackSchema,
   type DesignSystemPack,
+  DesignSystemPackV2Schema,
+  type DesignSystemPackV2,
   DesignTokensSchema,
   type DesignTokens,
+  type PixsoMap,
   PixsoMapSchema,
   type PixsoSemanticMapping,
+  type ReactRenderRecipes,
+  ReactRenderRecipesSchema,
+  type ReactStylePolicy,
+  ReactStylePolicySchema,
   SemanticPolicySchema,
   type SemanticPolicy,
   validateWithSchema,
@@ -21,10 +29,12 @@ import {
 
 import { buildCatalogIndexes } from "./catalog-index.js";
 import { DesignSystemPackError } from "./errors.js";
+import { hashLoadedDesignSystemPackDocuments } from "./hash-loaded-pack.js";
 import { validateCompositions } from "./validate-compositions.js";
+import { validateReactRecipes } from "./validate-react-recipes.js";
 
 export interface LoadedDesignSystemPack {
-  manifest: DesignSystemPack;
+  manifest: DesignSystemPack | DesignSystemPackV2;
   componentsById: ReadonlyMap<string, ComponentCatalogEntry>;
   candidatesByRole: ReadonlyMap<string, readonly ComponentCatalogEntry[]>;
   semanticPolicy: SemanticPolicy;
@@ -34,60 +44,34 @@ export interface LoadedDesignSystemPack {
   verification: Verification;
 }
 
+export interface LoadedDesignSystemPackV2 extends LoadedDesignSystemPack {
+  manifest: DesignSystemPackV2;
+  reactRenderRecipes: ReactRenderRecipes;
+  reactStylePolicy: ReactStylePolicy;
+  sha256: string;
+}
+
 export async function loadDesignSystemPack(
   packDirectory: string,
 ): Promise<LoadedDesignSystemPack> {
   try {
     const root = await realpath(packDirectory);
-    const manifest = validateWithSchema(
-      DesignSystemPackSchema,
-      await readSafeJson(root, "pack.json"),
-    );
-    const [
-      catalog,
-      semanticPolicy,
-      pixsoMap,
-      compositionRules,
-      tokens,
-      verification,
-    ] = await Promise.all([
-      readAndValidate(root, manifest.files.catalog, ComponentCatalogSchema),
-      readAndValidate(
-        root,
-        manifest.files.semanticPolicy,
-        SemanticPolicySchema,
-      ),
-      readAndValidate(root, manifest.files.pixsoMap, PixsoMapSchema),
-      readAndValidate(
-        root,
-        manifest.files.compositionRules,
-        CompositionRulesSchema,
-      ),
-      readAndValidate(root, manifest.files.tokens, DesignTokensSchema),
-      readAndValidate(root, manifest.files.verification, VerificationSchema),
-    ]);
-
-    const indexes = buildCatalogIndexes(catalog.components, semanticPolicy);
-    validateCompositions({
-      componentsById: indexes.componentsById,
-      compositionRules,
-    });
-    validateVerification({
-      componentsById: indexes.componentsById,
-      candidatesByRole: indexes.candidatesByRole,
-      semanticPolicy,
-      verification,
-    });
-
-    return {
-      manifest,
-      ...indexes,
-      semanticPolicy,
-      exactPixsoMappings: pixsoMap.mappings,
-      compositionRules,
-      tokens,
-      verification,
-    };
+    const rawManifest = await readSafeJson(root, "pack.json");
+    if (!isSchemaDocument(rawManifest)) {
+      invalidManifest();
+    }
+    if (rawManifest.schema === "design-system-pack/v1") {
+      const manifest = validateWithSchema(DesignSystemPackSchema, rawManifest);
+      return loadCommonPack(root, manifest);
+    }
+    if (rawManifest.schema === "design-system-pack/v2") {
+      const manifest = validateWithSchema(
+        DesignSystemPackV2Schema,
+        rawManifest,
+      );
+      return loadV2Pack(root, manifest);
+    }
+    invalidManifest();
   } catch (error) {
     if (error instanceof DesignSystemPackError) {
       throw error;
@@ -98,6 +82,157 @@ export async function loadDesignSystemPack(
       { cause: error },
     );
   }
+}
+
+export async function loadDesignSystemPackV2(
+  packDirectory: string,
+): Promise<LoadedDesignSystemPackV2> {
+  const loaded = await loadDesignSystemPack(packDirectory);
+  if (loaded.manifest.schema !== "design-system-pack/v2") {
+    throw new DesignSystemPackError(
+      "DESIGN_SYSTEM_PACK_INVALID",
+      "React generation requires design-system-pack/v2",
+    );
+  }
+  return loaded as LoadedDesignSystemPackV2;
+}
+
+interface CommonPackDocuments {
+  catalog: ComponentCatalog;
+  semanticPolicy: SemanticPolicy;
+  pixsoMap: PixsoMap;
+  compositionRules: CompositionRules;
+  tokens: DesignTokens;
+  verification: Verification;
+}
+
+async function loadCommonPack(
+  root: string,
+  manifest: DesignSystemPack | DesignSystemPackV2,
+): Promise<LoadedDesignSystemPack> {
+  const documents = await loadCommonDocuments(root, manifest);
+  const indexes = validateCommonDocuments(documents);
+  return {
+    manifest,
+    ...indexes,
+    semanticPolicy: documents.semanticPolicy,
+    exactPixsoMappings: documents.pixsoMap.mappings,
+    compositionRules: documents.compositionRules,
+    tokens: documents.tokens,
+    verification: documents.verification,
+  };
+}
+
+async function loadV2Pack(
+  root: string,
+  manifest: DesignSystemPackV2,
+): Promise<LoadedDesignSystemPackV2> {
+  const [documents, reactRenderRecipes, reactStylePolicy] = await Promise.all([
+    loadCommonDocuments(root, manifest),
+    readAndValidate(
+      root,
+      manifest.files.reactRenderRecipes,
+      ReactRenderRecipesSchema,
+    ),
+    readAndValidate(
+      root,
+      manifest.files.reactStylePolicy,
+      ReactStylePolicySchema,
+    ),
+  ]);
+  const indexes = validateCommonDocuments(documents);
+  validateReactRecipes({
+    componentsById: indexes.componentsById,
+    semanticPolicy: documents.semanticPolicy,
+    compositionRules: documents.compositionRules,
+    reactRenderRecipes,
+    reactStylePolicy,
+  });
+
+  return {
+    manifest,
+    ...indexes,
+    semanticPolicy: documents.semanticPolicy,
+    exactPixsoMappings: documents.pixsoMap.mappings,
+    compositionRules: documents.compositionRules,
+    tokens: documents.tokens,
+    verification: documents.verification,
+    reactRenderRecipes,
+    reactStylePolicy,
+    sha256: hashLoadedDesignSystemPackDocuments({
+      manifest,
+      ...documents,
+      reactRenderRecipes,
+      reactStylePolicy,
+    }),
+  };
+}
+
+async function loadCommonDocuments(
+  root: string,
+  manifest: DesignSystemPack | DesignSystemPackV2,
+): Promise<CommonPackDocuments> {
+  const [
+    catalog,
+    semanticPolicy,
+    pixsoMap,
+    compositionRules,
+    tokens,
+    verification,
+  ] = await Promise.all([
+    readAndValidate(root, manifest.files.catalog, ComponentCatalogSchema),
+    readAndValidate(root, manifest.files.semanticPolicy, SemanticPolicySchema),
+    readAndValidate(root, manifest.files.pixsoMap, PixsoMapSchema),
+    readAndValidate(
+      root,
+      manifest.files.compositionRules,
+      CompositionRulesSchema,
+    ),
+    readAndValidate(root, manifest.files.tokens, DesignTokensSchema),
+    readAndValidate(root, manifest.files.verification, VerificationSchema),
+  ]);
+  return {
+    catalog,
+    semanticPolicy,
+    pixsoMap,
+    compositionRules,
+    tokens,
+    verification,
+  };
+}
+
+function validateCommonDocuments(documents: CommonPackDocuments) {
+  const indexes = buildCatalogIndexes(
+    documents.catalog.components,
+    documents.semanticPolicy,
+  );
+  validateCompositions({
+    componentsById: indexes.componentsById,
+    compositionRules: documents.compositionRules,
+  });
+  validateVerification({
+    componentsById: indexes.componentsById,
+    candidatesByRole: indexes.candidatesByRole,
+    semanticPolicy: documents.semanticPolicy,
+    verification: documents.verification,
+  });
+  return indexes;
+}
+
+function isSchemaDocument(value: unknown): value is { schema: string } {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "schema" in value &&
+    typeof value.schema === "string"
+  );
+}
+
+function invalidManifest(): never {
+  throw new DesignSystemPackError(
+    "DESIGN_SYSTEM_PACK_INVALID",
+    "Pack manifest has an unsupported schema",
+  );
 }
 
 async function readAndValidate<

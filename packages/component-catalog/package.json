@@ -7,6 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@uig/contracts": "workspace:*"
+    "@uig/contracts": "workspace:*",
+    "@uig/design-context": "workspace:*"
   }
 }
