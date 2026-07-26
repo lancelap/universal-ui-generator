@@ -1,8 +1,14 @@
-import type { Appearance, DesignNode, Diagnostic } from "@uig/contracts";
+import type {
+  Appearance,
+  DesignNode,
+  DesignNodeV2,
+  Diagnostic,
+} from "@uig/contracts";
 
 import { normalizeEffects } from "./normalize-effect.js";
 import { normalizeLayout } from "./normalize-layout.js";
 import { normalizeBorders, normalizeFills } from "./normalize-paint.js";
+import { normalizePosition } from "./normalize-position.js";
 import {
   finiteNumber,
   isRecord,
@@ -92,6 +98,19 @@ export function normalizePixsoNode(
     ...(layout ? { layout } : {}),
     ...(text ? { text } : {}),
     ...(component ? { component } : {}),
+  };
+}
+
+export function normalizePixsoNodeV2(
+  node: PixsoRecord,
+  childIds: string[],
+  context: NormalizeNodeContext,
+): DesignNodeV2 {
+  const normalized = normalizePixsoNode(node, childIds, context);
+  const position = normalizePosition(node);
+  return {
+    ...normalized,
+    ...(position ? { position } : {}),
   };
 }
 

@@ -61,7 +61,8 @@
             "top": 24,
             "width": 536,
             "height": 32,
-            "nodeText": "Заявка"
+            "nodeText": "Заявка",
+            "autoLayoutAbsolutePos": false
           },
           {
             "guid": "4:316",
@@ -74,7 +75,8 @@
             "height": 40,
             "componentKey": "Button/Primary",
             "componentNormName": "size=m",
-            "props": { "disabled": false }
+            "props": { "disabled": false },
+            "autoLayoutAbsolutePos": true
           },
           {
             "guid": "4:317",

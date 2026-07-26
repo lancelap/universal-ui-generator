@@ -1,10 +1,14 @@
 import minimalDesignIr from "./__fixtures__/minimal-design-ir.json";
+import minimalDesignIrV2 from "./__fixtures__/minimal-design-ir-v2.json";
 import minimalPixsoDsl from "./__fixtures__/minimal-pixso-dsl.json";
 
 import { stableStringify } from "@uig/contracts";
 import { describe, expect, it } from "vitest";
 
-import { normalizePixsoDesign } from "./normalize-design.js";
+import {
+  normalizePixsoDesign,
+  normalizePixsoDesignV2,
+} from "./normalize-design.js";
 
 const artifactId = "pixso_doc_4_314_0123456789ab";
 
@@ -207,5 +211,104 @@ describe("normalizePixsoDesign", () => {
         code: "DESIGN_NODE_REFERENCE_MISSING",
       }),
     );
+  });
+});
+
+describe("normalizePixsoDesignV2 positioning", () => {
+  it("normalizes the committed positioning fixture into a deterministic golden", () => {
+    const result = normalizePixsoDesignV2({
+      artifactId,
+      rawDsl: minimalPixsoDsl,
+    });
+
+    expect(stableStringify(result)).toBe(stableStringify(minimalDesignIrV2));
+  });
+
+  it("leaves position absent when Pixso provides no positioning fact", () => {
+    const root = fixtureRoot();
+    const child = root.childNode[0] as Record<string, unknown>;
+    delete child.autoLayoutAbsolutePos;
+
+    const result = normalizePixsoDesignV2({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:315/0/0"]?.position).toBeUndefined();
+  });
+
+  it("normalizes an explicit auto-layout item as flow", () => {
+    const root = fixtureRoot();
+    const child = root.childNode[0] as Record<string, unknown>;
+    child.autoLayoutAbsolutePos = false;
+
+    const result = normalizePixsoDesignV2({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:315/0/0"]?.position).toEqual({ mode: "flow" });
+  });
+
+  it("normalizes explicit absolute positioning with source top and left", () => {
+    const root = fixtureRoot();
+    const child = root.childNode[1] as Record<string, unknown>;
+    child.autoLayoutAbsolutePos = true;
+
+    const result = normalizePixsoDesignV2({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:316"]?.position).toEqual({
+      mode: "absolute",
+      inset: { top: 320, left: 32 },
+    });
+  });
+
+  it("rejects malformed explicit absolute insets", () => {
+    const root = fixtureRoot();
+    const child = root.childNode[1] as Record<string, unknown>;
+    child.autoLayoutAbsolutePos = true;
+    child.top = Number.POSITIVE_INFINITY;
+
+    expect(() =>
+      normalizePixsoDesignV2({
+        artifactId,
+        rawDsl: {
+          dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+        },
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "DESIGN_DSL_UNSUPPORTED",
+      }),
+    );
+  });
+
+  it("does not infer absolute positioning from overlapping coordinates", () => {
+    const root = fixtureRoot();
+    const first = root.childNode[0] as Record<string, unknown>;
+    const second = root.childNode[1] as Record<string, unknown>;
+    delete first.autoLayoutAbsolutePos;
+    delete second.autoLayoutAbsolutePos;
+    second.left = first.left;
+    second.top = first.top;
+
+    const result = normalizePixsoDesignV2({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.nodes["4:315/0/0"]?.position).toBeUndefined();
+    expect(result.nodes["4:316"]?.position).toBeUndefined();
   });
 });

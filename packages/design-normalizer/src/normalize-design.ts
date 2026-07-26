@@ -1,12 +1,20 @@
 import {
   DesignIRSchema,
   type DesignIR,
+  DesignIRV2Schema,
+  type DesignIRV2,
   type DesignNode,
+  type DesignNodeV2,
   type Diagnostic,
+  assertDesignIRV2Integrity,
   validateWithSchema,
 } from "@uig/contracts";
 
-import { normalizePixsoNode, pixsoNodeId } from "./normalize-node.js";
+import {
+  normalizePixsoNode,
+  normalizePixsoNodeV2,
+  pixsoNodeId,
+} from "./normalize-node.js";
 import {
   DesignNormalizationError,
   isRecord,
@@ -20,6 +28,25 @@ export function normalizePixsoDesign(input: {
   rootNodeId?: string;
   rawDsl: unknown;
 }): DesignIR {
+  return normalizePixsoDesignVersion(input, "v1") as DesignIR;
+}
+
+export function normalizePixsoDesignV2(input: {
+  artifactId: string;
+  rootNodeId?: string;
+  rawDsl: unknown;
+}): DesignIRV2 {
+  return normalizePixsoDesignVersion(input, "v2") as DesignIRV2;
+}
+
+function normalizePixsoDesignVersion(
+  input: {
+    artifactId: string;
+    rootNodeId?: string;
+    rawDsl: unknown;
+  },
+  version: "v1" | "v2",
+): DesignIR | DesignIRV2 {
   const envelope = readPixsoEnvelope(input.rawDsl);
   const root = selectRoot(envelope.dsl.pixTreeDslNodes, input.rootNodeId);
   if (!isRecord(root)) {
@@ -29,7 +56,7 @@ export function normalizePixsoDesign(input: {
   const nodeIndex = buildNodeIndex([root]);
   addNodesToIndex(nodeIndex, envelope.dsl.pixTreeDslNodes, false);
   const diagnostics: Diagnostic[] = [];
-  const nodes: Record<string, DesignNode> = {};
+  const nodes: Record<string, DesignNode | DesignNodeV2> = {};
   const reservedIds = new Set<string>();
   const activeObjects = new WeakSet<object>();
 
@@ -55,18 +82,21 @@ export function normalizePixsoDesign(input: {
     const childIds = resolvedChildren.map((child, index) =>
       traverse(child, `${id}/${index}`),
     );
-    nodes[id] = normalizePixsoNode(rawNode, childIds, {
+    const context = {
       artifactId: input.artifactId,
       diagnostics,
       nodeId: id,
-    });
+    };
+    nodes[id] =
+      version === "v2"
+        ? normalizePixsoNodeV2(rawNode, childIds, context)
+        : normalizePixsoNode(rawNode, childIds, context);
     activeObjects.delete(rawNode);
     return id;
   };
 
   const rootNodeId = traverse(root, pixsoNodeId(root));
-  const result: DesignIR = {
-    schema: "design-ir/v1",
+  const common = {
     sourceArtifactId: input.artifactId,
     dslVersion: envelope.dsl.dslVersion,
     rootNodeId,
@@ -75,7 +105,18 @@ export function normalizePixsoDesign(input: {
   };
 
   try {
-    return validateWithSchema(DesignIRSchema, result);
+    if (version === "v2") {
+      const result = validateWithSchema(DesignIRV2Schema, {
+        schema: "design-ir/v2",
+        ...common,
+      });
+      assertDesignIRV2Integrity(result);
+      return result;
+    }
+    return validateWithSchema(DesignIRSchema, {
+      schema: "design-ir/v1",
+      ...common,
+    });
   } catch (error) {
     throw unsupported(
       "Normalized DesignIR violates its public contract",
