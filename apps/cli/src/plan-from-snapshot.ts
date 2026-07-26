@@ -1,7 +1,7 @@
 import { join } from "node:path";
 
-import { loadDesignSystemPack } from "@uig/component-catalog";
-import { resolveUiManifest } from "@uig/component-resolver";
+import { loadDesignSystemPackV2 } from "@uig/component-catalog";
+import { resolveUiManifestV2 } from "@uig/component-resolver";
 import {
   type DesignSnapshot,
   type GenerationRun,
@@ -9,8 +9,8 @@ import {
   validateWithSchema,
 } from "@uig/contracts";
 import { buildDesignSummary, createArtifactStore } from "@uig/design-context";
-import { normalizePixsoDesign } from "@uig/design-normalizer";
-import { buildUiManifest } from "@uig/semantic-planner";
+import { normalizePixsoDesignV2 } from "@uig/design-normalizer";
+import { buildUiManifestV2 } from "@uig/semantic-planner";
 
 import { createRunLayout } from "./run-layout.js";
 import { writeRunArtifacts } from "./write-run-artifacts.js";
@@ -33,7 +33,7 @@ export async function planFromSnapshot(
   const [bytes, metadata, pack] = await Promise.all([
     store.read(input.artifactId),
     store.describe(input.artifactId),
-    loadDesignSystemPack(input.designSystemPackPath),
+    loadDesignSystemPackV2(input.designSystemPackPath),
   ]);
   const rawDsl = parseJson(bytes);
   const snapshot =
@@ -47,17 +47,19 @@ export async function planFromSnapshot(
       rawDsl,
       retrievedAt: now,
     });
-  const designIr = normalizePixsoDesign({
+  const designIr = normalizePixsoDesignV2({
     artifactId: input.artifactId,
     rootNodeId: snapshot.source.nodeId,
     rawDsl,
   });
-  const designSummary = buildDesignSummary({ ir: designIr });
-  const uiManifest = buildUiManifest({
+  const designSummary = buildDesignSummary({
+    ir: { ...designIr, schema: "design-ir/v1" },
+  });
+  const uiManifest = buildUiManifestV2({
     ir: designIr,
     exactMappings: [...pack.exactPixsoMappings],
   });
-  const resolutionPlan = resolveUiManifest({
+  const resolutionPlan = resolveUiManifestV2({
     manifest: uiManifest,
     designIr,
     pack,

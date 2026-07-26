@@ -6,12 +6,12 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import {
-  DesignIRSchema,
+  DesignIRV2Schema,
   DesignSnapshotSchema,
   DesignSummarySchema,
   GenerationRunSchema,
-  ResolutionPlanSchema,
-  UiManifestSchema,
+  ResolutionPlanV2Schema,
+  UiManifestV2Schema,
   validateWithSchema,
 } from "@uig/contracts";
 import { afterEach, describe, expect, it } from "vitest";
@@ -70,14 +70,14 @@ describe("planFromUrl", () => {
 
     validateWithSchema(GenerationRunSchema, JSON.parse(contents.run!));
     validateWithSchema(DesignSnapshotSchema, JSON.parse(contents.snapshot!));
-    validateWithSchema(DesignIRSchema, JSON.parse(contents.designIr!));
+    validateWithSchema(DesignIRV2Schema, JSON.parse(contents.designIr!));
     validateWithSchema(
       DesignSummarySchema,
       JSON.parse(contents.designSummary!),
     );
-    validateWithSchema(UiManifestSchema, JSON.parse(contents.uiManifest!));
+    validateWithSchema(UiManifestV2Schema, JSON.parse(contents.uiManifest!));
     validateWithSchema(
-      ResolutionPlanSchema,
+      ResolutionPlanV2Schema,
       JSON.parse(contents.resolutionPlan!),
     );
     expect(Array.isArray(JSON.parse(contents.diagnostics!))).toBe(true);
