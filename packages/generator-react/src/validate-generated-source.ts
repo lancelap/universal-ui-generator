@@ -5,7 +5,9 @@ import { ReactGenerationError } from "./errors.js";
 export interface GeneratedTsxExpectation {
   componentName: string;
   packages: string[];
-  localNames: string[];
+  importedLocalNames: string[];
+  jsxNames: string[];
+  localComponentNames: string[];
 }
 
 export function validateGeneratedTsx(
@@ -33,10 +35,13 @@ export function validateGeneratedTsx(
   }
 
   const expectedPackages = new Set(expectation.packages);
-  const expectedNames = new Set(expectation.localNames);
+  const expectedImportedNames = new Set(expectation.importedLocalNames);
+  const expectedJsxNames = new Set(expectation.jsxNames);
+  const expectedLocalComponentNames = new Set(expectation.localComponentNames);
   const importedPackages = new Set<string>();
   const importedNames = new Set<string>();
   const jsxNames = new Set<string>();
+  const localComponentNames = new Set<string>();
   let componentFound = false;
 
   const visit = (node: ts.Node): void => {
@@ -63,6 +68,13 @@ export function validateGeneratedTsx(
     ) {
       componentFound = true;
     }
+    const localComponentName = declaredLocalComponentName(
+      node,
+      expectation.componentName,
+    );
+    if (localComponentName) {
+      localComponentNames.add(localComponentName);
+    }
     if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
       const identifier = jsxTagIdentifier(node.tagName);
       if (identifier) {
@@ -81,15 +93,20 @@ export function validateGeneratedTsx(
       `Imported packages do not match expectation: received ${[...importedPackages].sort().join(", ")}`,
     );
   }
-  if (!sameSet(importedNames, expectedNames)) {
+  if (!sameSet(importedNames, expectedImportedNames)) {
     invalid(
       `Imported local names do not match expectation: received ${[...importedNames].sort().join(", ")}`,
     );
   }
-  for (const name of jsxNames) {
-    if (!expectedNames.has(name)) {
-      invalid(`Unexpected JSX identifier ${name}`);
-    }
+  if (!sameSet(jsxNames, expectedJsxNames)) {
+    invalid(
+      `JSX identifiers do not match expectation: received ${[...jsxNames].sort().join(", ")}`,
+    );
+  }
+  if (!sameSet(localComponentNames, expectedLocalComponentNames)) {
+    invalid(
+      `Local component declarations do not match expectation: received ${[...localComponentNames].sort().join(", ")}`,
+    );
   }
 }
 
@@ -114,6 +131,21 @@ function jsxTagIdentifier(
     return /^[A-Z]/.test(tagName.text) ? tagName.text : undefined;
   }
   return undefined;
+}
+
+function declaredLocalComponentName(
+  node: ts.Node,
+  rootComponentName: string,
+): string | undefined {
+  const name =
+    ts.isFunctionDeclaration(node) || ts.isClassDeclaration(node)
+      ? node.name?.text
+      : ts.isVariableDeclaration(node) && ts.isIdentifier(node.name)
+        ? node.name.text
+        : undefined;
+  return name && name !== rootComponentName && /^[A-Z]/.test(name)
+    ? name
+    : undefined;
 }
 
 function sameSet(

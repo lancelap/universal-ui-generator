@@ -47,13 +47,49 @@ describe("validateGeneratedTsx", () => {
   const expectation = {
     componentName: "DialogPreview",
     packages: ["@ui/assets", "@ui/core"],
-    localNames: ["Dialog", "DialogBody", "Logo"],
+    importedLocalNames: ["Dialog", "DialogBody", "Logo"],
+    jsxNames: ["Dialog", "DialogBody", "Logo"],
+    localComponentNames: [],
   };
 
   it("accepts the AST-emitted source", () => {
     expect(() =>
       validateGeneratedTsx(emitTsx(model(), "DialogPreview"), expectation),
     ).not.toThrow();
+  });
+
+  it("accepts a locally declared fallback component without treating it as an import", () => {
+    const source = [
+      'import { Dialog } from "@ui/core";',
+      "function GeneratedWarning() { return <div />; }",
+      "export function DialogPreview() { return <Dialog><GeneratedWarning /></Dialog>; }",
+      "",
+    ].join("\n");
+
+    expect(() =>
+      validateGeneratedTsx(source, {
+        componentName: "DialogPreview",
+        packages: ["@ui/core"],
+        importedLocalNames: ["Dialog"],
+        jsxNames: ["Dialog", "GeneratedWarning"],
+        localComponentNames: ["GeneratedWarning"],
+      }),
+    ).not.toThrow();
+  });
+
+  it("rejects a source that omits an expected JSX component despite retaining its imports", () => {
+    const source = [
+      'import Logo from "@ui/assets";',
+      'import { Dialog, DialogBody } from "@ui/core";',
+      "export function DialogPreview() { return <Dialog><Logo /></Dialog>; }",
+      "",
+    ].join("\n");
+
+    expect(() => validateGeneratedTsx(source, expectation)).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_SOURCE_INVALID",
+      }),
+    );
   });
 
   it("rejects sources with an unexpected package, JSX identifier, or syntax", () => {
