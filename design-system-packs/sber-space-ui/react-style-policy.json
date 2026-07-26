@@ -1,0 +1,95 @@
+{
+  "schema": "react-style-policy/v1",
+  "defaults": {
+    "layout": {
+      "allowed": ["display", "flexDirection", "gap", "padding"]
+    },
+    "appearance": { "allowed": [] },
+    "internalSelectors": false,
+    "inlineStyles": false
+  },
+  "components": [
+    {
+      "componentId": "base.Button",
+      "layout": { "allowed": ["width", "minWidth", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.Field",
+      "layout": { "allowed": ["width", "minWidth", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.FormControl",
+      "layout": {
+        "allowed": ["display", "flexDirection", "gap", "width", "maxWidth"]
+      },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.FormLabel",
+      "layout": { "allowed": [] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.Modal",
+      "layout": { "allowed": [] },
+      "appearance": { "allowed": [] },
+      "wrapper": "forbidden"
+    },
+    {
+      "componentId": "base.ModalHeader",
+      "layout": { "allowed": ["padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.ModalBody",
+      "layout": { "allowed": ["display", "flexDirection", "gap", "padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.ModalFooter",
+      "layout": { "allowed": ["display", "gap", "padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.Stack",
+      "layout": {
+        "allowed": [
+          "display",
+          "flexDirection",
+          "gap",
+          "padding",
+          "width",
+          "maxWidth",
+          "alignItems",
+          "justifyContent",
+          "flexWrap"
+        ]
+      },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.Typography",
+      "layout": { "allowed": ["width", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    }
+  ],
+  "fallback": {
+    "layout": "all-supported",
+    "appearance": "all-supported"
+  },
+  "provenance": {
+    "kind": "generator-policy",
+    "source": "Sber Space UI external-layout policy"
+  }
+}

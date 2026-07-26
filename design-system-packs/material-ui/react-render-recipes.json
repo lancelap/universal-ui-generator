@@ -1,0 +1,164 @@
+{
+  "schema": "react-render-recipes/v1",
+  "components": [
+    {
+      "componentId": "mui.Button",
+      "content": { "source": "content.label", "target": "children" },
+      "stateProps": [
+        {
+          "source": "state.disabled",
+          "target": "disabled",
+          "valueType": "boolean"
+        }
+      ],
+      "eventProps": [{ "source": "activate", "target": "onClick" }],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/button/"
+      }
+    },
+    {
+      "componentId": "mui.TextField",
+      "content": { "source": "content.label", "target": "label" },
+      "stateProps": [
+        {
+          "source": "state.disabled",
+          "target": "disabled",
+          "valueType": "boolean"
+        },
+        {
+          "source": "state.placeholder",
+          "target": "placeholder",
+          "valueType": "string"
+        }
+      ],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/text-field/"
+      }
+    },
+    {
+      "componentId": "mui.Dialog",
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "forbidden",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/dialog/"
+      }
+    },
+    {
+      "componentId": "mui.DialogTitle",
+      "content": { "source": "content.text", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "optional",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/dialog-title/"
+      }
+    },
+    {
+      "componentId": "mui.DialogContent",
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/dialog-content/"
+      }
+    },
+    {
+      "componentId": "mui.DialogActions",
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/dialog-actions/"
+      }
+    },
+    {
+      "componentId": "mui.Alert",
+      "content": { "source": "content.text", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/alert/"
+      }
+    },
+    {
+      "componentId": "mui.Stack",
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/stack/"
+      }
+    },
+    {
+      "componentId": "mui.Typography",
+      "content": { "source": "content.text", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/api/typography/"
+      }
+    }
+  ],
+  "compositions": [
+    {
+      "compositionId": "mui-dialog",
+      "rootComponentId": "mui.Dialog",
+      "slots": [
+        {
+          "name": "heading",
+          "componentId": "mui.DialogTitle",
+          "acceptsRoles": ["heading"],
+          "cardinality": "zero-or-one"
+        },
+        {
+          "name": "body",
+          "componentId": "mui.DialogContent",
+          "acceptsRemaining": true,
+          "cardinality": "many"
+        },
+        {
+          "name": "actions",
+          "componentId": "mui.DialogActions",
+          "acceptsRoles": ["actionGroup"],
+          "cardinality": "zero-or-one"
+        }
+      ],
+      "provenance": {
+        "kind": "official-api-doc",
+        "source": "https://mui.com/material-ui/react-dialog/"
+      }
+    }
+  ]
+}

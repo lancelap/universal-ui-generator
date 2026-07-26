@@ -1,0 +1,87 @@
+{
+  "schema": "react-style-policy/v1",
+  "defaults": {
+    "layout": {
+      "allowed": ["display", "flexDirection", "gap", "padding"]
+    },
+    "appearance": { "allowed": [] },
+    "internalSelectors": false,
+    "inlineStyles": false
+  },
+  "components": [
+    {
+      "componentId": "mui.Button",
+      "layout": { "allowed": ["width", "minWidth", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.TextField",
+      "layout": { "allowed": ["width", "minWidth", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.Dialog",
+      "layout": { "allowed": [] },
+      "appearance": { "allowed": [] },
+      "wrapper": "forbidden"
+    },
+    {
+      "componentId": "mui.DialogTitle",
+      "layout": { "allowed": ["padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.DialogContent",
+      "layout": { "allowed": ["display", "flexDirection", "gap", "padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.DialogActions",
+      "layout": { "allowed": ["display", "gap", "padding"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.Alert",
+      "layout": { "allowed": ["width", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.Stack",
+      "layout": {
+        "allowed": [
+          "display",
+          "flexDirection",
+          "gap",
+          "padding",
+          "width",
+          "maxWidth",
+          "alignItems",
+          "justifyContent",
+          "flexWrap"
+        ]
+      },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
+      "componentId": "mui.Typography",
+      "layout": { "allowed": ["width", "maxWidth"] },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    }
+  ],
+  "fallback": {
+    "layout": "all-supported",
+    "appearance": "all-supported"
+  },
+  "provenance": {
+    "kind": "generator-policy",
+    "source": "Material UI external-layout policy"
+  }
+}

@@ -1,0 +1,192 @@
+{
+  "schema": "react-render-recipes/v1",
+  "components": [
+    {
+      "componentId": "base.Button",
+      "content": { "source": "content.label", "target": "children" },
+      "stateProps": [
+        {
+          "source": "state.disabled",
+          "target": "disabled",
+          "valueType": "boolean"
+        }
+      ],
+      "eventProps": [{ "source": "activate", "target": "onClick" }],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Button/Button.md"
+      }
+    },
+    {
+      "componentId": "base.Field",
+      "content": { "source": "content.value", "target": "value" },
+      "stateProps": [
+        {
+          "source": "state.disabled",
+          "target": "disabled",
+          "valueType": "boolean"
+        },
+        {
+          "source": "state.placeholder",
+          "target": "placeholder",
+          "valueType": "string"
+        }
+      ],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Field/Field.md"
+      }
+    },
+    {
+      "componentId": "base.FormControl",
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+      }
+    },
+    {
+      "componentId": "base.FormLabel",
+      "content": { "source": "content.label", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+      }
+    },
+    {
+      "componentId": "base.Modal",
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "forbidden",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    },
+    {
+      "componentId": "base.ModalHeader",
+      "content": { "source": "content.label", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "optional",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    },
+    {
+      "componentId": "base.ModalBody",
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    },
+    {
+      "componentId": "base.ModalFooter",
+      "stateProps": [],
+      "eventProps": [],
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    },
+    {
+      "componentId": "base.Stack",
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Stack/Stack.md"
+      }
+    },
+    {
+      "componentId": "base.Typography",
+      "content": { "source": "content.text", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Typography/Typography.md"
+      }
+    }
+  ],
+  "compositions": [
+    {
+      "compositionId": "sber-dialog",
+      "rootComponentId": "base.Modal",
+      "slots": [
+        {
+          "name": "heading",
+          "componentId": "base.ModalHeader",
+          "acceptsRoles": ["heading"],
+          "cardinality": "zero-or-one"
+        },
+        {
+          "name": "body",
+          "componentId": "base.ModalBody",
+          "acceptsRemaining": true,
+          "cardinality": "many"
+        },
+        {
+          "name": "actions",
+          "componentId": "base.ModalFooter",
+          "acceptsRoles": ["actionGroup"],
+          "cardinality": "zero-or-one"
+        }
+      ],
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    },
+    {
+      "compositionId": "sber-text-input",
+      "rootComponentId": "base.Field",
+      "slots": [
+        {
+          "name": "control",
+          "componentId": "base.FormControl",
+          "acceptsRemaining": true,
+          "cardinality": "zero-or-one"
+        },
+        {
+          "name": "label",
+          "componentId": "base.FormLabel",
+          "acceptsRoles": ["label"],
+          "cardinality": "zero-or-one"
+        }
+      ],
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+      }
+    }
+  ]
+}

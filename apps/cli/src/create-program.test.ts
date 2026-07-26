@@ -154,7 +154,7 @@ describe("uig CLI", () => {
       }).parseAsync(["pack", "validate", join(packsRoot, packId)], {
         from: "user",
       });
-      expect(written.text).toContain(`${packId}@1.0.0`);
+      expect(written.text).toContain(`${packId}@2.0.0`);
     },
   );
 

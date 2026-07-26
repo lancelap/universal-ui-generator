@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 import { afterEach, describe, expect, it } from "vitest";
 
-import { loadDesignSystemPack } from "./load-pack.js";
+import { loadDesignSystemPack, loadDesignSystemPackV2 } from "./load-pack.js";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const sberPack = join(repoRoot, "design-system-packs", "sber-space-ui");
@@ -47,6 +47,17 @@ describe("loadDesignSystemPack", () => {
         (mapping) => mapping.componentKey.length === 0,
       ),
     ).toBe(false);
+  });
+
+  it.each([
+    ["Sber Space UI", sberPack],
+    ["Material UI", muiPack],
+  ])("loads the built-in %s pack as generation-ready v2", async (_, path) => {
+    const pack = await loadDesignSystemPackV2(path);
+
+    expect(pack.manifest.schema).toBe("design-system-pack/v2");
+    expect(pack.reactRenderRecipes.components.length).toBeGreaterThan(0);
+    expect(pack.sha256).toMatch(/^[a-f0-9]{64}$/);
   });
 
   it("rejects a manifest path that escapes the pack directory", async () => {
