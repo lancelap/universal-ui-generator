@@ -31,12 +31,16 @@ export async function main(argv = process.argv): Promise<void> {
     stderr: process.stderr,
   });
   try {
-    await program.parseAsync(argv);
+    await program.parseAsync(normalizeCliArgv(argv));
     process.exitCode = program.exitCode ?? 0;
   } catch (error) {
     process.stderr.write(`${formatDiagnostic(error)}\n`);
     process.exitCode = 1;
   }
+}
+
+export function normalizeCliArgv(argv: string[]): string[] {
+  return argv[2] === "--" ? [...argv.slice(0, 2), ...argv.slice(3)] : [...argv];
 }
 
 if (
