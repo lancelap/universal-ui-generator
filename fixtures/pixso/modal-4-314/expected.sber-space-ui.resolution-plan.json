@@ -1,19 +1,6 @@
 {
   "diagnostics": [
     {
-      "blocking": true,
-      "code": "NATIVE_FALLBACK_FORBIDDEN",
-      "evidence": {
-        "semanticRole": "combobox"
-      },
-      "message": "No permitted component decision exists for combobox",
-      "severity": "error",
-      "source": {
-        "manifestNodeId": "ui_combobox_4-316"
-      },
-      "stage": "component-resolution"
-    },
-    {
       "blocking": false,
       "code": "VISUAL_TOKEN_MISMATCH",
       "evidence": {
@@ -88,11 +75,15 @@
       "semanticRole": "dialog"
     },
     {
+      "binding": {
+        "componentId": "base.Autocomplete",
+        "export": "Autocomplete",
+        "exportKind": "named",
+        "package": "@sber-space-ui/autocomplete"
+      },
       "confidence": 1,
-      "decision": "blocked",
-      "diagnosticCodes": [
-        "NATIVE_FALLBACK_FORBIDDEN"
-      ],
+      "decision": "reuse",
+      "diagnosticCodes": [],
       "evidence": [
         {
           "kind": "component-key",
@@ -114,6 +105,7 @@
         }
       ],
       "manifestNodeId": "ui_combobox_4-316",
+      "props": {},
       "semanticRole": "combobox"
     },
     {
@@ -188,10 +180,10 @@
   "schema": "resolution-plan/v1",
   "sourceManifestId": "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105",
   "summary": {
-    "blocked": 1,
+    "blocked": 0,
     "compose": 1,
     "fallback": 0,
-    "reuse": 2
+    "reuse": 3
   },
   "target": {
     "designSystem": "sber-space-ui",

@@ -20,8 +20,8 @@
       "unresolvedCode": "COMPONENT_UNRESOLVED"
     },
     "combobox": {
-      "allowedDecisions": ["blocked"],
-      "candidateComponentIds": [],
+      "allowedDecisions": ["reuse", "blocked"],
+      "candidateComponentIds": ["base.Autocomplete"],
       "nativeFallback": false,
       "unresolvedCode": "COMPONENT_UNRESOLVED"
     },

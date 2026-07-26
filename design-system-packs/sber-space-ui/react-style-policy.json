@@ -22,6 +22,14 @@
       "wrapper": "allowed"
     },
     {
+      "componentId": "base.Autocomplete",
+      "layout": {
+        "allowed": ["width", "minWidth", "maxWidth", "alignSelf"]
+      },
+      "appearance": { "allowed": [] },
+      "wrapper": "allowed"
+    },
+    {
       "componentId": "base.FormControl",
       "layout": {
         "allowed": ["display", "flexDirection", "gap", "width", "maxWidth"]

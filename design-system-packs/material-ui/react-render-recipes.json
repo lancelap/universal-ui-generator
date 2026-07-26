@@ -1,8 +1,9 @@
 {
-  "schema": "react-render-recipes/v1",
+  "schema": "react-render-recipes/v2",
   "components": [
     {
       "componentId": "mui.Button",
+      "staticProps": [],
       "content": { "source": "content.label", "target": "children" },
       "stateProps": [
         {
@@ -22,6 +23,7 @@
     },
     {
       "componentId": "mui.TextField",
+      "staticProps": [],
       "content": { "source": "content.label", "target": "label" },
       "stateProps": [
         {
@@ -46,6 +48,7 @@
     },
     {
       "componentId": "mui.Dialog",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "semanticChildrenPolicy": "required",
@@ -57,6 +60,7 @@
     },
     {
       "componentId": "mui.DialogTitle",
+      "staticProps": [],
       "content": { "source": "content.text", "target": "children" },
       "stateProps": [],
       "eventProps": [],
@@ -70,6 +74,7 @@
     },
     {
       "componentId": "mui.DialogContent",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "classNameProp": "className",
@@ -82,6 +87,7 @@
     },
     {
       "componentId": "mui.DialogActions",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "classNameProp": "className",
@@ -94,6 +100,7 @@
     },
     {
       "componentId": "mui.Alert",
+      "staticProps": [],
       "content": { "source": "content.text", "target": "children" },
       "stateProps": [],
       "eventProps": [],
@@ -107,10 +114,11 @@
     },
     {
       "componentId": "mui.Stack",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "classNameProp": "className",
-      "semanticChildrenPolicy": "required",
+      "semanticChildrenPolicy": "render-only-optional",
       "wrapper": "allowed",
       "provenance": {
         "kind": "official-api-doc",
@@ -119,6 +127,7 @@
     },
     {
       "componentId": "mui.Typography",
+      "staticProps": [],
       "content": { "source": "content.text", "target": "children" },
       "stateProps": [],
       "eventProps": [],

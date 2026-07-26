@@ -12,6 +12,11 @@
       "source": "gigacode-mcp catalog"
     },
     {
+      "componentId": "base.Autocomplete",
+      "status": "verified",
+      "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Autocomplete/Autocomplete.md"
+    },
+    {
       "componentId": "base.FormControl",
       "status": "verified",
       "source": "gigacode-mcp catalog"

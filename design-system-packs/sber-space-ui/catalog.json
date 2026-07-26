@@ -38,6 +38,24 @@
       }
     },
     {
+      "id": "base.Autocomplete",
+      "package": "@sber-space-ui/autocomplete",
+      "export": "Autocomplete",
+      "exportKind": "named",
+      "semanticRoles": ["combobox"],
+      "capabilities": ["value", "options", "change", "dropdown"],
+      "formAdapters": ["controlled"],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Autocomplete/Autocomplete.md"
+      }
+    },
+    {
       "id": "base.FormControl",
       "package": "@sber-space-ui/form-control",
       "export": "FormControl",

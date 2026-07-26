@@ -24,16 +24,22 @@ describe("resolveNode decision table", () => {
     ["heading", "reuse"],
     ["dialog", "compose"],
     ["warning", "fallback"],
-    ["combobox", "blocked"],
-  ] as const)("resolves %s as %s", (role, decision) => {
+    ["combobox", "reuse", "base.Autocomplete"],
+  ] as const)("resolves %s as %s", (role, decision, componentId?) => {
     const result = resolveNode({ node: uiNode(role), pack });
 
     expect(result.resolution.decision).toBe(decision);
-    if (decision === "blocked") {
-      expect(result.resolution).not.toHaveProperty("binding");
-      expect(result.diagnostics).toContainEqual(
-        expect.objectContaining({ blocking: true }),
-      );
+    if (componentId === "base.Autocomplete") {
+      expect(result.resolution).toMatchObject({
+        binding: {
+          componentId,
+          package: "@sber-space-ui/autocomplete",
+          export: "Autocomplete",
+          exportKind: "named",
+        },
+      });
+      expect(result.resolution).not.toHaveProperty("localComponentName");
+      expect(result.diagnostics).toEqual([]);
     }
   });
 

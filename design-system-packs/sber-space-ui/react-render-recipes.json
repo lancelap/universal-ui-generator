@@ -1,8 +1,9 @@
 {
-  "schema": "react-render-recipes/v1",
+  "schema": "react-render-recipes/v2",
   "components": [
     {
       "componentId": "base.Button",
+      "staticProps": [],
       "content": { "source": "content.label", "target": "children" },
       "stateProps": [
         {
@@ -22,6 +23,7 @@
     },
     {
       "componentId": "base.Field",
+      "staticProps": [],
       "content": { "source": "content.value", "target": "value" },
       "stateProps": [
         {
@@ -44,7 +46,41 @@
       }
     },
     {
+      "componentId": "base.Autocomplete",
+      "staticProps": [
+        {
+          "target": "mode",
+          "value": { "kind": "literal", "value": "dropdown" },
+          "reason": "render-only"
+        },
+        {
+          "target": "value",
+          "value": { "kind": "literal", "value": "" },
+          "reason": "render-only"
+        },
+        {
+          "target": "options",
+          "value": { "kind": "empty-array" },
+          "reason": "render-only"
+        },
+        {
+          "target": "onChange",
+          "value": { "kind": "noop" },
+          "reason": "render-only"
+        }
+      ],
+      "stateProps": [],
+      "eventProps": [{ "source": "change", "target": "onChange" }],
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Autocomplete/Autocomplete.md"
+      }
+    },
+    {
       "componentId": "base.FormControl",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "semanticChildrenPolicy": "required",
@@ -56,6 +92,7 @@
     },
     {
       "componentId": "base.FormLabel",
+      "staticProps": [],
       "content": { "source": "content.label", "target": "children" },
       "stateProps": [],
       "eventProps": [],
@@ -68,6 +105,7 @@
     },
     {
       "componentId": "base.Modal",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "semanticChildrenPolicy": "required",
@@ -79,6 +117,7 @@
     },
     {
       "componentId": "base.ModalHeader",
+      "staticProps": [],
       "content": { "source": "content.label", "target": "children" },
       "stateProps": [],
       "eventProps": [],
@@ -91,6 +130,7 @@
     },
     {
       "componentId": "base.ModalBody",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "semanticChildrenPolicy": "required",
@@ -102,6 +142,7 @@
     },
     {
       "componentId": "base.ModalFooter",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "semanticChildrenPolicy": "required",
@@ -113,10 +154,11 @@
     },
     {
       "componentId": "base.Stack",
+      "staticProps": [],
       "stateProps": [],
       "eventProps": [],
       "classNameProp": "className",
-      "semanticChildrenPolicy": "required",
+      "semanticChildrenPolicy": "render-only-optional",
       "wrapper": "allowed",
       "provenance": {
         "kind": "canonical-library-doc",
@@ -125,6 +167,7 @@
     },
     {
       "componentId": "base.Typography",
+      "staticProps": [],
       "content": { "source": "content.text", "target": "children" },
       "stateProps": [],
       "eventProps": [],
