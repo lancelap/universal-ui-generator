@@ -6,7 +6,8 @@ export class SemanticPlannerError extends Error {
   readonly name = "SemanticPlannerError";
 
   constructor(
-    readonly code: "SEMANTIC_MAPPING_CONFLICT",
+    readonly code:
+      "SEMANTIC_MAPPING_CONFLICT" | "SEMANTIC_INTERACTION_CONFLICT",
     message: string,
   ) {
     super(message);

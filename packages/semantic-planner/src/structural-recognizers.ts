@@ -1,4 +1,9 @@
-import type { DesignIR, DesignNode } from "@uig/contracts";
+import type {
+  DesignIR,
+  DesignIRV2,
+  DesignNode,
+  DesignNodeV2,
+} from "@uig/contracts";
 
 import {
   recognition,
@@ -12,8 +17,8 @@ export const confidencePolicy = {
 } as const;
 
 export function recognizeStructure(
-  node: DesignNode,
-  ir: DesignIR,
+  node: DesignNode | DesignNodeV2,
+  ir: DesignIR | DesignIRV2,
 ): SemanticRecognition | undefined {
   const children = node.children.flatMap((id) => {
     const child = ir.nodes[id];
