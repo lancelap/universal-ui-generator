@@ -120,6 +120,34 @@ export function queryDesignContext(
   }
 }
 
+export function createVisibleTreeCursor(
+  ir: DesignIR,
+  input: { rootNodeId: string; depth: number; offset: number },
+): string {
+  assertRoot(ir, input.rootNodeId);
+  if (!Number.isInteger(input.depth) || input.depth < 0) {
+    throw new DesignQueryError(
+      "DESIGN_QUERY_DEPTH_INVALID",
+      "Visible-tree depth must be a non-negative integer",
+    );
+  }
+  if (!Number.isInteger(input.offset) || input.offset < 0) {
+    throw new DesignQueryError(
+      "DESIGN_QUERY_CURSOR_INVALID",
+      "Visible-tree cursor offset must be a non-negative integer",
+    );
+  }
+
+  return encodeCursor({
+    selector: "visible-tree",
+    offset: input.offset,
+    fingerprint: queryFingerprint(ir, "visible-tree", {
+      rootNodeId: input.rootNodeId,
+      depth: input.depth,
+    }),
+  });
+}
+
 function documentOrder(ir: DesignIR, rootNodeId: string): DesignNode[] {
   assertRoot(ir, rootNodeId);
   const ordered: DesignNode[] = [];
