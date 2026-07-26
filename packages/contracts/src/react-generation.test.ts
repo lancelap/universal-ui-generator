@@ -1,9 +1,13 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   ContractValidationError,
+  type ReactGenerationBundleV2,
   type ReactGenerationReport,
+  type ReactGenerationReportV1,
+  type ReactGenerationReportV2,
   ReactGenerationReportSchema,
+  ReactGenerationReportV2Schema,
   assertReactGenerationReportIntegrity,
   validateWithSchema,
 } from "./index.js";
@@ -94,7 +98,124 @@ function reportFixture(status: "generated" | "blocked"): ReactGenerationReport {
   };
 }
 
+const generatedV2ReportFixture = {
+  schema: "react-generation-report/v2",
+  sourceRunId: "run_20260726_4-314",
+  designSystem: "sber-space-ui",
+  status: "generated",
+  componentName: "PaymentDetailsModal",
+  validation: {
+    inputContracts: "passed",
+    pack: "passed",
+    syntax: "passed",
+    targetTypecheck: "not-run",
+  },
+  statistics: {
+    manifestNodes: 7,
+    imports: 5,
+    generatedProps: 6,
+    cssRules: 6,
+    fallbackComponents: 0,
+    filesByKind: {
+      tsx: 1,
+      cssModule: 1,
+      fallbackTsx: 0,
+      fallbackCssModule: 0,
+    },
+    sourceByteLength: 1500,
+  },
+  renderOnlyProps: [
+    {
+      manifestNodeId: "ui_combobox_4-316",
+      componentId: "base.Autocomplete",
+      propNames: ["mode", "onChange", "options", "value"],
+    },
+  ],
+  files: [
+    {
+      path: "PaymentDetailsModal.tsx",
+      kind: "tsx",
+      sha256: "a".repeat(64),
+      byteLength: 1240,
+    },
+    {
+      path: "PaymentDetailsModal.module.css",
+      kind: "css-module",
+      sha256: "b".repeat(64),
+      byteLength: 260,
+    },
+  ],
+  diagnostics: [],
+} as const;
+
 describe("React generation report", () => {
+  it("accepts a v2 render-only report while preserving historical v1", () => {
+    expect(
+      validateWithSchema(
+        ReactGenerationReportV2Schema,
+        generatedV2ReportFixture,
+      ),
+    ).toEqual(generatedV2ReportFixture);
+    expect(
+      validateWithSchema(
+        ReactGenerationReportSchema,
+        reportFixture("generated"),
+      ),
+    ).toEqual(reportFixture("generated"));
+  });
+
+  it.each([
+    ["missing render-only props", undefined],
+    ["empty prop name", [""]],
+  ] as const)("rejects v2 report with %s", (_label, propNames) => {
+    const { renderOnlyProps: _renderOnlyProps, ...withoutRenderOnlyProps } =
+      generatedV2ReportFixture;
+    const report =
+      propNames === undefined
+        ? withoutRenderOnlyProps
+        : {
+            ...generatedV2ReportFixture,
+            renderOnlyProps: [
+              {
+                ...generatedV2ReportFixture.renderOnlyProps[0],
+                propNames,
+              },
+            ],
+          };
+
+    expect(() =>
+      validateWithSchema(ReactGenerationReportV2Schema, report),
+    ).toThrowError(ContractValidationError);
+  });
+
+  it("keeps v2 bundles report-version exact", () => {
+    expectTypeOf<
+      ReactGenerationBundleV2["report"]
+    >().toEqualTypeOf<ReactGenerationReportV2>();
+    expectTypeOf<
+      ReactGenerationBundleV2["report"]
+    >().not.toEqualTypeOf<ReactGenerationReportV1>();
+  });
+
+  it("rejects blocked v2 output with source files during integrity validation", () => {
+    const generatedReport = validateWithSchema(
+      ReactGenerationReportV2Schema,
+      generatedV2ReportFixture,
+    );
+
+    expect(() =>
+      assertReactGenerationReportIntegrity({
+        ...generatedReport,
+        status: "blocked",
+        validation: {
+          ...generatedReport.validation,
+          syntax: "not-run",
+        },
+        diagnostics: [diagnostic],
+      }),
+    ).toThrow(/^REACT_GENERATION_REPORT_INTEGRITY:/);
+  });
+
   it.each(["generated", "blocked"] as const)(
     "validates a %s report",
     (status) => {

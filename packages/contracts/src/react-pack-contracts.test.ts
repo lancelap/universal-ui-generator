@@ -4,6 +4,7 @@ import {
   ContractValidationError,
   DesignSystemPackV2Schema,
   ReactRenderRecipesSchema,
+  ReactRenderRecipesV2Schema,
   ReactStylePolicySchema,
   validateWithSchema,
 } from "./index.js";
@@ -48,6 +49,33 @@ const recipesFixture = {
       provenance,
     },
   ],
+} as const;
+
+const recipesV2Fixture = {
+  schema: "react-render-recipes/v2",
+  components: [
+    {
+      componentId: "base.Autocomplete",
+      staticProps: [
+        {
+          target: "options",
+          value: { kind: "empty-array" },
+          reason: "render-only",
+        },
+        {
+          target: "onChange",
+          value: { kind: "noop" },
+          reason: "render-only",
+        },
+      ],
+      stateProps: [],
+      eventProps: [{ source: "change", target: "onChange" }],
+      semanticChildrenPolicy: "forbidden",
+      wrapper: "allowed",
+      provenance: { kind: "canonical-library-doc", source: "Autocomplete.md" },
+    },
+  ],
+  compositions: [],
 } as const;
 
 const stylePolicyFixture = {
@@ -105,6 +133,46 @@ describe("React pack contracts", () => {
     expect(validateWithSchema(DesignSystemPackV2Schema, packFixture)).toEqual(
       packFixture,
     );
+  });
+
+  it("accepts render-only recipe v2 and preserves the v1 fixture", () => {
+    expect(
+      validateWithSchema(ReactRenderRecipesV2Schema, recipesV2Fixture),
+    ).toEqual(recipesV2Fixture);
+    expect(
+      validateWithSchema(ReactRenderRecipesSchema, recipesV2Fixture),
+    ).toEqual(recipesV2Fixture);
+    expect(
+      validateWithSchema(ReactRenderRecipesSchema, recipesFixture),
+    ).toEqual(recipesFixture);
+  });
+
+  it.each([
+    ["source", { source: "state.options" }],
+    ["expression", { expression: "options.map(toOption)" }],
+    ["non-empty array", { value: { kind: "literal", value: ["one"] } }],
+    ["object", { value: { kind: "literal", value: { nested: true } } }],
+    [
+      "unknown kind",
+      { value: { kind: "expression", value: "options.map(toOption)" } },
+    ],
+  ] as const)("rejects render-only static prop %s values", (_label, change) => {
+    expect(() =>
+      validateWithSchema(ReactRenderRecipesV2Schema, {
+        ...recipesV2Fixture,
+        components: [
+          {
+            ...recipesV2Fixture.components[0],
+            staticProps: [
+              {
+                ...recipesV2Fixture.components[0].staticProps[0],
+                ...change,
+              },
+            ],
+          },
+        ],
+      }),
+    ).toThrowError(ContractValidationError);
   });
 
   it("rejects an arbitrary content source", () => {

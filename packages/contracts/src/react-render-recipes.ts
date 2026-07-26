@@ -26,10 +26,17 @@ export const EventSourceSchema = Type.Union([
   Type.Literal("change"),
 ]);
 
-export const SemanticChildrenPolicySchema = Type.Union([
+export const SemanticChildrenPolicyV1Schema = Type.Union([
   Type.Literal("forbidden"),
   Type.Literal("optional"),
   Type.Literal("required"),
+]);
+
+export const SemanticChildrenPolicyV2Schema = Type.Union([
+  Type.Literal("forbidden"),
+  Type.Literal("optional"),
+  Type.Literal("required"),
+  Type.Literal("render-only-optional"),
 ]);
 
 export const CompositionCardinalitySchema = Type.Union([
@@ -50,7 +57,7 @@ const PropValueTypeSchema = Type.Union([
   Type.Literal("number"),
 ]);
 
-export const ReactComponentRecipeSchema = closedObject({
+export const ReactComponentRecipeV1Schema = closedObject({
   componentId: Type.String({ minLength: 1 }),
   content: Type.Optional(
     closedObject({
@@ -72,7 +79,55 @@ export const ReactComponentRecipeSchema = closedObject({
     }),
   ),
   classNameProp: Type.Optional(Type.String({ minLength: 1 })),
-  semanticChildrenPolicy: SemanticChildrenPolicySchema,
+  semanticChildrenPolicy: SemanticChildrenPolicyV1Schema,
+  wrapper: WrapperPolicySchema,
+  provenance: RecipeProvenanceSchema,
+});
+
+export const StaticRenderPropValueSchema = Type.Union([
+  closedObject({
+    kind: Type.Literal("literal"),
+    value: Type.Union([
+      Type.String(),
+      Type.Number(),
+      Type.Boolean(),
+      Type.Null(),
+    ]),
+  }),
+  closedObject({ kind: Type.Literal("empty-array") }),
+  closedObject({ kind: Type.Literal("noop") }),
+]);
+
+export const StaticRenderPropSchema = closedObject({
+  target: Type.String({ minLength: 1 }),
+  value: StaticRenderPropValueSchema,
+  reason: Type.Literal("render-only"),
+});
+
+export const ReactComponentRecipeV2Schema = closedObject({
+  componentId: Type.String({ minLength: 1 }),
+  content: Type.Optional(
+    closedObject({
+      source: ContentSourceSchema,
+      target: Type.String({ minLength: 1 }),
+    }),
+  ),
+  staticProps: Type.Array(StaticRenderPropSchema),
+  stateProps: Type.Array(
+    closedObject({
+      source: StateSourceSchema,
+      target: Type.String({ minLength: 1 }),
+      valueType: PropValueTypeSchema,
+    }),
+  ),
+  eventProps: Type.Array(
+    closedObject({
+      source: EventSourceSchema,
+      target: Type.String({ minLength: 1 }),
+    }),
+  ),
+  classNameProp: Type.Optional(Type.String({ minLength: 1 })),
+  semanticChildrenPolicy: SemanticChildrenPolicyV2Schema,
   wrapper: WrapperPolicySchema,
   provenance: RecipeProvenanceSchema,
 });
@@ -103,25 +158,50 @@ export const ReactCompositionRecipeSchema = closedObject({
   provenance: RecipeProvenanceSchema,
 });
 
-export const ReactRenderRecipesSchema = closedObject({
+export const ReactRenderRecipesV1Schema = closedObject({
   schema: Type.Literal("react-render-recipes/v1"),
-  components: Type.Array(ReactComponentRecipeSchema),
+  components: Type.Array(ReactComponentRecipeV1Schema),
   compositions: Type.Array(ReactCompositionRecipeSchema),
 });
+
+export const ReactRenderRecipesV2Schema = closedObject({
+  schema: Type.Literal("react-render-recipes/v2"),
+  components: Type.Array(ReactComponentRecipeV2Schema),
+  compositions: Type.Array(ReactCompositionRecipeSchema),
+});
+
+export const ReactRenderRecipesSchema = Type.Union([
+  ReactRenderRecipesV1Schema,
+  ReactRenderRecipesV2Schema,
+]) as unknown as typeof ReactRenderRecipesV1Schema;
 
 export type RecipeProvenance = Static<typeof RecipeProvenanceSchema>;
 export type ContentSource = Static<typeof ContentSourceSchema>;
 export type StateSource = Static<typeof StateSourceSchema>;
 export type EventSource = Static<typeof EventSourceSchema>;
-export type SemanticChildrenPolicy = Static<
-  typeof SemanticChildrenPolicySchema
+export type SemanticChildrenPolicyV1 = Static<
+  typeof SemanticChildrenPolicyV1Schema
 >;
+export type SemanticChildrenPolicyV2 = Static<
+  typeof SemanticChildrenPolicyV2Schema
+>;
+export type SemanticChildrenPolicy = SemanticChildrenPolicyV1;
 export type CompositionCardinality = Static<
   typeof CompositionCardinalitySchema
 >;
-export type ReactComponentRecipe = Static<typeof ReactComponentRecipeSchema>;
+export type StaticRenderPropValue = Static<typeof StaticRenderPropValueSchema>;
+export type StaticRenderProp = Static<typeof StaticRenderPropSchema>;
+export type ReactComponentRecipeV1 = Static<
+  typeof ReactComponentRecipeV1Schema
+>;
+export type ReactComponentRecipeV2 = Static<
+  typeof ReactComponentRecipeV2Schema
+>;
+export type ReactComponentRecipe = ReactComponentRecipeV1;
 export type ReactCompositionSlot = Static<typeof ReactCompositionSlotSchema>;
 export type ReactCompositionRecipe = Static<
   typeof ReactCompositionRecipeSchema
 >;
-export type ReactRenderRecipes = Static<typeof ReactRenderRecipesSchema>;
+export type ReactRenderRecipesV1 = Static<typeof ReactRenderRecipesV1Schema>;
+export type ReactRenderRecipesV2 = Static<typeof ReactRenderRecipesV2Schema>;
+export type ReactRenderRecipes = ReactRenderRecipesV1;

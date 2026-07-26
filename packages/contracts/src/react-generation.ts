@@ -44,15 +44,15 @@ const StatisticsSchema = closedObject({
   sourceByteLength: Type.Integer({ minimum: 0 }),
 });
 
-const ReportCommonProperties = {
+const ReportV1CommonProperties = {
   schema: Type.Literal("react-generation-report/v1"),
   sourceRunId: Type.String({ minLength: 1 }),
   designSystem: Type.String({ minLength: 1 }),
   statistics: StatisticsSchema,
 };
 
-export const GeneratedReactGenerationReportSchema = closedObject({
-  ...ReportCommonProperties,
+export const GeneratedReactGenerationReportV1Schema = closedObject({
+  ...ReportV1CommonProperties,
   status: Type.Literal("generated"),
   componentName: Type.String({ minLength: 1 }),
   validation: closedObject({
@@ -65,8 +65,8 @@ export const GeneratedReactGenerationReportSchema = closedObject({
   diagnostics: Type.Array(DiagnosticSchema),
 });
 
-export const BlockedReactGenerationReportSchema = closedObject({
-  ...ReportCommonProperties,
+export const BlockedReactGenerationReportV1Schema = closedObject({
+  ...ReportV1CommonProperties,
   status: Type.Literal("blocked"),
   componentName: Type.Optional(Type.String({ minLength: 1 })),
   validation: closedObject({
@@ -79,9 +79,61 @@ export const BlockedReactGenerationReportSchema = closedObject({
   diagnostics: Type.Array(DiagnosticSchema, { minItems: 1 }),
 });
 
+export const ReactGenerationReportV1Schema = Type.Union([
+  GeneratedReactGenerationReportV1Schema,
+  BlockedReactGenerationReportV1Schema,
+]);
+
+export const RenderOnlyPropReportSchema = closedObject({
+  manifestNodeId: Type.String({ minLength: 1 }),
+  componentId: Type.String({ minLength: 1 }),
+  propNames: Type.Array(Type.String({ minLength: 1 })),
+});
+
+const ReportV2CommonProperties = {
+  schema: Type.Literal("react-generation-report/v2"),
+  sourceRunId: Type.String({ minLength: 1 }),
+  designSystem: Type.String({ minLength: 1 }),
+  statistics: StatisticsSchema,
+  renderOnlyProps: Type.Array(RenderOnlyPropReportSchema),
+};
+
+export const GeneratedReactGenerationReportV2Schema = closedObject({
+  ...ReportV2CommonProperties,
+  status: Type.Literal("generated"),
+  componentName: Type.String({ minLength: 1 }),
+  validation: closedObject({
+    inputContracts: Type.Literal("passed"),
+    pack: Type.Literal("passed"),
+    syntax: Type.Literal("passed"),
+    targetTypecheck: Type.Literal("not-run"),
+  }),
+  files: Type.Array(GeneratedSourceFileReportSchema, { minItems: 1 }),
+  diagnostics: Type.Array(DiagnosticSchema),
+});
+
+export const BlockedReactGenerationReportV2Schema = closedObject({
+  ...ReportV2CommonProperties,
+  status: Type.Literal("blocked"),
+  componentName: Type.Optional(Type.String({ minLength: 1 })),
+  validation: closedObject({
+    inputContracts: InputValidationStatusSchema,
+    pack: InputValidationStatusSchema,
+    syntax: Type.Literal("not-run"),
+    targetTypecheck: Type.Literal("not-run"),
+  }),
+  files: Type.Array(GeneratedSourceFileReportSchema, { maxItems: 0 }),
+  diagnostics: Type.Array(DiagnosticSchema, { minItems: 1 }),
+});
+
+export const ReactGenerationReportV2Schema = Type.Union([
+  GeneratedReactGenerationReportV2Schema,
+  BlockedReactGenerationReportV2Schema,
+]);
+
 export const ReactGenerationReportSchema = Type.Union([
-  GeneratedReactGenerationReportSchema,
-  BlockedReactGenerationReportSchema,
+  ReactGenerationReportV1Schema,
+  ReactGenerationReportV2Schema,
 ]);
 
 export type GeneratedSourceFileKind = Static<
@@ -89,6 +141,13 @@ export type GeneratedSourceFileKind = Static<
 >;
 export type GeneratedSourceFileReport = Static<
   typeof GeneratedSourceFileReportSchema
+>;
+export type RenderOnlyPropReport = Static<typeof RenderOnlyPropReportSchema>;
+export type ReactGenerationReportV1 = Static<
+  typeof ReactGenerationReportV1Schema
+>;
+export type ReactGenerationReportV2 = Static<
+  typeof ReactGenerationReportV2Schema
 >;
 export type ReactGenerationReport = Static<typeof ReactGenerationReportSchema>;
 export type ReactGenerationValidation = ReactGenerationReport["validation"];
@@ -101,13 +160,23 @@ export interface GeneratedSourceFile {
   byteLength: number;
 }
 
-export interface ReactGenerationBundle {
+export interface ReactGenerationBundleV1 {
   schema: "react-generation-bundle/v1";
   status: "generated" | "blocked";
   sourceRunId: string;
   files: GeneratedSourceFile[];
-  report: ReactGenerationReport;
+  report: ReactGenerationReportV1;
 }
+
+export interface ReactGenerationBundleV2 {
+  schema: "react-generation-bundle/v2";
+  status: "generated" | "blocked";
+  sourceRunId: string;
+  files: GeneratedSourceFile[];
+  report: ReactGenerationReportV2;
+}
+
+export type ReactGenerationBundle = ReactGenerationBundleV2;
 
 export function assertReactGenerationReportIntegrity(
   report: ReactGenerationReport,
