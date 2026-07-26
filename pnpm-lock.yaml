@@ -67,6 +67,9 @@ importers:
       "@uig/contracts":
         specifier: workspace:*
         version: link:../contracts
+      "@uig/design-context":
+        specifier: workspace:*
+        version: link:../design-context
 
   packages/contracts:
     dependencies:

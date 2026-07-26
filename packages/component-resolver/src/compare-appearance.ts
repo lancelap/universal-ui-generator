@@ -1,13 +1,15 @@
 import type {
   DesignIR,
+  DesignIRV2,
   DesignTokens,
   Diagnostic,
   UiManifest,
+  UiManifestV2,
 } from "@uig/contracts";
 
 export function compareAppearance(input: {
-  manifest: UiManifest;
-  designIr: DesignIR;
+  manifest: UiManifest | UiManifestV2;
+  designIr: DesignIR | DesignIRV2;
   tokens: DesignTokens;
 }): Diagnostic[] {
   const diagnostics: Diagnostic[] = [];
@@ -84,6 +86,8 @@ function compare(
   });
 }
 
-function flatten(root: UiManifest["root"]): UiManifest["root"][] {
+type AppearanceManifestNode = UiManifest["root"] | UiManifestV2["root"];
+
+function flatten(root: AppearanceManifestNode): AppearanceManifestNode[] {
   return [root, ...root.children.flatMap(flatten)];
 }
