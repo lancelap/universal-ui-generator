@@ -1,0 +1,14 @@
+{
+  "name": "@uig/provider-pixso",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/client": "2.0.0-beta.5",
+    "@uig/contracts": "workspace:*",
+    "@uig/design-context": "workspace:*"
+  }
+}
