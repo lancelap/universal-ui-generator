@@ -1,21 +1,26 @@
 import type {
   Diagnostic,
   ReactComponentRecipe,
+  ReactComponentRecipeV2,
   ReactStylePolicy,
   RenderOnlyPropReport,
   ResolutionNode,
   UiNodeV2,
 } from "@uig/contracts";
 
+import { buildFallbackModel } from "./build-fallback-model.js";
 import { buildImportModel } from "./build-import-model.js";
 import { buildPropsModel } from "./build-props-model.js";
+import { buildStyleModel } from "./build-style-model.js";
 import { ReactGenerationError } from "./errors.js";
 import type {
   GeneratedPropModel,
+  FallbackComponentModel,
   ReactElementModel,
   ReactGenerationModel,
   ReactImportModel,
   ReadyGenerationInput,
+  StyleRuleModel,
 } from "./generation-model.js";
 import { placeCompositionSlots } from "./place-composition-slots.js";
 
@@ -36,6 +41,8 @@ export function buildReactGenerationModel(
   const externalProps = new Map<string, GeneratedPropModel>();
   const renderOnlyProps: RenderOnlyPropReport[] = [];
   const diagnostics: Diagnostic[] = [];
+  const styles: StyleRuleModel[] = [];
+  const fallbacks: FallbackComponentModel[] = [];
 
   const lower = (node: UiNodeV2): ReactElementModel => {
     const resolution = input.resolutionsByManifestNodeId.get(node.id);
@@ -47,6 +54,24 @@ export function buildReactGenerationModel(
     }
 
     if (resolution.decision === "fallback") {
+      const designNode = requireDesignNode(input, node);
+      const fallback = buildFallbackModel({
+        node,
+        designNode,
+        resolution,
+        policy: input.pack.reactStylePolicy,
+      });
+      fallbacks.push(fallback);
+      mergeStyleResult(
+        styles,
+        diagnostics,
+        buildStyleModel({
+          node,
+          designNode,
+          recipe: fallbackRecipe,
+          policy: input.pack.reactStylePolicy,
+        }),
+      );
       return {
         kind: "fallback",
         nodeId: node.id,
@@ -72,6 +97,14 @@ export function buildReactGenerationModel(
       diagnostics.push(childrenPolicyDiagnostic);
     }
     const props = buildPropsModel(node, resolution, recipe);
+    const styleResult = buildStyleModel({
+      node,
+      designNode: requireDesignNode(input, node),
+      componentId: rootBinding.componentId,
+      recipe,
+      policy: input.pack.reactStylePolicy,
+    });
+    mergeStyleResult(styles, diagnostics, styleResult);
     mergeExternalProps(externalProps, props.externalProps);
     if (props.renderOnlyPropNames.length > 0) {
       renderOnlyProps.push({
@@ -134,7 +167,14 @@ export function buildReactGenerationModel(
       };
     }
 
-    return maybeWrap(input, node, recipe, rootBinding.componentId, element);
+    return maybeWrap(
+      input,
+      node,
+      recipe,
+      rootBinding.componentId,
+      element,
+      styleResult.rules.length > 0,
+    );
   };
 
   const root = lower(input.uiManifest.root);
@@ -148,6 +188,12 @@ export function buildReactGenerationModel(
         left.manifestNodeId.localeCompare(right.manifestNodeId) ||
         left.componentId.localeCompare(right.componentId),
     ),
+    styles: deduplicateStyles(styles),
+    fallbacks: fallbacks.sort(
+      (left, right) =>
+        left.localComponentName.localeCompare(right.localComponentName) ||
+        left.nodeId.localeCompare(right.nodeId),
+    ),
     diagnostics: diagnostics.sort(
       (left, right) =>
         left.code.localeCompare(right.code) ||
@@ -157,6 +203,57 @@ export function buildReactGenerationModel(
     ),
     root,
   };
+}
+
+const fallbackRecipe: ReactComponentRecipeV2 = {
+  componentId: "__fallback__",
+  staticProps: [],
+  stateProps: [],
+  eventProps: [],
+  semanticChildrenPolicy: "optional",
+  wrapper: "forbidden",
+  provenance: { kind: "generator", source: "fallback style lowering" },
+};
+
+function requireDesignNode(input: ReadyGenerationInput, node: UiNodeV2) {
+  const designNode = input.designIr.nodes[node.layoutSourceNodeId];
+  if (!designNode) {
+    throw new ReactGenerationError(
+      "GENERATION_INPUT_INVALID",
+      `No design node exists for ${node.id}`,
+    );
+  }
+  return designNode;
+}
+
+function mergeStyleResult(
+  styles: StyleRuleModel[],
+  diagnostics: Diagnostic[],
+  result: { rules: StyleRuleModel[]; diagnostics: Diagnostic[] },
+): void {
+  styles.push(...result.rules);
+  diagnostics.push(...result.diagnostics);
+}
+
+function deduplicateStyles(styles: StyleRuleModel[]): StyleRuleModel[] {
+  const stylesByClassName = new Map<string, StyleRuleModel>();
+  for (const style of styles) {
+    const existing = stylesByClassName.get(style.className);
+    if (
+      existing &&
+      JSON.stringify(existing.declarations) !==
+        JSON.stringify(style.declarations)
+    ) {
+      throw new ReactGenerationError(
+        "GENERATION_OUTPUT_CONFLICT",
+        `Style class ${style.className} has incompatible declarations`,
+      );
+    }
+    stylesByClassName.set(style.className, existing ?? style);
+  }
+  return [...stylesByClassName.values()].sort((left, right) =>
+    left.className.localeCompare(right.className),
+  );
 }
 
 function findCompositionRoot(
@@ -219,10 +316,13 @@ function maybeWrap(
   recipe: ReactComponentRecipe,
   componentId: string,
   element: ReactElementModel,
+  hasGeneratedStyle: boolean,
 ): ReactElementModel {
   const designNode = input.designIr.nodes[node.layoutSourceNodeId];
   const needsStyleHook =
-    designNode?.layout !== undefined || designNode?.position !== undefined;
+    designNode?.layout !== undefined ||
+    designNode?.position !== undefined ||
+    (hasGeneratedStyle && !recipe.classNameProp);
   const stylePolicy = componentStylePolicy(
     input.pack.reactStylePolicy,
     componentId,

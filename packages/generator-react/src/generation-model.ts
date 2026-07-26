@@ -1,7 +1,9 @@
 import type { LoadedDesignSystemPackV2 } from "@uig/component-catalog";
 import type {
+  AppearanceStyleProperty,
   DesignIRV2,
   Diagnostic,
+  LayoutStyleProperty,
   RenderOnlyPropReport,
   ResolutionNode,
   ResolutionPlanV2,
@@ -126,6 +128,27 @@ export interface ReactFallbackElementModel extends ReactElementBaseModel {
   localComponentName: string;
 }
 
+export interface StyleDeclarationModel {
+  property: LayoutStyleProperty | AppearanceStyleProperty;
+  value: string;
+}
+
+export interface StyleRuleModel {
+  className: string;
+  declarations: StyleDeclarationModel[];
+}
+
+export interface StyleBuildResult {
+  rules: StyleRuleModel[];
+  diagnostics: Diagnostic[];
+}
+
+export interface FallbackComponentModel {
+  nodeId: string;
+  localComponentName: string;
+  className: string;
+}
+
 export interface ReactIntrinsicWrapperModel extends ReactElementBaseModel {
   kind: "intrinsic-wrapper";
   tag: "div";
@@ -142,6 +165,8 @@ export interface ReactGenerationModel {
   imports: ReactImportModel[];
   externalProps: GeneratedPropModel[];
   renderOnlyProps: RenderOnlyPropReport[];
+  styles: StyleRuleModel[];
+  fallbacks: FallbackComponentModel[];
   diagnostics: Diagnostic[];
   root: ReactElementModel;
 }

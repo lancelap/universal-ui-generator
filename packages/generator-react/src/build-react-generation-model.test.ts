@@ -258,6 +258,70 @@ describe("buildReactGenerationModel", () => {
       expect(buildReactGenerationModel(input).root.kind).toBe(expectedKind);
     },
   );
+
+  it("wraps a permitted appearance style when no component class hook exists", () => {
+    const root = node("root", "content", []);
+    const input = readyInput({
+      root,
+      resolutions: [reuse("root", "content", "base.Content", "Content")],
+      recipes: [recipe("base.Content", "optional", { wrapper: "allowed" })],
+      styleWrapper: "allowed",
+    });
+    input.designIr.nodes["source-root"]!.appearance.radii = {
+      topLeft: 8,
+      topRight: 8,
+      bottomRight: 8,
+      bottomLeft: 8,
+    };
+    input.pack.reactStylePolicy.components[0]!.appearance.allowed = [
+      "borderRadius",
+    ];
+
+    expect(buildReactGenerationModel(input).root.kind).toBe(
+      "intrinsic-wrapper",
+    );
+  });
+
+  it("aggregates fallback styles and fallback components deterministically", () => {
+    const root = node("ui_warning", "content", []);
+    const input = readyInput({
+      root,
+      resolutions: [
+        {
+          ...resolutionBase("ui_warning", "content"),
+          decision: "fallback",
+          localComponentName: "generated-warning",
+          styleStrategy: "css-module",
+        },
+      ],
+      recipes: [],
+    });
+    input.designIr.nodes["source-ui_warning"]!.layout = {
+      mode: "vertical",
+      gap: 10,
+      padding: { top: 20, right: 16, bottom: 20, left: 16 },
+      alignItems: "stretch",
+    };
+
+    const model = buildReactGenerationModel(input);
+
+    expect(model.fallbacks).toEqual([
+      {
+        nodeId: "ui_warning",
+        localComponentName: "GeneratedWarning",
+        className: "ui_warning",
+      },
+    ]);
+    expect(model.styles).toContainEqual({
+      className: "ui_warning",
+      declarations: expect.arrayContaining([
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "column" },
+        { property: "gap", value: "10px" },
+        { property: "padding", value: "20px 16px" },
+      ]),
+    });
+  });
 });
 
 function readyInput(input: {
