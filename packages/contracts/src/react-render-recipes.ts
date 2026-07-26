@@ -173,7 +173,7 @@ export const ReactRenderRecipesV2Schema = closedObject({
 export const ReactRenderRecipesSchema = Type.Union([
   ReactRenderRecipesV1Schema,
   ReactRenderRecipesV2Schema,
-]) as unknown as typeof ReactRenderRecipesV1Schema;
+]);
 
 export type RecipeProvenance = Static<typeof RecipeProvenanceSchema>;
 export type ContentSource = Static<typeof ContentSourceSchema>;
@@ -185,7 +185,8 @@ export type SemanticChildrenPolicyV1 = Static<
 export type SemanticChildrenPolicyV2 = Static<
   typeof SemanticChildrenPolicyV2Schema
 >;
-export type SemanticChildrenPolicy = SemanticChildrenPolicyV1;
+export type SemanticChildrenPolicy =
+  SemanticChildrenPolicyV1 | SemanticChildrenPolicyV2;
 export type CompositionCardinality = Static<
   typeof CompositionCardinalitySchema
 >;
@@ -197,11 +198,12 @@ export type ReactComponentRecipeV1 = Static<
 export type ReactComponentRecipeV2 = Static<
   typeof ReactComponentRecipeV2Schema
 >;
-export type ReactComponentRecipe = ReactComponentRecipeV1;
+export type ReactComponentRecipe =
+  ReactComponentRecipeV1 | ReactComponentRecipeV2;
 export type ReactCompositionSlot = Static<typeof ReactCompositionSlotSchema>;
 export type ReactCompositionRecipe = Static<
   typeof ReactCompositionRecipeSchema
 >;
 export type ReactRenderRecipesV1 = Static<typeof ReactRenderRecipesV1Schema>;
 export type ReactRenderRecipesV2 = Static<typeof ReactRenderRecipesV2Schema>;
-export type ReactRenderRecipes = ReactRenderRecipesV1;
+export type ReactRenderRecipes = Static<typeof ReactRenderRecipesSchema>;

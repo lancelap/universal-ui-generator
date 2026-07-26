@@ -3,11 +3,21 @@ import { describe, expect, it } from "vitest";
 import {
   ContractValidationError,
   DesignSystemPackV2Schema,
+  type ReactRenderRecipes,
   ReactRenderRecipesSchema,
   ReactRenderRecipesV2Schema,
   ReactStylePolicySchema,
   validateWithSchema,
 } from "./index.js";
+
+function staticPropsFromV2ReadUnion(
+  recipes: ReactRenderRecipes,
+): { target: string }[] {
+  if (recipes.schema !== "react-render-recipes/v2") {
+    return [];
+  }
+  return recipes.components[0]?.staticProps ?? [];
+}
 
 const provenance = {
   kind: "verified-public-api",
@@ -145,6 +155,17 @@ describe("React pack contracts", () => {
     expect(
       validateWithSchema(ReactRenderRecipesSchema, recipesFixture),
     ).toEqual(recipesFixture);
+  });
+
+  it("narrows the read union to v2 static props", () => {
+    const recipes: ReactRenderRecipes = validateWithSchema(
+      ReactRenderRecipesSchema,
+      recipesV2Fixture,
+    );
+
+    expect(staticPropsFromV2ReadUnion(recipes)).toEqual(
+      recipesV2Fixture.components[0].staticProps,
+    );
   });
 
   it.each([

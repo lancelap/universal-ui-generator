@@ -2,7 +2,7 @@ import type { LoadedDesignSystemPackV2 } from "@uig/component-catalog";
 import type {
   ComponentBinding,
   DesignIRV2,
-  ReactComponentRecipe,
+  ReactComponentRecipeV1,
   ResolutionNode,
   ResolutionPlanV2,
   UiManifestV2,
@@ -190,7 +190,7 @@ describe("buildReactGenerationModel", () => {
 function readyInput(input: {
   root: UiNodeV2;
   resolutions: ResolutionNode[];
-  recipes: ReactComponentRecipe[];
+  recipes: ReactComponentRecipeV1[];
   composition?: boolean;
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
@@ -272,7 +272,7 @@ function readyInput(input: {
 
 function packFixture(input: {
   resolutions: ResolutionNode[];
-  recipes: ReactComponentRecipe[];
+  recipes: ReactComponentRecipeV1[];
   composition?: boolean;
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
@@ -485,9 +485,9 @@ function binding(componentId: string, exportName: string): ComponentBinding {
 
 function recipe(
   componentId: string,
-  semanticChildrenPolicy: ReactComponentRecipe["semanticChildrenPolicy"],
-  overrides: Partial<ReactComponentRecipe> = {},
-): ReactComponentRecipe {
+  semanticChildrenPolicy: ReactComponentRecipeV1["semanticChildrenPolicy"],
+  overrides: Partial<ReactComponentRecipeV1> = {},
+): ReactComponentRecipeV1 {
   return {
     componentId,
     stateProps: [],
