@@ -96,12 +96,12 @@ const packFixture = {
 
 describe("React pack contracts", () => {
   it("accepts minimal recipes, style policy, and pack v2", () => {
-    expect(validateWithSchema(ReactRenderRecipesSchema, recipesFixture)).toEqual(
-      recipesFixture,
-    );
-    expect(validateWithSchema(ReactStylePolicySchema, stylePolicyFixture)).toEqual(
-      stylePolicyFixture,
-    );
+    expect(
+      validateWithSchema(ReactRenderRecipesSchema, recipesFixture),
+    ).toEqual(recipesFixture);
+    expect(
+      validateWithSchema(ReactStylePolicySchema, stylePolicyFixture),
+    ).toEqual(stylePolicyFixture);
     expect(validateWithSchema(DesignSystemPackV2Schema, packFixture)).toEqual(
       packFixture,
     );
@@ -213,9 +213,7 @@ describe("React pack contracts", () => {
     expect(() =>
       validateWithSchema(ReactRenderRecipesSchema, {
         ...recipesFixture,
-        components: [
-          { ...componentRecipe, semanticChildrenPolicy: "guess" },
-        ],
+        components: [{ ...componentRecipe, semanticChildrenPolicy: "guess" }],
       }),
     ).toThrowError(ContractValidationError);
   });

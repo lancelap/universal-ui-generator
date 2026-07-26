@@ -131,9 +131,9 @@ describe("v2 design and manifest contracts", () => {
     expect(validateWithSchema(DesignIRV2Schema, designIrV2Fixture)).toEqual(
       designIrV2Fixture,
     );
-    expect(
-      validateWithSchema(UiManifestV2Schema, uiManifestV2Fixture),
-    ).toEqual(uiManifestV2Fixture);
+    expect(validateWithSchema(UiManifestV2Schema, uiManifestV2Fixture)).toEqual(
+      uiManifestV2Fixture,
+    );
   });
 
   it("rejects an interaction with an unknown event", () => {
@@ -208,10 +208,7 @@ describe("v2 design and manifest contracts", () => {
           ...uiManifestV2Fixture,
           root: {
             ...uiManifestV2Fixture.root,
-            interactions: [
-              activateInteraction,
-              activateInteraction,
-            ],
+            interactions: [activateInteraction, activateInteraction],
           },
         },
         designIrV2Fixture,
@@ -260,9 +257,7 @@ describe("v2 design and manifest contracts", () => {
   });
 
   it("accepts internally consistent artifacts", () => {
-    expect(() =>
-      assertDesignIRV2Integrity(designIrV2Fixture),
-    ).not.toThrow();
+    expect(() => assertDesignIRV2Integrity(designIrV2Fixture)).not.toThrow();
     expect(() =>
       assertUiManifestV2Integrity(uiManifestV2Fixture, designIrV2Fixture),
     ).not.toThrow();

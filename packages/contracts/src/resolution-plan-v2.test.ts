@@ -76,9 +76,7 @@ describe("ResolutionPlan v2", () => {
             [sourceName]: {
               ...planFixture.source[sourceName],
               schema:
-                sourceName === "designIr"
-                  ? "design-ir/v1"
-                  : "ui-manifest/v1",
+                sourceName === "designIr" ? "design-ir/v1" : "ui-manifest/v1",
             },
           },
         }),
@@ -87,10 +85,8 @@ describe("ResolutionPlan v2", () => {
   );
 
   it("rejects a missing design-system version", () => {
-    const {
-      designSystemVersion: _removed,
-      ...targetWithoutVersion
-    } = planFixture.target;
+    const { designSystemVersion: _removed, ...targetWithoutVersion } =
+      planFixture.target;
 
     expect(() =>
       validateWithSchema(ResolutionPlanV2Schema, {

@@ -119,12 +119,8 @@ export type SemanticChildrenPolicy = Static<
 export type CompositionCardinality = Static<
   typeof CompositionCardinalitySchema
 >;
-export type ReactComponentRecipe = Static<
-  typeof ReactComponentRecipeSchema
->;
-export type ReactCompositionSlot = Static<
-  typeof ReactCompositionSlotSchema
->;
+export type ReactComponentRecipe = Static<typeof ReactComponentRecipeSchema>;
+export type ReactCompositionSlot = Static<typeof ReactCompositionSlotSchema>;
 export type ReactCompositionRecipe = Static<
   typeof ReactCompositionRecipeSchema
 >;

@@ -4,10 +4,7 @@ import { Type } from "@sinclair/typebox";
 import type { DesignIRV2 } from "./design-ir-v2.js";
 import { DiagnosticSchema } from "./diagnostic.js";
 import { closedObject } from "./schema-utils.js";
-import {
-  SemanticEvidenceSchema,
-  UiNodeKindSchema,
-} from "./ui-manifest.js";
+import { SemanticEvidenceSchema, UiNodeKindSchema } from "./ui-manifest.js";
 
 export const UiInteractionSchema = closedObject({
   key: Type.String({ pattern: "^[A-Za-z0-9][A-Za-z0-9_-]*$" }),

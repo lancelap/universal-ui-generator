@@ -49,10 +49,7 @@ const ComponentStylePolicySchema = closedObject({
   componentId: Type.String({ minLength: 1 }),
   layout: LayoutAllowanceSchema,
   appearance: AppearanceAllowanceSchema,
-  wrapper: Type.Union([
-    Type.Literal("allowed"),
-    Type.Literal("forbidden"),
-  ]),
+  wrapper: Type.Union([Type.Literal("allowed"), Type.Literal("forbidden")]),
 });
 
 export const ReactStylePolicySchema = closedObject({

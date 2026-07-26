@@ -53,14 +53,11 @@ export type UiManifestSourceReference = Static<
   typeof UiManifestSourceReferenceSchema
 >;
 export type ResolutionSourceReference =
-  | DesignIRSourceReference
-  | UiManifestSourceReference;
+  DesignIRSourceReference | UiManifestSourceReference;
 export type ResolutionTargetV2 = Static<typeof ResolutionTargetV2Schema>;
 export type ResolutionPlanV2 = Static<typeof ResolutionPlanV2Schema>;
 
-export function assertResolutionPlanV2Integrity(
-  plan: ResolutionPlanV2,
-): void {
+export function assertResolutionPlanV2Integrity(plan: ResolutionPlanV2): void {
   const actual = {
     reuse: 0,
     compose: 0,
@@ -72,12 +69,7 @@ export function assertResolutionPlanV2Integrity(
     actual[node.decision] += 1;
   }
 
-  for (const decision of [
-    "reuse",
-    "compose",
-    "fallback",
-    "blocked",
-  ] as const) {
+  for (const decision of ["reuse", "compose", "fallback", "blocked"] as const) {
     if (actual[decision] !== plan.summary[decision]) {
       throw new Error(
         `RESOLUTION_V2_INTEGRITY: summary.${decision} is ${plan.summary[decision]}, expected ${actual[decision]}`,

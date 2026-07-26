@@ -9,6 +9,7 @@ export * from "./generation-run.js";
 export * from "./resolution-plan.js";
 export * from "./resolution-plan-v2.js";
 export * from "./react-render-recipes.js";
+export * from "./react-generation.js";
 export * from "./react-style-policy.js";
 export * from "./schema-utils.js";
 export * from "./stable-json.js";
