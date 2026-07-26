@@ -282,6 +282,72 @@ describe("buildReactGenerationModel", () => {
     );
   });
 
+  it("blocks an absolute child whose parent cannot receive a relative class", () => {
+    const root = node("ui_parent", "content", [
+      node("ui_child", "content", []),
+    ]);
+    const input = readyInput({
+      root,
+      resolutions: [
+        reuse("ui_parent", "content", "base.Parent", "Parent"),
+        reuse("ui_child", "content", "base.Child", "Child"),
+      ],
+      recipes: [
+        recipe("base.Parent", "optional", { wrapper: "forbidden" }),
+        recipe("base.Child", "optional"),
+      ],
+    });
+    input.designIr.nodes["source-ui_child"]!.position = {
+      mode: "absolute",
+      inset: { top: 8, left: 4 },
+    };
+    componentStyle(input, "base.Parent").layout.allowed = ["position"];
+    componentStyle(input, "base.Child").layout.allowed = ["position", "inset"];
+
+    expect(() => buildReactGenerationModel(input)).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_LAYOUT_UNSUPPORTED",
+      }),
+    );
+  });
+
+  it("adds a deterministic relative parent rule for an authorized absolute child", () => {
+    const root = node("ui_parent", "content", [
+      node("ui_child", "content", []),
+    ]);
+    const input = readyInput({
+      root,
+      resolutions: [
+        reuse("ui_parent", "content", "base.Parent", "Parent"),
+        reuse("ui_child", "content", "base.Child", "Child"),
+      ],
+      recipes: [
+        recipe("base.Parent", "required", { classNameProp: "className" }),
+        recipe("base.Child", "optional"),
+      ],
+    });
+    input.designIr.nodes["source-ui_child"]!.position = {
+      mode: "absolute",
+      inset: { top: 8, right: 12, bottom: 16, left: 4 },
+    };
+    componentStyle(input, "base.Parent").layout.allowed = ["position"];
+    componentStyle(input, "base.Child").layout.allowed = ["position", "inset"];
+
+    expect(buildReactGenerationModel(input).styles).toEqual([
+      {
+        className: "ui_child",
+        declarations: [
+          { property: "position", value: "absolute" },
+          { property: "inset", value: "8px 12px 16px 4px" },
+        ],
+      },
+      {
+        className: "ui_parent",
+        declarations: [{ property: "position", value: "relative" }],
+      },
+    ]);
+  });
+
   it("aggregates fallback styles and fallback components deterministically", () => {
     const root = node("ui_warning", "content", []);
     const input = readyInput({
@@ -524,6 +590,14 @@ function packFixture(input: {
     },
     sha256: "c".repeat(64),
   };
+}
+
+function componentStyle(input: ReadyGenerationInput, componentId: string) {
+  const style = input.pack.reactStylePolicy.components.find(
+    (candidate) => candidate.componentId === componentId,
+  );
+  if (!style) throw new Error(`Missing style fixture for ${componentId}`);
+  return style;
 }
 
 function node(

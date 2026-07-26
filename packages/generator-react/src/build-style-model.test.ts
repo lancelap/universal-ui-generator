@@ -118,6 +118,7 @@ describe("buildStyleModel", () => {
             inset: { top: 8, right: 12, bottom: 16, left: 4 },
           },
         }),
+        parentPositioning: { canAttach: true, positionAllowed: true },
       }).rules,
     ).toEqual([
       {
@@ -140,6 +141,24 @@ describe("buildStyleModel", () => {
         componentId: "base.Positioned",
         recipe: recipe(),
         policy: policy({ layout: [] }),
+      }),
+    ).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_LAYOUT_UNSUPPORTED",
+      }),
+    );
+  });
+
+  it("blocks root absolute positioning without legal relative-parent evidence", () => {
+    expect(() =>
+      buildStyleModel({
+        node: node("ui_root"),
+        designNode: designNode({
+          position: { mode: "absolute", inset: { top: 8, left: 4 } },
+        }),
+        componentId: "base.Positioned",
+        recipe: recipe(),
+        policy: policy({ layout: ["position", "inset"] }),
       }),
     ).toThrowError(
       expect.objectContaining<Partial<ReactGenerationError>>({

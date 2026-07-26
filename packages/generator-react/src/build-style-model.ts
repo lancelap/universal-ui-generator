@@ -47,16 +47,24 @@ const propertyOrder = [
 
 type StyleProperty = LayoutStyleProperty | AppearanceStyleProperty;
 
+export interface ParentPositioningEvidence {
+  canAttach: boolean;
+  positionAllowed: boolean;
+}
+
 export function buildStyleModel(input: {
   node: UiNodeV2;
   designNode: DesignNodeV2;
   componentId?: string;
   recipe: ReactComponentRecipeV2;
   policy: ReactStylePolicy;
+  parentPositioning?: ParentPositioningEvidence;
+  relativeContainingBlock?: boolean;
 }): StyleBuildResult {
   const declarations = new Map<StyleProperty, string>();
   const diagnostics: Diagnostic[] = [];
   const allowed = allowedProperties(input.policy, input.componentId);
+  let requiresRelativeParent = false;
   const add = (property: StyleProperty, value: string, structural = false) => {
     if (allowed.has(property)) {
       declarations.set(property, value);
@@ -88,10 +96,31 @@ export function buildStyleModel(input: {
   add("width", px(input.designNode.geometry.width));
   add("height", px(input.designNode.geometry.height));
 
+  if (
+    input.relativeContainingBlock &&
+    input.designNode.position?.mode === "absolute"
+  ) {
+    throw new ReactGenerationError(
+      "GENERATION_LAYOUT_UNSUPPORTED",
+      `Node ${input.node.id} cannot be both absolute and a relative containing block`,
+    );
+  }
+  if (input.relativeContainingBlock) add("position", "relative", true);
+
   if (input.designNode.position?.mode === "absolute") {
+    if (
+      !input.parentPositioning?.canAttach ||
+      !input.parentPositioning.positionAllowed
+    ) {
+      throw new ReactGenerationError(
+        "GENERATION_LAYOUT_UNSUPPORTED",
+        `Node ${input.node.id} has no legal relative containing parent`,
+      );
+    }
     add("position", "absolute", true);
     const inset = input.designNode.position.inset;
     if (inset) add("inset", insetValue(inset), true);
+    requiresRelativeParent = true;
   }
 
   const appearance = input.designNode.appearance;
@@ -152,6 +181,7 @@ export function buildStyleModel(input: {
             },
           ],
     diagnostics: sortDiagnostics(diagnostics),
+    requiresRelativeParent,
   };
 }
 

@@ -141,6 +141,7 @@ export interface StyleRuleModel {
 export interface StyleBuildResult {
   rules: StyleRuleModel[];
   diagnostics: Diagnostic[];
+  requiresRelativeParent: boolean;
 }
 
 export interface FallbackComponentModel {

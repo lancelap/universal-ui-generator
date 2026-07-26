@@ -11,7 +11,10 @@ import type {
 import { buildFallbackModel } from "./build-fallback-model.js";
 import { buildImportModel } from "./build-import-model.js";
 import { buildPropsModel } from "./build-props-model.js";
-import { buildStyleModel } from "./build-style-model.js";
+import {
+  buildStyleModel,
+  type ParentPositioningEvidence,
+} from "./build-style-model.js";
 import { ReactGenerationError } from "./errors.js";
 import type {
   GeneratedPropModel,
@@ -44,7 +47,10 @@ export function buildReactGenerationModel(
   const styles: StyleRuleModel[] = [];
   const fallbacks: FallbackComponentModel[] = [];
 
-  const lower = (node: UiNodeV2): ReactElementModel => {
+  const lower = (
+    node: UiNodeV2,
+    parentPositioning?: ParentPositioningContext,
+  ): ReactElementModel => {
     const resolution = input.resolutionsByManifestNodeId.get(node.id);
     if (!resolution || resolution.decision === "blocked") {
       throw new ReactGenerationError(
@@ -62,22 +68,32 @@ export function buildReactGenerationModel(
         policy: input.pack.reactStylePolicy,
       });
       fallbacks.push(fallback);
-      mergeStyleResult(
-        styles,
-        diagnostics,
-        buildStyleModel({
-          node,
-          designNode,
-          recipe: fallbackRecipe,
-          policy: input.pack.reactStylePolicy,
-        }),
+      const currentPositioning: ParentPositioningContext = {
+        canAttach: true,
+        positionAllowed: true,
+        requiresRelative: false,
+      };
+      const children = node.children.map((child) =>
+        lower(child, currentPositioning),
       );
+      const styleResult = buildStyleModel({
+        node,
+        designNode,
+        recipe: fallbackRecipe,
+        policy: input.pack.reactStylePolicy,
+        ...(parentPositioning ? { parentPositioning } : {}),
+        relativeContainingBlock: currentPositioning.requiresRelative,
+      });
+      if (styleResult.requiresRelativeParent && parentPositioning) {
+        parentPositioning.requiresRelative = true;
+      }
+      mergeStyleResult(styles, diagnostics, styleResult);
       return {
         kind: "fallback",
         nodeId: node.id,
         sourceNodeIds: node.sourceNodeIds,
         localComponentName: resolution.localComponentName,
-        children: node.children.map(lower),
+        children,
       };
     }
 
@@ -97,14 +113,19 @@ export function buildReactGenerationModel(
       diagnostics.push(childrenPolicyDiagnostic);
     }
     const props = buildPropsModel(node, resolution, recipe);
-    const styleResult = buildStyleModel({
-      node,
-      designNode: requireDesignNode(input, node),
-      componentId: rootBinding.componentId,
-      recipe,
-      policy: input.pack.reactStylePolicy,
-    });
-    mergeStyleResult(styles, diagnostics, styleResult);
+    const currentPositioning: ParentPositioningContext = {
+      canAttach: canAttachCssClass(
+        input.pack.reactStylePolicy,
+        recipe,
+        rootBinding.componentId,
+      ),
+      positionAllowed: stylePropertyAllowed(
+        input.pack.reactStylePolicy,
+        rootBinding.componentId,
+        "position",
+      ),
+      requiresRelative: false,
+    };
     mergeExternalProps(externalProps, props.externalProps);
     if (props.renderOnlyPropNames.length > 0) {
       renderOnlyProps.push({
@@ -124,7 +145,9 @@ export function buildReactGenerationModel(
         localName: requireLocalName(localNames, rootBinding.componentId),
         props: props.elementProps,
         ...(props.textChild ? { textChild: props.textChild } : {}),
-        children: node.children.map(lower),
+        children: node.children.map((child) =>
+          lower(child, currentPositioning),
+        ),
       };
     } else {
       const composition = input.pack.reactRenderRecipes.compositions.find(
@@ -151,7 +174,7 @@ export function buildReactGenerationModel(
           name: slot.name,
           componentId: slot.componentId,
           localName: requireLocalName(localNames, slot.componentId),
-          children: slot.children.map(lower),
+          children: slot.children.map((child) => lower(child)),
         };
       });
       element = {
@@ -167,6 +190,20 @@ export function buildReactGenerationModel(
       };
     }
 
+    const styleResult = buildStyleModel({
+      node,
+      designNode: requireDesignNode(input, node),
+      componentId: rootBinding.componentId,
+      recipe,
+      policy: input.pack.reactStylePolicy,
+      ...(parentPositioning ? { parentPositioning } : {}),
+      relativeContainingBlock: currentPositioning.requiresRelative,
+    });
+    if (styleResult.requiresRelativeParent && parentPositioning) {
+      parentPositioning.requiresRelative = true;
+    }
+    mergeStyleResult(styles, diagnostics, styleResult);
+
     return maybeWrap(
       input,
       node,
@@ -174,6 +211,7 @@ export function buildReactGenerationModel(
       rootBinding.componentId,
       element,
       styleResult.rules.length > 0,
+      currentPositioning.requiresRelative,
     );
   };
 
@@ -203,6 +241,10 @@ export function buildReactGenerationModel(
     ),
     root,
   };
+}
+
+interface ParentPositioningContext extends ParentPositioningEvidence {
+  requiresRelative: boolean;
 }
 
 const fallbackRecipe: ReactComponentRecipeV2 = {
@@ -317,12 +359,14 @@ function maybeWrap(
   componentId: string,
   element: ReactElementModel,
   hasGeneratedStyle: boolean,
+  requiresRelativeContainingBlock: boolean,
 ): ReactElementModel {
   const designNode = input.designIr.nodes[node.layoutSourceNodeId];
   const needsStyleHook =
     designNode?.layout !== undefined ||
     designNode?.position !== undefined ||
-    (hasGeneratedStyle && !recipe.classNameProp);
+    (hasGeneratedStyle && !recipe.classNameProp) ||
+    requiresRelativeContainingBlock;
   const stylePolicy = componentStylePolicy(
     input.pack.reactStylePolicy,
     componentId,
@@ -348,6 +392,29 @@ function maybeWrap(
 function componentStylePolicy(policy: ReactStylePolicy, componentId: string) {
   return policy.components.find(
     (component) => component.componentId === componentId,
+  );
+}
+
+function canAttachCssClass(
+  policy: ReactStylePolicy,
+  recipe: ReactComponentRecipe,
+  componentId: string,
+): boolean {
+  return (
+    recipe.classNameProp !== undefined ||
+    (recipe.wrapper === "allowed" &&
+      componentStylePolicy(policy, componentId)?.wrapper === "allowed")
+  );
+}
+
+function stylePropertyAllowed(
+  policy: ReactStylePolicy,
+  componentId: string,
+  property: "position",
+): boolean {
+  const component = componentStylePolicy(policy, componentId);
+  return (component?.layout.allowed ?? policy.defaults.layout.allowed).includes(
+    property,
   );
 }
 
