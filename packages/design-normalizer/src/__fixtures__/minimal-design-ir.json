@@ -1,0 +1,176 @@
+{
+  "diagnostics": [],
+  "dslVersion": "2.1.15",
+  "nodes": {
+    "4:314": {
+      "appearance": {
+        "borders": [
+          {
+            "color": "#D0D3D8",
+            "opacity": 0.8,
+            "position": "inside",
+            "style": "solid",
+            "width": {
+              "bottom": 1,
+              "left": 1,
+              "right": 1,
+              "top": 1
+            }
+          }
+        ],
+        "fills": [
+          {
+            "color": "#FFFFFF",
+            "opacity": 1,
+            "type": "solid"
+          }
+        ],
+        "opacity": 0.95,
+        "radii": {
+          "bottomLeft": 12,
+          "bottomRight": 12,
+          "topLeft": 12,
+          "topRight": 12
+        },
+        "shadows": [
+          {
+            "blur": 24,
+            "color": "#000000",
+            "opacity": 0.2,
+            "spread": 0,
+            "type": "drop",
+            "x": 0,
+            "y": 8
+          }
+        ]
+      },
+      "children": ["4:315", "4:316", "4:317"],
+      "geometry": {
+        "height": 400,
+        "width": 600,
+        "x": 10,
+        "y": 20
+      },
+      "id": "4:314",
+      "layout": {
+        "alignItems": "center",
+        "gap": 16,
+        "justifyContent": "min",
+        "mode": "vertical",
+        "padding": {
+          "bottom": 24,
+          "left": 32,
+          "right": 32,
+          "top": 24
+        }
+      },
+      "name": "Request modal",
+      "source": {
+        "nodeId": "4:314",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": true
+    },
+    "4:315": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 32,
+        "width": 536,
+        "x": 32,
+        "y": 24
+      },
+      "id": "4:315",
+      "name": "Title",
+      "source": {
+        "nodeId": "4:315",
+        "provider": "pixso"
+      },
+      "text": {
+        "value": "Заявка"
+      },
+      "type": "text",
+      "visible": true
+    },
+    "4:316": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "component": {
+        "key": "Button/Primary",
+        "properties": {
+          "disabled": false
+        },
+        "variant": "size=m"
+      },
+      "geometry": {
+        "height": 40,
+        "width": 120,
+        "x": 32,
+        "y": 320
+      },
+      "id": "4:316",
+      "name": "Primary action",
+      "source": {
+        "nodeId": "4:316",
+        "provider": "pixso"
+      },
+      "type": "instance",
+      "visible": true
+    },
+    "4:317": {
+      "appearance": {
+        "borders": [],
+        "fills": [],
+        "opacity": 1,
+        "radii": {
+          "bottomLeft": 0,
+          "bottomRight": 0,
+          "topLeft": 0,
+          "topRight": 0
+        },
+        "shadows": []
+      },
+      "children": [],
+      "geometry": {
+        "height": 1,
+        "width": 1,
+        "x": 0,
+        "y": 0
+      },
+      "id": "4:317",
+      "name": "Hidden helper",
+      "source": {
+        "nodeId": "4:317",
+        "provider": "pixso"
+      },
+      "type": "frame",
+      "visible": false
+    }
+  },
+  "rootNodeId": "4:314",
+  "schema": "design-ir/v1",
+  "sourceArtifactId": "pixso_doc_4_314_0123456789ab"
+}

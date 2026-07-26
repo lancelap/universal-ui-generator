@@ -1,0 +1,97 @@
+{
+  "dsl": {
+    "dslVersion": "2.1.15",
+    "converterVersion": "2.2.13",
+    "pixTreeDslNodes": [
+      {
+        "guid": "4:314",
+        "type": "FRAME",
+        "name": "Request modal",
+        "visible": true,
+        "left": 10,
+        "top": 20,
+        "width": 600,
+        "height": 400,
+        "opacity": 0.95,
+        "autoLayout": {
+          "stackMode": "VERTICAL",
+          "autoLayoutPaddingTop": 24,
+          "autoLayoutPaddingRight": 32,
+          "autoLayoutPaddingBottom": 24,
+          "autoLayoutPaddingLeft": 32,
+          "autoLayoutCounterItemSpacing": 16,
+          "autoLayoutCounterAxisAlignItems": "CENTER",
+          "autoLayoutPrimaryAxisAlignItems": "MIN"
+        },
+        "fills": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "color": { "r": 255, "g": 255, "b": 255, "a": 1 }
+          }
+        ],
+        "strokePaints": [
+          {
+            "type": "SOLID",
+            "visible": true,
+            "color": { "r": 208, "g": 211, "b": 216, "a": 0.8 }
+          }
+        ],
+        "strokeWeight": 1,
+        "strokeAlign": "INSIDE",
+        "cornerRadius": 12,
+        "effects": [
+          {
+            "type": "DROP_SHADOW",
+            "visible": true,
+            "offset": { "x": 0, "y": 8 },
+            "radius": 24,
+            "spread": 0,
+            "color": { "r": 0, "g": 0, "b": 0, "a": 0.2 }
+          }
+        ],
+        "childNode": [
+          {
+            "componentId": "4:315",
+            "pathString": "0/0",
+            "type": "TEXT",
+            "name": "Title",
+            "visible": true,
+            "left": 32,
+            "top": 24,
+            "width": 536,
+            "height": 32,
+            "nodeText": "Заявка"
+          },
+          {
+            "guid": "4:316",
+            "type": "INSTANCE",
+            "name": "Primary action",
+            "visible": true,
+            "left": 32,
+            "top": 320,
+            "width": 120,
+            "height": 40,
+            "componentKey": "Button/Primary",
+            "componentNormName": "size=m",
+            "props": { "disabled": false }
+          },
+          {
+            "guid": "4:317",
+            "type": "FRAME",
+            "name": "Hidden helper",
+            "visible": false,
+            "left": 0,
+            "top": 0,
+            "width": 1,
+            "height": 1
+          }
+        ]
+      }
+    ],
+    "pixComponentTreeDslNodes": [],
+    "localStyleMap": {},
+    "variableMap": {},
+    "variableSetMap": {}
+  }
+}
