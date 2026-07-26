@@ -3,6 +3,7 @@ import type {
   ComponentBinding,
   DesignIRV2,
   ReactComponentRecipeV1,
+  ReactComponentRecipeV2,
   ResolutionNode,
   ResolutionPlanV2,
   UiManifestV2,
@@ -15,6 +16,78 @@ import type { ReadyGenerationInput } from "./generation-model.js";
 import { buildReactGenerationModel } from "./build-react-generation-model.js";
 
 describe("buildReactGenerationModel", () => {
+  it("keeps an empty render-only structural group and reports one warning", () => {
+    const root = node("ui_action_group", "actionGroup", []);
+    const model = buildReactGenerationModel(
+      readyInput({
+        root,
+        resolutions: [
+          reuse("ui_action_group", "actionGroup", "base.Stack", "Stack"),
+        ],
+        recipes: [
+          recipe("base.Stack", "render-only-optional", {
+            staticProps: [
+              {
+                target: "gap",
+                value: { kind: "literal", value: 8 },
+                reason: "render-only",
+              },
+            ],
+          }),
+        ],
+      }),
+    );
+
+    expect(model.root).toMatchObject({
+      kind: "reuse",
+      componentId: "base.Stack",
+      children: [],
+    });
+    expect(model.diagnostics).toContainEqual({
+      severity: "warning",
+      blocking: false,
+      stage: "react-generation",
+      code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
+      message: "Render-only structural group has no semantic children",
+      evidence: {
+        manifestNodeId: "ui_action_group",
+        semanticRole: "actionGroup",
+      },
+    });
+    expect(model.renderOnlyProps).toEqual([
+      {
+        manifestNodeId: "ui_action_group",
+        componentId: "base.Stack",
+        propNames: ["gap"],
+      },
+    ]);
+  });
+
+  it("does not warn when a render-only structural group has semantic children", () => {
+    const root = node("actions", "actionGroup", [
+      node("action", "primaryAction", []),
+    ]);
+    const model = buildReactGenerationModel(
+      readyInput({
+        root,
+        resolutions: [
+          reuse("actions", "actionGroup", "base.Stack", "Stack"),
+          reuse("action", "primaryAction", "base.Button", "Button"),
+        ],
+        recipes: [
+          recipe("base.Stack", "render-only-optional"),
+          recipe("base.Button", "forbidden"),
+        ],
+      }),
+    );
+
+    expect(model.diagnostics).not.toContainEqual(
+      expect.objectContaining({
+        code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
+      }),
+    );
+  });
+
   it("lowers one manifest tree to one nested reuse element tree", () => {
     const root = node("root", "verticalGroup", [
       node("action", "primaryAction", [], { label: "Continue" }),
@@ -190,7 +263,7 @@ describe("buildReactGenerationModel", () => {
 function readyInput(input: {
   root: UiNodeV2;
   resolutions: ResolutionNode[];
-  recipes: ReactComponentRecipeV1[];
+  recipes: Array<ReactComponentRecipeV1 | ReactComponentRecipeV2>;
   composition?: boolean;
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
@@ -272,7 +345,7 @@ function readyInput(input: {
 
 function packFixture(input: {
   resolutions: ResolutionNode[];
-  recipes: ReactComponentRecipeV1[];
+  recipes: Array<ReactComponentRecipeV1 | ReactComponentRecipeV2>;
   composition?: boolean;
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
@@ -333,7 +406,7 @@ function packFixture(input: {
       schema: "react-render-recipes/v2",
       components: input.recipes.map((recipe) => ({
         ...recipe,
-        staticProps: [],
+        staticProps: "staticProps" in recipe ? recipe.staticProps : [],
       })),
       compositions: input.composition
         ? [
@@ -488,11 +561,14 @@ function binding(componentId: string, exportName: string): ComponentBinding {
 
 function recipe(
   componentId: string,
-  semanticChildrenPolicy: ReactComponentRecipeV1["semanticChildrenPolicy"],
-  overrides: Partial<ReactComponentRecipeV1> = {},
-): ReactComponentRecipeV1 {
+  semanticChildrenPolicy:
+    | ReactComponentRecipeV1["semanticChildrenPolicy"]
+    | ReactComponentRecipeV2["semanticChildrenPolicy"],
+  overrides: Partial<ReactComponentRecipeV2> = {},
+): ReactComponentRecipeV2 {
   return {
     componentId,
+    staticProps: [],
     stateProps: [],
     eventProps: [],
     semanticChildrenPolicy,

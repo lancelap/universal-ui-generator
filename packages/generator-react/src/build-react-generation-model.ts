@@ -1,6 +1,8 @@
 import type {
+  Diagnostic,
   ReactComponentRecipe,
   ReactStylePolicy,
+  RenderOnlyPropReport,
   ResolutionNode,
   UiNodeV2,
 } from "@uig/contracts";
@@ -32,6 +34,8 @@ export function buildReactGenerationModel(
     ]),
   );
   const externalProps = new Map<string, GeneratedPropModel>();
+  const renderOnlyProps: RenderOnlyPropReport[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   const lower = (node: UiNodeV2): ReactElementModel => {
     const resolution = input.resolutionsByManifestNodeId.get(node.id);
@@ -63,9 +67,19 @@ export function buildReactGenerationModel(
         `No render recipe exists for ${rootBinding.componentId}`,
       );
     }
-    enforceChildrenPolicy(node, recipe);
+    const childrenPolicyDiagnostic = evaluateChildrenPolicy(node, recipe);
+    if (childrenPolicyDiagnostic) {
+      diagnostics.push(childrenPolicyDiagnostic);
+    }
     const props = buildPropsModel(node, resolution, recipe);
     mergeExternalProps(externalProps, props.externalProps);
+    if (props.renderOnlyPropNames.length > 0) {
+      renderOnlyProps.push({
+        manifestNodeId: node.id,
+        componentId: rootBinding.componentId,
+        propNames: props.renderOnlyPropNames,
+      });
+    }
 
     let element: ReactElementModel;
     if (resolution.decision === "reuse") {
@@ -123,12 +137,25 @@ export function buildReactGenerationModel(
     return maybeWrap(input, node, recipe, rootBinding.componentId, element);
   };
 
+  const root = lower(input.uiManifest.root);
   return {
     imports,
     externalProps: [...externalProps.values()].sort((left, right) =>
       left.name.localeCompare(right.name),
     ),
-    root: lower(input.uiManifest.root),
+    renderOnlyProps: renderOnlyProps.sort(
+      (left, right) =>
+        left.manifestNodeId.localeCompare(right.manifestNodeId) ||
+        left.componentId.localeCompare(right.componentId),
+    ),
+    diagnostics: diagnostics.sort(
+      (left, right) =>
+        left.code.localeCompare(right.code) ||
+        String(left.evidence?.manifestNodeId ?? "").localeCompare(
+          String(right.evidence?.manifestNodeId ?? ""),
+        ),
+    ),
+    root,
   };
 }
 
@@ -153,10 +180,10 @@ function findCompositionRoot(
   return matches[0]!;
 }
 
-function enforceChildrenPolicy(
+function evaluateChildrenPolicy(
   node: UiNodeV2,
   recipe: ReactComponentRecipe,
-): void {
+): Diagnostic | undefined {
   if (
     (recipe.semanticChildrenPolicy === "required" &&
       node.children.length === 0) ||
@@ -167,6 +194,23 @@ function enforceChildrenPolicy(
       `Node ${node.id} violates the ${recipe.semanticChildrenPolicy} semantic children policy`,
     );
   }
+  if (
+    recipe.semanticChildrenPolicy === "render-only-optional" &&
+    node.children.length === 0
+  ) {
+    return {
+      severity: "warning",
+      blocking: false,
+      stage: "react-generation",
+      code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
+      message: "Render-only structural group has no semantic children",
+      evidence: {
+        manifestNodeId: node.id,
+        semanticRole: node.role,
+      },
+    };
+  }
+  return undefined;
 }
 
 function maybeWrap(

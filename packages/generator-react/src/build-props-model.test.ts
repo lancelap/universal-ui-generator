@@ -1,5 +1,6 @@
 import type {
   ReactComponentRecipe,
+  ReactComponentRecipeV2,
   ResolutionNode,
   UiNodeV2,
 } from "@uig/contracts";
@@ -9,6 +10,59 @@ import { ReactGenerationError } from "./errors.js";
 import { buildPropsModel } from "./build-props-model.js";
 
 describe("buildPropsModel", () => {
+  it("lowers sorted render-only static props into the element model", () => {
+    const result = buildPropsModel(
+      actionNode({}),
+      reuseResolution({}),
+      recipeWithStaticProps(),
+    );
+
+    expect(result.elementProps).toEqual([
+      { name: "mode", value: { kind: "literal", value: "dropdown" } },
+      { name: "onChange", value: { kind: "noop" } },
+      { name: "options", value: { kind: "empty-array" } },
+      { name: "value", value: { kind: "literal", value: "" } },
+    ]);
+    expect(result.renderOnlyPropNames).toEqual([
+      "mode",
+      "onChange",
+      "options",
+      "value",
+    ]);
+  });
+
+  it("applies higher prop sources over render-only static props", () => {
+    const recipe = recipeWithStaticProps({
+      stateProps: [
+        {
+          source: "state.placeholder",
+          target: "mode",
+          valueType: "string",
+        },
+      ],
+      eventProps: [{ source: "change", target: "onChange" }],
+    });
+    const result = buildPropsModel(
+      actionNode({
+        state: { placeholder: "semantic" },
+        interactions: [{ key: "value", event: "change", valueType: "string" }],
+      }),
+      reuseResolution({ mode: "resolution" }),
+      recipe,
+    );
+
+    expect(result.elementProps).toEqual([
+      { name: "mode", value: { kind: "literal", value: "semantic" } },
+      {
+        name: "onChange",
+        value: { kind: "external-prop", propName: "onValue" },
+      },
+      { name: "options", value: { kind: "empty-array" } },
+      { name: "value", value: { kind: "literal", value: "" } },
+    ]);
+    expect(result.renderOnlyPropNames).toEqual(["options", "value"]);
+  });
+
   it("lowers defaults, text children, typed state, callbacks, and class hooks", () => {
     const node = actionNode({
       content: { label: "Continue" },
@@ -23,16 +77,16 @@ describe("buildPropsModel", () => {
 
     expect(result).toEqual({
       elementProps: [
-        { name: "variant", value: { kind: "literal", value: "primary" } },
+        {
+          name: "className",
+          value: { kind: "class-name", className: "ui_action" },
+        },
         { name: "disabled", value: { kind: "literal", value: true } },
         {
           name: "onClick",
           value: { kind: "external-prop", propName: "onConfirm" },
         },
-        {
-          name: "className",
-          value: { kind: "class-name", className: "ui_action" },
-        },
+        { name: "variant", value: { kind: "literal", value: "primary" } },
       ],
       externalProps: [
         {
@@ -42,6 +96,7 @@ describe("buildPropsModel", () => {
           interactionKey: "confirm",
         },
       ],
+      renderOnlyPropNames: [],
       textChild: { kind: "text", value: "Continue" },
     });
     expect(result.elementProps.some((prop) => prop.name === "children")).toBe(
@@ -174,5 +229,41 @@ function buttonRecipe(): ReactComponentRecipe {
     semanticChildrenPolicy: "forbidden",
     wrapper: "allowed",
     provenance: { kind: "test", source: "test fixture" },
+  };
+}
+
+function recipeWithStaticProps(
+  overrides: Partial<ReactComponentRecipeV2> = {},
+): ReactComponentRecipeV2 {
+  return {
+    componentId: "base.Autocomplete",
+    staticProps: [
+      {
+        target: "options",
+        value: { kind: "empty-array" },
+        reason: "render-only",
+      },
+      {
+        target: "onChange",
+        value: { kind: "noop" },
+        reason: "render-only",
+      },
+      {
+        target: "mode",
+        value: { kind: "literal", value: "dropdown" },
+        reason: "render-only",
+      },
+      {
+        target: "value",
+        value: { kind: "literal", value: "" },
+        reason: "render-only",
+      },
+    ],
+    stateProps: [],
+    eventProps: [],
+    semanticChildrenPolicy: "forbidden",
+    wrapper: "allowed",
+    provenance: { kind: "test", source: "test fixture" },
+    ...overrides,
   };
 }

@@ -27,6 +27,20 @@ export function buildPropsModel(
   }
 
   const elementProps: ReactPropModel[] = [];
+  const renderOnlyNames = new Set<string>();
+  if ("staticProps" in recipe) {
+    for (const prop of recipe.staticProps) {
+      setElementProp(elementProps, {
+        name: prop.target,
+        value:
+          prop.value.kind === "literal"
+            ? { kind: "literal", value: prop.value.value }
+            : { kind: prop.value.kind },
+      });
+      renderOnlyNames.add(prop.target);
+    }
+  }
+
   const resolvedDefaults =
     resolution.decision === "reuse" || resolution.decision === "compose"
       ? resolution.props
@@ -40,7 +54,7 @@ export function buildPropsModel(
         `Default prop ${name} on ${node.id} is not a supported literal`,
       );
     }
-    setElementProp(elementProps, {
+    setHigherPrecedenceProp(elementProps, renderOnlyNames, {
       name,
       value: { kind: "literal", value },
     });
@@ -57,8 +71,9 @@ export function buildPropsModel(
     }
     if (recipe.content.target === "children") {
       textChild = { kind: "text", value };
+      renderOnlyNames.delete(recipe.content.target);
     } else {
-      setElementProp(elementProps, {
+      setHigherPrecedenceProp(elementProps, renderOnlyNames, {
         name: recipe.content.target,
         value: { kind: "literal", value },
       });
@@ -76,13 +91,14 @@ export function buildPropsModel(
         `${mapping.source} on ${node.id} is not ${mapping.valueType}`,
       );
     }
-    setElementProp(elementProps, {
+    setHigherPrecedenceProp(elementProps, renderOnlyNames, {
       name: mapping.target,
       value: { kind: "literal", value },
     });
   }
 
   const generatedByName = new Map<string, GeneratedPropModel>();
+  const mappedEventTargets = new Set<string>();
   for (const mapping of recipe.eventProps) {
     const interactions = (node.interactions ?? []).filter(
       (interaction) => interaction.event === mapping.source,
@@ -97,13 +113,14 @@ export function buildPropsModel(
         );
       }
       generatedByName.set(external.name, existing ?? external);
-      if (elementProps.some((prop) => prop.name === mapping.target)) {
+      if (mappedEventTargets.has(mapping.target)) {
         throw new ReactGenerationError(
           "GENERATION_PROP_CONFLICT",
           `Multiple interactions map to ${mapping.target} on ${node.id}`,
         );
       }
-      setElementProp(elementProps, {
+      mappedEventTargets.add(mapping.target);
+      setHigherPrecedenceProp(elementProps, renderOnlyNames, {
         name: mapping.target,
         value: { kind: "external-prop", propName: external.name },
       });
@@ -111,16 +128,21 @@ export function buildPropsModel(
   }
 
   if (recipe.classNameProp) {
-    setElementProp(elementProps, {
+    setHigherPrecedenceProp(elementProps, renderOnlyNames, {
       name: recipe.classNameProp,
       value: { kind: "class-name", className: cssIdentifier(node.id) },
     });
   }
 
   return {
-    elementProps,
+    elementProps: elementProps.sort((left, right) =>
+      left.name.localeCompare(right.name),
+    ),
     externalProps: [...generatedByName.values()].sort((left, right) =>
       left.name.localeCompare(right.name),
+    ),
+    renderOnlyPropNames: [...renderOnlyNames].sort((left, right) =>
+      left.localeCompare(right),
     ),
     ...(textChild ? { textChild } : {}),
   };
@@ -177,6 +199,15 @@ function setElementProp(props: ReactPropModel[], prop: ReactPropModel): void {
     props.splice(existing, 1);
   }
   props.push(prop);
+}
+
+function setHigherPrecedenceProp(
+  props: ReactPropModel[],
+  renderOnlyNames: Set<string>,
+  prop: ReactPropModel,
+): void {
+  setElementProp(props, prop);
+  renderOnlyNames.delete(prop.name);
 }
 
 function isLiteral(value: unknown): value is string | number | boolean | null {

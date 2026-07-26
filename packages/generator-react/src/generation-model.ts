@@ -2,6 +2,7 @@ import type { LoadedDesignSystemPackV2 } from "@uig/component-catalog";
 import type {
   DesignIRV2,
   Diagnostic,
+  RenderOnlyPropReport,
   ResolutionNode,
   ResolutionPlanV2,
   UiManifestV2,
@@ -57,6 +58,8 @@ export type ReactImportModel = ReactNamedImportModel | ReactDefaultImportModel;
 
 export type ReactPropValueModel =
   | { kind: "literal"; value: string | number | boolean | null }
+  | { kind: "empty-array" }
+  | { kind: "noop" }
   | { kind: "external-prop"; propName: string }
   | { kind: "class-name"; className: string };
 
@@ -84,6 +87,7 @@ export interface ReactTextChildModel {
 export interface ReactPropsBuildResult {
   elementProps: ReactPropModel[];
   externalProps: GeneratedPropModel[];
+  renderOnlyPropNames: string[];
   textChild?: ReactTextChildModel;
 }
 
@@ -137,5 +141,7 @@ export type ReactElementModel =
 export interface ReactGenerationModel {
   imports: ReactImportModel[];
   externalProps: GeneratedPropModel[];
+  renderOnlyProps: RenderOnlyPropReport[];
+  diagnostics: Diagnostic[];
   root: ReactElementModel;
 }
