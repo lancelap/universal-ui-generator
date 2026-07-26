@@ -1,4 +1,5 @@
 export * from "./design-ir.js";
+export * from "./design-ir-v2.js";
 export * from "./design-snapshot.js";
 export * from "./design-summary.js";
 export * from "./design-system-pack.js";
@@ -8,3 +9,4 @@ export * from "./resolution-plan.js";
 export * from "./schema-utils.js";
 export * from "./stable-json.js";
 export * from "./ui-manifest.js";
+export * from "./ui-manifest-v2.js";
