@@ -92,6 +92,10 @@ describe("emitFallbackTsx", () => {
 describe("validateGeneratedTsx", () => {
   const expectation: GeneratedTsxExpectation = {
     componentName: "DialogPreview",
+    exportedDeclarations: [
+      { kind: "interface", name: "DialogPreviewProps" },
+      { kind: "function", name: "DialogPreview" },
+    ],
     externalImports: [
       {
         source: "@ui/assets",
@@ -137,6 +141,7 @@ describe("validateGeneratedTsx", () => {
     expect(() =>
       validateGeneratedTsx(source, {
         componentName: "DialogPreview",
+        exportedDeclarations: [{ kind: "function", name: "DialogPreview" }],
         externalImports: [
           {
             source: "@ui/core",
@@ -180,6 +185,7 @@ describe("validateGeneratedTsx", () => {
     expect(() =>
       validateGeneratedTsx(generatedAlias, {
         componentName: "DialogPreview",
+        exportedDeclarations: [{ kind: "function", name: "DialogPreview" }],
         externalImports: [
           {
             source: "@ui/core",
@@ -212,6 +218,7 @@ describe("validateGeneratedTsx", () => {
     expect(() =>
       validateGeneratedTsx(externalAlias, {
         componentName: "DialogPreview",
+        exportedDeclarations: [{ kind: "function", name: "DialogPreview" }],
         externalImports: [
           {
             source: "@ui/core",
@@ -236,6 +243,10 @@ describe("validateGeneratedTsx", () => {
     expect(() =>
       validateGeneratedTsx(emitFallbackTsx(fallbackModel()), {
         componentName: "GeneratedWarning",
+        exportedDeclarations: [
+          { kind: "interface", name: "GeneratedWarningProps" },
+          { kind: "function", name: "GeneratedWarning" },
+        ],
         externalImports: [
           {
             source: "react",
@@ -258,6 +269,38 @@ describe("validateGeneratedTsx", () => {
         localComponentNames: [],
       }),
     ).not.toThrow();
+  });
+
+  it("rejects missing exports and duplicate root declarations", () => {
+    const valid = emitTsx(model(), "DialogPreview");
+    const missingComponentExport = valid.replace(
+      "export function DialogPreview",
+      "function DialogPreview",
+    );
+    const missingPropsExport = valid.replace(
+      "export interface DialogPreviewProps",
+      "interface DialogPreviewProps",
+    );
+    const duplicateComponent = `${valid}\nexport function DialogPreview() { return <Dialog />; }\n`;
+    const nestedDuplicateComponent = valid.replace(
+      "    return (",
+      "    function DialogPreview() { return <Dialog />; }\n    return (",
+    );
+    const unexpectedReexport = `${valid}\nexport { DialogPreview as Extra };\n`;
+
+    for (const source of [
+      missingComponentExport,
+      missingPropsExport,
+      duplicateComponent,
+      nestedDuplicateComponent,
+      unexpectedReexport,
+    ]) {
+      expect(() => validateGeneratedTsx(source, expectation)).toThrowError(
+        expect.objectContaining<Partial<ReactGenerationError>>({
+          code: "GENERATION_SOURCE_INVALID",
+        }),
+      );
+    }
   });
 
   it("rejects a source that omits an expected JSX component despite retaining its imports", () => {

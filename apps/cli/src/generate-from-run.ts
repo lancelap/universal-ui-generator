@@ -23,6 +23,10 @@ export async function generateFromRun(input: {
   runId: string;
   workspaceDir: string;
   explicitPackPath?: string;
+  /** @internal Deterministic run-rebinding coordination for filesystem tests. */
+  testHooks?: {
+    beforeInstall?: () => Promise<void>;
+  };
 }): Promise<{
   outputPath: string;
   status: "generated" | "blocked";
@@ -35,12 +39,12 @@ export async function generateFromRun(input: {
     const uigDir = resolve(input.workspaceDir, ".uig");
     const runsDir = join(uigDir, "runs");
     const runDir = join(runsDir, input.runId);
-    await Promise.all([
+    const [, , canonicalRunDir] = await Promise.all([
       assertOrdinaryDirectory(uigDir, "Generator workspace"),
       assertOrdinaryDirectory(runsDir, "Generation runs"),
       assertOrdinaryDirectory(runDir, "Generation run"),
     ]);
-    const runPath = await resolveArtifactPath(runDir, "run.json");
+    const runPath = await resolveArtifactPath(canonicalRunDir, "run.json");
     const run = validateWithSchema(
       GenerationRunSchema,
       await readJson(runPath),
@@ -53,9 +57,9 @@ export async function generateFromRun(input: {
 
     const [designIrPath, uiManifestPath, resolutionPlanPath] =
       await Promise.all([
-        resolveArtifactPath(runDir, run.artifacts.designIr),
-        resolveArtifactPath(runDir, run.artifacts.uiManifest),
-        resolveArtifactPath(runDir, run.artifacts.resolutionPlan),
+        resolveArtifactPath(canonicalRunDir, run.artifacts.designIr),
+        resolveArtifactPath(canonicalRunDir, run.artifacts.uiManifest),
+        resolveArtifactPath(canonicalRunDir, run.artifacts.resolutionPlan),
       ]);
     const [designIrValue, uiManifestValue, resolutionPlanValue] =
       await Promise.all([
@@ -80,13 +84,15 @@ export async function generateFromRun(input: {
       resolutionPlan,
       pack,
     });
-    const destination = join(runDir, "generated");
+    await input.testHooks?.beforeInstall?.();
+    await assertCanonicalRunIdentity(runDir, canonicalRunDir);
+    const destination = join(canonicalRunDir, "generated");
     const writeStatus = await writeGeneratedBundleAtomically({
       destination,
       bundle,
     });
     return {
-      outputPath: relative(input.workspaceDir, destination)
+      outputPath: relative(input.workspaceDir, join(runDir, "generated"))
         .split(sep)
         .join("/"),
       status: bundle.status,
@@ -107,10 +113,25 @@ export async function generateFromRun(input: {
 async function assertOrdinaryDirectory(
   directory: string,
   label: string,
-): Promise<void> {
+): Promise<string> {
   const metadata = await lstat(directory);
   if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
     invalid(`${label} path must be an ordinary directory`);
+  }
+  return realpath(directory);
+}
+
+async function assertCanonicalRunIdentity(
+  selectedRunDir: string,
+  canonicalRunDir: string,
+): Promise<void> {
+  const metadata = await lstat(selectedRunDir);
+  if (
+    !metadata.isDirectory() ||
+    metadata.isSymbolicLink() ||
+    (await realpath(selectedRunDir)) !== canonicalRunDir
+  ) {
+    invalid("Selected generation run changed before output installation");
   }
 }
 

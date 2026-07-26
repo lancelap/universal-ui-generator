@@ -5,47 +5,81 @@ import {
   readFile,
   readdir,
   rename,
+  rmdir,
   rm,
   writeFile,
 } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, sep } from "node:path";
 
 import { stableStringify, type ReactGenerationBundleV2 } from "@uig/contracts";
-import { ReactGenerationError } from "@uig/generator-react";
+import {
+  assertReactGenerationBundleIntegrity,
+  ReactGenerationError,
+} from "@uig/generator-react";
 
 const encoder = new TextEncoder();
 
 export async function writeGeneratedBundleAtomically(input: {
   destination: string;
   bundle: ReactGenerationBundleV2;
+  /** @internal Deterministic concurrency coordination for filesystem tests. */
+  testHooks?: {
+    afterReservationAcquired?: () => Promise<void>;
+  };
 }): Promise<"written" | "identical"> {
+  assertReactGenerationBundleIntegrity(input.bundle);
   const parent = dirname(input.destination);
   const temporary = join(
     parent,
     `${basename(input.destination)}.tmp-${randomUUID()}`,
   );
+  const reservation = join(parent, `${basename(input.destination)}.lock`);
   await mkdir(temporary);
   let installed = false;
+  let reservationHeld = false;
   try {
     await writeBundleMap(temporary, input.bundle);
+    await acquireReservation(reservation);
+    reservationHeld = true;
+    await input.testHooks?.afterReservationAcquired?.();
     if (await exists(input.destination)) {
       return await compareOrConflict(temporary, input.destination);
     }
+    await rename(temporary, input.destination);
+    installed = true;
+    return "written";
+  } finally {
+    await Promise.all([
+      reservationHeld ? rmdir(reservation) : Promise.resolve(),
+      !installed
+        ? rm(temporary, { recursive: true, force: true })
+        : Promise.resolve(),
+    ]);
+  }
+}
+
+async function acquireReservation(path: string): Promise<void> {
+  const deadline = Date.now() + 5_000;
+  for (;;) {
     try {
-      await rename(temporary, input.destination);
-      installed = true;
-      return "written";
+      await mkdir(path);
+      return;
     } catch (error) {
-      if (!(await exists(input.destination))) {
+      if (!hasCode(error, "EEXIST")) {
         throw error;
       }
-      return await compareOrConflict(temporary, input.destination);
-    }
-  } finally {
-    if (!installed) {
-      await rm(temporary, { recursive: true, force: true });
+      if (Date.now() >= deadline) {
+        conflict(`Timed out waiting for generated output reservation: ${path}`);
+      }
+      await waitForRetry();
     }
   }
+}
+
+async function waitForRetry(): Promise<void> {
+  await new Promise<void>((resolve) => {
+    setTimeout(resolve, 5);
+  });
 }
 
 async function writeBundleMap(
@@ -145,16 +179,20 @@ async function exists(path: string): Promise<boolean> {
     await lstat(path);
     return true;
   } catch (error) {
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "code" in error &&
-      error.code === "ENOENT"
-    ) {
+    if (hasCode(error, "ENOENT")) {
       return false;
     }
     throw error;
   }
+}
+
+function hasCode(error: unknown, code: string): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    error.code === code
+  );
 }
 
 function conflict(message: string): never {

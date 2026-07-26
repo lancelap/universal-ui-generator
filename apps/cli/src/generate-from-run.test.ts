@@ -3,7 +3,9 @@ import {
   mkdtemp,
   readFile,
   readdir,
+  rename,
   rm,
+  symlink,
   writeFile,
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
@@ -112,6 +114,34 @@ describe("generateFromRun", () => {
     });
     await expect(
       readFile(join(fixture.runDir, "generated", "generation-report.json")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+  });
+
+  it("fails closed when the selected run is rebound before installation", async () => {
+    const fixture = await runFixture(roots);
+    const originalRun = `${fixture.runDir}.original`;
+    const outsideRun = join(fixture.workspace, "outside-run");
+    await mkdir(outsideRun);
+
+    await expect(
+      generateFromRun({
+        runId: fixture.run.runId,
+        workspaceDir: fixture.workspace,
+        testHooks: {
+          beforeInstall: async () => {
+            await rename(fixture.runDir, originalRun);
+            await symlink(outsideRun, fixture.runDir);
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: "GENERATION_INPUT_INVALID",
+    });
+    await expect(
+      readFile(join(outsideRun, "generated", "generation-report.json")),
+    ).rejects.toMatchObject({ code: "ENOENT" });
+    await expect(
+      readFile(join(originalRun, "generated", "generation-report.json")),
     ).rejects.toMatchObject({ code: "ENOENT" });
   });
 
@@ -238,7 +268,143 @@ describe("writeGeneratedBundleAtomically", () => {
       ),
     ).toEqual([]);
   });
+
+  it("rejects a tampered bundle before creating a destination", async () => {
+    const fixture = await runFixture(roots);
+    const destination = join(fixture.runDir, "generated");
+    const bundle = generateReactBundle(fixture.generationInput);
+    bundle.files[0]!.bytes = new TextEncoder().encode("tampered\n");
+
+    await expect(
+      writeGeneratedBundleAtomically({ destination, bundle }),
+    ).rejects.toMatchObject({
+      code: "GENERATION_SOURCE_INVALID",
+    });
+    await expect(readFile(destination)).rejects.toMatchObject({
+      code: "ENOENT",
+    });
+  });
+
+  it("does not replace a concurrently-created empty destination", async () => {
+    const fixture = await runFixture(roots);
+    const destination = join(fixture.runDir, "generated");
+    const bundle = generateReactBundle(fixture.generationInput);
+
+    await expect(
+      writeGeneratedBundleAtomically({
+        destination,
+        bundle,
+        testHooks: {
+          afterReservationAcquired: async () => {
+            await mkdir(destination);
+          },
+        },
+      }),
+    ).rejects.toMatchObject({
+      code: "GENERATION_OUTPUT_CONFLICT",
+    });
+    expect(await readdir(destination)).toEqual([]);
+    expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+  });
+
+  it("serializes concurrent identical writers and converges without clobbering", async () => {
+    const fixture = await runFixture(roots);
+    const destination = join(fixture.runDir, "generated");
+    const bundle = generateReactBundle(fixture.generationInput);
+    const acquired = deferred<void>();
+    const release = deferred<void>();
+    const first = writeGeneratedBundleAtomically({
+      destination,
+      bundle,
+      testHooks: {
+        afterReservationAcquired: async () => {
+          acquired.resolve();
+          await release.promise;
+        },
+      },
+    });
+    await withTimeout(acquired.promise, 250);
+    const second = writeGeneratedBundleAtomically({ destination, bundle });
+    release.resolve();
+
+    await expect(Promise.all([first, second])).resolves.toEqual([
+      "written",
+      "identical",
+    ]);
+    expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+  });
+
+  it("preserves the winner when a concurrent writer conflicts", async () => {
+    const fixture = await runFixture(roots);
+    const blockedFixture = await runFixture(roots, { blocked: true });
+    const destination = join(fixture.runDir, "generated");
+    const generatedBundle = generateReactBundle(fixture.generationInput);
+    const blockedBundle = generateReactBundle(blockedFixture.generationInput);
+    const acquired = deferred<void>();
+    const release = deferred<void>();
+    const first = writeGeneratedBundleAtomically({
+      destination,
+      bundle: generatedBundle,
+      testHooks: {
+        afterReservationAcquired: async () => {
+          acquired.resolve();
+          await release.promise;
+        },
+      },
+    });
+    await withTimeout(acquired.promise, 250);
+    const second = writeGeneratedBundleAtomically({
+      destination,
+      bundle: blockedBundle,
+    });
+    release.resolve();
+
+    await expect(first).resolves.toBe("written");
+    await expect(second).rejects.toMatchObject({
+      code: "GENERATION_OUTPUT_CONFLICT",
+    });
+    expect(await relativeFiles(destination)).toEqual([
+      "GeneratedModal.module.css",
+      "GeneratedModal.tsx",
+      "generation-report.json",
+    ]);
+    expect(await generatedSiblings(fixture.runDir)).toEqual([]);
+  });
 });
+
+function deferred<T>(): {
+  promise: Promise<T>;
+  resolve: (value: T | PromiseLike<T>) => void;
+} {
+  let resolve!: (value: T | PromiseLike<T>) => void;
+  const promise = new Promise<T>((resolvePromise) => {
+    resolve = resolvePromise;
+  });
+  return { promise, resolve };
+}
+
+async function withTimeout<T>(
+  promise: Promise<T>,
+  milliseconds: number,
+): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<never>((_, reject) => {
+      setTimeout(
+        () => reject(new Error("Timed out waiting for writer reservation")),
+        milliseconds,
+      );
+    }),
+  ]);
+}
+
+async function generatedSiblings(runDir: string): Promise<string[]> {
+  return (await readdir(runDir))
+    .filter(
+      (name) => name.startsWith("generated.tmp-") || name === "generated.lock",
+    )
+    .sort();
+}
 
 async function runFixture(
   roots: string[],

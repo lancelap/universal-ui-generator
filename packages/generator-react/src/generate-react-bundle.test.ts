@@ -11,7 +11,10 @@ import { sha256 } from "@uig/design-context";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { ReactGenerationInput } from "./generation-model.js";
-import { generateReactBundle } from "./generate-react-bundle.js";
+import {
+  assertReactGenerationBundleIntegrity,
+  generateReactBundle,
+} from "./generate-react-bundle.js";
 
 const materialUiPack = fileURLToPath(
   new URL("../../../design-system-packs/material-ui", import.meta.url),
@@ -190,7 +193,253 @@ describe("generateReactBundle", () => {
       fallbackCssModule: 1,
     });
   });
+
+  it("reserves stable unique names for repeated fallback components", () => {
+    const repeated = withFallbackChildren(input, [
+      {
+        manifestNodeId: "ui_warning_a",
+        designNodeId: "4:401",
+        localComponentName: "GeneratedWarning",
+      },
+      {
+        manifestNodeId: "ui_warning_b",
+        designNodeId: "4:402",
+        localComponentName: "GeneratedWarning",
+      },
+    ]);
+
+    const first = generateReactBundle(repeated);
+    const second = generateReactBundle(repeated);
+    const rootTsx = source(first, "GeneratedModal.tsx");
+
+    expect(first.files.map((file) => file.path)).toEqual([
+      "GeneratedModal.module.css",
+      "GeneratedModal.tsx",
+      "fallbacks/GeneratedWarning_dd391a3f.module.css",
+      "fallbacks/GeneratedWarning_dd391a3f.tsx",
+      "fallbacks/GeneratedWarning_49434e1b.module.css",
+      "fallbacks/GeneratedWarning_49434e1b.tsx",
+    ]);
+    expect(rootTsx).toContain(
+      'import { GeneratedWarning_dd391a3f } from "./fallbacks/GeneratedWarning_dd391a3f";',
+    );
+    expect(rootTsx).toContain(
+      'import { GeneratedWarning_49434e1b } from "./fallbacks/GeneratedWarning_49434e1b";',
+    );
+    expect(rootTsx).toContain("<GeneratedWarning_dd391a3f />");
+    expect(rootTsx).toContain("<GeneratedWarning_49434e1b />");
+    expect(fileMap(first)).toEqual(fileMap(second));
+  });
+
+  it("reserves fallback names that collide with the root or an imported local", () => {
+    const colliding = withFallbackChildren(input, [
+      {
+        manifestNodeId: "ui_root_collision",
+        designNodeId: "4:403",
+        localComponentName: "GeneratedModal",
+      },
+      {
+        manifestNodeId: "ui_import_collision",
+        designNodeId: "4:404",
+        localComponentName: "Stack",
+      },
+    ]);
+
+    const result = generateReactBundle(colliding);
+    const rootTsx = source(result, "GeneratedModal.tsx");
+
+    expect(result.files.map((file) => file.path)).toContain(
+      "fallbacks/GeneratedModal_4890a208.tsx",
+    );
+    expect(result.files.map((file) => file.path)).toContain(
+      "fallbacks/Stack_f5dadec6.tsx",
+    );
+    expect(rootTsx).toContain(
+      'import { GeneratedModal_4890a208 } from "./fallbacks/GeneratedModal_4890a208";',
+    );
+    expect(rootTsx).toContain(
+      'import { Stack_f5dadec6 } from "./fallbacks/Stack_f5dadec6";',
+    );
+    expect(rootTsx).not.toContain(
+      'import { GeneratedModal } from "./fallbacks/GeneratedModal";',
+    );
+    expect(rootTsx).not.toContain('import { Stack } from "./fallbacks/Stack";');
+  });
+
+  it("counts grouped named component imports by binding", () => {
+    const grouped = withReuseWarningChild(input);
+
+    const result = generateReactBundle(grouped);
+
+    expect(source(result, "GeneratedModal.tsx")).toContain(
+      'import { Alert, Stack } from "@mui/material";',
+    );
+    expect(result.report.statistics.imports).toBe(2);
+  });
+
+  it("rejects tampered bytes and duplicate bundle paths", () => {
+    const generated = generateReactBundle(input);
+    const tampered = structuredClone(generated);
+    tampered.files[0]!.bytes = new TextEncoder().encode("tampered\n");
+    const duplicate = structuredClone(generated);
+    duplicate.files.push(structuredClone(duplicate.files[0]!));
+    const wrongSchema = structuredClone(generated);
+    (wrongSchema as { schema: string }).schema = "react-generation-bundle/v1";
+
+    expect(() => assertReactGenerationBundleIntegrity(tampered)).toThrowError(
+      expect.objectContaining({ code: "GENERATION_SOURCE_INVALID" }),
+    );
+    expect(() => assertReactGenerationBundleIntegrity(duplicate)).toThrowError(
+      expect.objectContaining({ code: "GENERATION_SOURCE_INVALID" }),
+    );
+    expect(() =>
+      assertReactGenerationBundleIntegrity(wrongSchema),
+    ).toThrowError(
+      expect.objectContaining({ code: "GENERATION_SOURCE_INVALID" }),
+    );
+  });
 });
+
+function withFallbackChildren(
+  input: ReactGenerationInput,
+  fallbacks: Array<{
+    manifestNodeId: string;
+    designNodeId: string;
+    localComponentName: string;
+  }>,
+): ReactGenerationInput {
+  const designIr = structuredClone(input.designIr);
+  designIr.nodes[designIr.rootNodeId] = {
+    ...designIr.nodes[designIr.rootNodeId]!,
+    children: fallbacks.map((fallback) => fallback.designNodeId),
+  };
+  for (const fallback of fallbacks) {
+    designIr.nodes[fallback.designNodeId] = designNode(
+      fallback.designNodeId,
+      [],
+    );
+  }
+  const uiManifest = structuredClone(input.uiManifest);
+  uiManifest.root.children = fallbacks.map((fallback) => ({
+    id: fallback.manifestNodeId,
+    kind: "content",
+    role: "warning",
+    sourceNodeIds: [fallback.designNodeId],
+    layoutSourceNodeId: fallback.designNodeId,
+    confidence: 1,
+    evidence: [{ kind: "semantic-role", value: "warning" }],
+    children: [],
+  }));
+  const resolutionPlan = structuredClone(input.resolutionPlan);
+  resolutionPlan.source = {
+    designIr: {
+      artifactId: designIr.sourceArtifactId,
+      schema: "design-ir/v2",
+      sha256: sha256(stableStringify(designIr)),
+    },
+    uiManifest: {
+      artifactId: uiManifest.sourceArtifactId,
+      schema: "ui-manifest/v2",
+      sha256: sha256(stableStringify(uiManifest)),
+    },
+  };
+  resolutionPlan.nodes = [
+    resolutionPlan.nodes[0]!,
+    ...fallbacks.map((fallback): ResolutionPlanV2["nodes"][number] => ({
+      manifestNodeId: fallback.manifestNodeId,
+      semanticRole: "warning",
+      confidence: 1,
+      evidence: [{ kind: "semantic-role", value: "warning" }],
+      diagnosticCodes: [],
+      decision: "fallback",
+      localComponentName: fallback.localComponentName,
+      styleStrategy: "css-module",
+    })),
+  ];
+  resolutionPlan.summary = {
+    reuse: 1,
+    compose: 0,
+    fallback: fallbacks.length,
+    blocked: 0,
+  };
+  return { ...input, designIr, uiManifest, resolutionPlan };
+}
+
+function withReuseWarningChild(
+  input: ReactGenerationInput,
+): ReactGenerationInput {
+  const designIr = structuredClone(input.designIr);
+  designIr.nodes[designIr.rootNodeId] = {
+    ...designIr.nodes[designIr.rootNodeId]!,
+    children: ["4:405"],
+  };
+  designIr.nodes["4:405"] = designNode("4:405", []);
+  const uiManifest = structuredClone(input.uiManifest);
+  uiManifest.root.children = [
+    {
+      id: "ui_warning",
+      kind: "content",
+      role: "warning",
+      sourceNodeIds: ["4:405"],
+      layoutSourceNodeId: "4:405",
+      confidence: 1,
+      evidence: [{ kind: "semantic-role", value: "warning" }],
+      content: { text: "Warning" },
+      children: [],
+    },
+  ];
+  const resolutionPlan = structuredClone(input.resolutionPlan);
+  resolutionPlan.source = {
+    designIr: {
+      artifactId: designIr.sourceArtifactId,
+      schema: "design-ir/v2",
+      sha256: sha256(stableStringify(designIr)),
+    },
+    uiManifest: {
+      artifactId: uiManifest.sourceArtifactId,
+      schema: "ui-manifest/v2",
+      sha256: sha256(stableStringify(uiManifest)),
+    },
+  };
+  resolutionPlan.nodes.push({
+    manifestNodeId: "ui_warning",
+    semanticRole: "warning",
+    confidence: 1,
+    evidence: [{ kind: "semantic-role", value: "warning" }],
+    diagnosticCodes: [],
+    decision: "reuse",
+    binding: {
+      componentId: "mui.Alert",
+      package: "@mui/material",
+      export: "Alert",
+      exportKind: "named",
+    },
+    props: { severity: "warning" },
+  });
+  resolutionPlan.summary = {
+    reuse: 2,
+    compose: 0,
+    fallback: 0,
+    blocked: 0,
+  };
+  return { ...input, designIr, uiManifest, resolutionPlan };
+}
+
+function source(
+  bundle: ReturnType<typeof generateReactBundle>,
+  path: string,
+): string {
+  return new TextDecoder().decode(
+    bundle.files.find((file) => file.path === path)!.bytes,
+  );
+}
+
+function fileMap(bundle: ReturnType<typeof generateReactBundle>) {
+  return bundle.files.map((file) => ({
+    ...file,
+    bytes: [...file.bytes],
+  }));
+}
 
 function withStackStaticProps(
   input: ReactGenerationInput,
