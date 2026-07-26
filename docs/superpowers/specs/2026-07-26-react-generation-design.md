@@ -332,7 +332,11 @@ Example:
   ],
   "classNameProp": "className",
   "semanticChildrenPolicy": "forbidden",
-  "wrapper": "allowed"
+  "wrapper": "allowed",
+  "provenance": {
+    "kind": "verified-public-api",
+    "source": "library documentation or public type declaration"
+  }
 }
 ```
 
@@ -373,6 +377,12 @@ Recipes cannot contain:
 - string templates that evaluate at generation time.
 
 Adding a source requires a contract version and tests.
+
+Every component and composition recipe requires provenance. The loader
+validates the provenance shape and retains it in the loaded pack; reviewers can
+trace each JSX prop/slot rule to library documentation or a public type
+declaration. A catalog component's import provenance does not automatically
+prove its render props.
 
 ### 6.3 Prop construction
 
@@ -514,6 +524,10 @@ Example:
   "fallback": {
     "layout": "all-supported",
     "appearance": "all-supported"
+  },
+  "provenance": {
+    "kind": "approved-pack-policy",
+    "source": "Slice 2 style policy review"
   }
 }
 ```
