@@ -5,7 +5,15 @@ import { fileURLToPath } from "node:url";
 
 import { afterEach, describe, expect, it } from "vitest";
 
+import {
+  type ReactRenderRecipesV1,
+  type ReactRenderRecipesV2,
+  ReactRenderRecipesSchema,
+  validateWithSchema,
+} from "@uig/contracts";
+
 import { loadDesignSystemPack, loadDesignSystemPackV2 } from "./load-pack.js";
+import { normalizeReactRenderRecipes } from "./normalize-react-recipes.js";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const sberPack = join(repoRoot, "design-system-packs", "sber-space-ui");
@@ -132,6 +140,82 @@ describe("loadDesignSystemPack", () => {
     await expect(loadDesignSystemPack(pack)).rejects.toMatchObject({
       code: "COMPONENT_CATALOG_ENTRY_INVALID",
     });
+  });
+
+  it("normalizes a v1 recipe document to v2 without mutating it", () => {
+    const v1: ReactRenderRecipesV1 = {
+      schema: "react-render-recipes/v1",
+      components: [
+        {
+          componentId: "base.Button",
+          stateProps: [],
+          eventProps: [],
+          semanticChildrenPolicy: "optional",
+          wrapper: "allowed",
+          provenance: { kind: "test", source: "fixture" },
+        },
+      ],
+      compositions: [],
+    };
+
+    expect(normalizeReactRenderRecipes(v1)).toEqual({
+      schema: "react-render-recipes/v2",
+      components: [
+        {
+          ...v1.components[0],
+          staticProps: [],
+        },
+      ],
+      compositions: v1.compositions,
+    });
+    expect(v1).toEqual({
+      schema: "react-render-recipes/v1",
+      components: [
+        {
+          componentId: "base.Button",
+          stateProps: [],
+          eventProps: [],
+          semanticChildrenPolicy: "optional",
+          wrapper: "allowed",
+          provenance: { kind: "test", source: "fixture" },
+        },
+      ],
+      compositions: [],
+    });
+  });
+
+  it("clones a validated v2 recipe document without changing its bytes", () => {
+    const v2: ReactRenderRecipesV2 = {
+      schema: "react-render-recipes/v2",
+      components: [
+        {
+          componentId: "base.Button",
+          staticProps: [
+            {
+              target: "options",
+              value: { kind: "empty-array" },
+              reason: "render-only",
+            },
+          ],
+          stateProps: [],
+          eventProps: [],
+          semanticChildrenPolicy: "render-only-optional",
+          wrapper: "allowed",
+          provenance: { kind: "test", source: "fixture" },
+        },
+      ],
+      compositions: [],
+    };
+    const validated = validateWithSchema(ReactRenderRecipesSchema, v2);
+    const normalized = normalizeReactRenderRecipes(validated);
+
+    expect(JSON.stringify(normalized)).toBe(JSON.stringify(v2));
+    normalized.components[0]?.staticProps.push({
+      target: "onChange",
+      value: { kind: "noop" },
+      reason: "render-only",
+    });
+    expect(v2.components[0]?.staticProps).toHaveLength(1);
   });
 
   async function copyPack(): Promise<string> {

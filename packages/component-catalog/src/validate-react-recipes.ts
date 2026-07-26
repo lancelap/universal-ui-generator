@@ -1,8 +1,8 @@
 import type {
   ComponentCatalogEntry,
   CompositionRules,
-  ReactComponentRecipe,
-  ReactRenderRecipes,
+  ReactComponentRecipeV2,
+  ReactRenderRecipesV2,
   ReactStylePolicy,
   SemanticPolicy,
 } from "@uig/contracts";
@@ -13,7 +13,7 @@ export function validateReactRecipes(input: {
   componentsById: ReadonlyMap<string, ComponentCatalogEntry>;
   semanticPolicy: SemanticPolicy;
   compositionRules: CompositionRules;
-  reactRenderRecipes: ReactRenderRecipes;
+  reactRenderRecipes: ReactRenderRecipesV2;
   reactStylePolicy: ReactStylePolicy;
 }): void {
   const recipesByComponentId = indexComponentRecipes(
@@ -27,10 +27,10 @@ export function validateReactRecipes(input: {
 }
 
 function indexComponentRecipes(
-  recipes: ReactComponentRecipe[],
+  recipes: ReactComponentRecipeV2[],
   componentsById: ReadonlyMap<string, ComponentCatalogEntry>,
-): ReadonlyMap<string, ReactComponentRecipe> {
-  const indexed = new Map<string, ReactComponentRecipe>();
+): ReadonlyMap<string, ReactComponentRecipeV2> {
+  const indexed = new Map<string, ReactComponentRecipeV2>();
   for (const recipe of recipes) {
     if (!componentsById.has(recipe.componentId)) {
       throw new DesignSystemPackError(
@@ -55,7 +55,7 @@ function validateRecipeCoverage(
     semanticPolicy: SemanticPolicy;
     compositionRules: CompositionRules;
   },
-  recipesByComponentId: ReadonlyMap<string, ReactComponentRecipe>,
+  recipesByComponentId: ReadonlyMap<string, ReactComponentRecipeV2>,
 ): void {
   const requiredIds = new Set<string>();
   const addClosure = (componentId: string): void => {
@@ -96,7 +96,7 @@ function validateRecipeCoverage(
   }
 }
 
-function validatePropTargets(recipes: ReactComponentRecipe[]): void {
+function validatePropTargets(recipes: ReactComponentRecipeV2[]): void {
   for (const recipe of recipes) {
     const targets = [
       ...(recipe.content ? [recipe.content.target] : []),
@@ -105,10 +105,22 @@ function validatePropTargets(recipes: ReactComponentRecipe[]): void {
       ...(recipe.classNameProp ? [recipe.classNameProp] : []),
     ];
     if (new Set(targets).size !== targets.length) {
-      throw new DesignSystemPackError(
-        "REACT_RECIPE_PROP_CONFLICT",
-        `React recipe ${recipe.componentId} maps multiple sources to one prop`,
-      );
+      recipeConflict(recipe.componentId, "maps multiple sources to one prop");
+    }
+
+    const staticTargets = recipe.staticProps.map((prop) => prop.target);
+    if (new Set(staticTargets).size !== staticTargets.length) {
+      recipeConflict(recipe.componentId, "duplicate static prop target");
+    }
+
+    const eventTargets = new Set(recipe.eventProps.map((prop) => prop.target));
+    for (const prop of recipe.staticProps) {
+      if (prop.value.kind === "noop" && !eventTargets.has(prop.target)) {
+        recipeConflict(
+          recipe.componentId,
+          `noop target ${prop.target} is not an event`,
+        );
+      }
     }
   }
 }
@@ -116,7 +128,7 @@ function validatePropTargets(recipes: ReactComponentRecipe[]): void {
 function validateCompositionRecipes(input: {
   componentsById: ReadonlyMap<string, ComponentCatalogEntry>;
   compositionRules: CompositionRules;
-  reactRenderRecipes: ReactRenderRecipes;
+  reactRenderRecipes: ReactRenderRecipesV2;
 }): void {
   const rulesById = new Map(
     input.compositionRules.rules.map((rule) => [rule.id, rule]),
@@ -217,4 +229,11 @@ function validateStylePolicy(input: {
 
 function compositionError(message: string): never {
   throw new DesignSystemPackError("REACT_COMPOSITION_RECIPE_INVALID", message);
+}
+
+function recipeConflict(componentId: string, message: string): never {
+  throw new DesignSystemPackError(
+    "REACT_RECIPE_PROP_CONFLICT",
+    `React recipe ${componentId} ${message}`,
+  );
 }

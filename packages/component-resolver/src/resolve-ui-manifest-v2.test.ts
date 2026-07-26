@@ -187,11 +187,12 @@ function packFixture(
     },
   };
   const reactRenderRecipes = {
-    schema: "react-render-recipes/v1" as const,
+    schema: "react-render-recipes/v2" as const,
     components: [
       {
         componentId,
         content: { source: contentSource, target: "children" },
+        staticProps: [],
         stateProps: [],
         eventProps: [{ source: "activate" as const, target: "onClick" }],
         classNameProp: "className",

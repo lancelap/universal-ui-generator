@@ -37,6 +37,7 @@ describe("loadDesignSystemPackV2", () => {
     const recipes = await readJson(
       join(packDirectory, "react-render-recipes.json"),
     );
+    promoteRecipesToV2(recipes);
     recipes.components.push({
       ...recipes.components[0],
       componentId: "base.Missing",
@@ -77,6 +78,90 @@ describe("loadDesignSystemPackV2", () => {
 
     await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
       code: "REACT_RECIPE_PROP_CONFLICT",
+    });
+  });
+
+  it("rejects duplicate static prop targets", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    const button = recipeFor(recipes, "base.Button");
+    button.staticProps = [
+      {
+        target: "options",
+        value: { kind: "empty-array" },
+        reason: "render-only",
+      },
+      {
+        target: "options",
+        value: { kind: "empty-array" },
+        reason: "render-only",
+      },
+    ];
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "REACT_RECIPE_PROP_CONFLICT",
+    });
+  });
+
+  it("rejects a noop static prop that is not an event target", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipeFor(recipes, "base.Button").staticProps = [
+      {
+        target: "onChange",
+        value: { kind: "noop" },
+        reason: "render-only",
+      },
+    ];
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "REACT_RECIPE_PROP_CONFLICT",
+    });
+  });
+
+  it("allows a noop static prop to be a lower-precedence event default", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    const button = recipeFor(recipes, "base.Button");
+    button.staticProps = [
+      {
+        target: "onChange",
+        value: { kind: "noop" },
+        reason: "render-only",
+      },
+    ];
+    button.eventProps.push({ source: "change", target: "onChange" });
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).resolves.toMatchObject({
+      reactRenderRecipes: {
+        schema: "react-render-recipes/v2",
+      },
+    });
+  });
+
+  it("rejects an unknown v2 semantic children policy", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipeFor(recipes, "base.Button").semanticChildrenPolicy = "guess";
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "DESIGN_SYSTEM_PACK_INVALID",
     });
   });
 
@@ -123,6 +208,19 @@ describe("loadDesignSystemPackV2", () => {
     };
     await writeJson(recipesPath, reordered);
     await utimes(recipesPath, new Date(1_000), new Date(2_000));
+
+    const second = await loadDesignSystemPackV2(packDirectory);
+
+    expect(second.sha256).toBe(first.sha256);
+  });
+
+  it("hashes v1 recipes as their effective normalized v2 document", async () => {
+    const packDirectory = await createV2Pack();
+    const first = await loadDesignSystemPackV2(packDirectory);
+    const recipesPath = join(packDirectory, "react-render-recipes.json");
+    const recipes = await readJson(recipesPath);
+    promoteRecipesToV2(recipes);
+    await writeJson(recipesPath, recipes);
 
     const second = await loadDesignSystemPackV2(packDirectory);
 
@@ -240,4 +338,18 @@ async function readJson(path: string): Promise<any> {
 
 async function writeJson(path: string, value: unknown): Promise<void> {
   await writeFile(path, `${JSON.stringify(value, null, 2)}\n`, "utf8");
+}
+
+function promoteRecipesToV2(recipes: any): void {
+  recipes.schema = "react-render-recipes/v2";
+  recipes.components = recipes.components.map((recipe: any) => ({
+    ...recipe,
+    staticProps: [],
+  }));
+}
+
+function recipeFor(recipes: any, componentId: string): any {
+  return recipes.components.find(
+    (recipe: { componentId: string }) => recipe.componentId === componentId,
+  );
 }

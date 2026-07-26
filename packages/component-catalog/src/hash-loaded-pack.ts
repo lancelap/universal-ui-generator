@@ -4,7 +4,7 @@ import {
   type DesignSystemPackV2,
   type DesignTokens,
   type PixsoMap,
-  type ReactRenderRecipes,
+  type ReactRenderRecipesV2,
   type ReactStylePolicy,
   type SemanticPolicy,
   stableStringify,
@@ -20,7 +20,7 @@ export interface LoadedDesignSystemPackDocuments {
   compositionRules: CompositionRules;
   tokens: DesignTokens;
   verification: Verification;
-  reactRenderRecipes: ReactRenderRecipes;
+  reactRenderRecipes: ReactRenderRecipesV2;
   reactStylePolicy: ReactStylePolicy;
 }
 

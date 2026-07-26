@@ -16,7 +16,7 @@ import {
   type PixsoMap,
   PixsoMapSchema,
   type PixsoSemanticMapping,
-  type ReactRenderRecipes,
+  type ReactRenderRecipesV2,
   ReactRenderRecipesSchema,
   type ReactStylePolicy,
   ReactStylePolicySchema,
@@ -30,6 +30,7 @@ import {
 import { buildCatalogIndexes } from "./catalog-index.js";
 import { DesignSystemPackError } from "./errors.js";
 import { hashLoadedDesignSystemPackDocuments } from "./hash-loaded-pack.js";
+import { normalizeReactRenderRecipes } from "./normalize-react-recipes.js";
 import { validateCompositions } from "./validate-compositions.js";
 import { validateReactRecipes } from "./validate-react-recipes.js";
 
@@ -46,7 +47,7 @@ export interface LoadedDesignSystemPack {
 
 export interface LoadedDesignSystemPackV2 extends LoadedDesignSystemPack {
   manifest: DesignSystemPackV2;
-  reactRenderRecipes: ReactRenderRecipes;
+  reactRenderRecipes: ReactRenderRecipesV2;
   reactStylePolicy: ReactStylePolicy;
   sha256: string;
 }
@@ -69,7 +70,7 @@ export async function loadDesignSystemPack(
         DesignSystemPackV2Schema,
         rawManifest,
       );
-      return loadV2Pack(root, manifest);
+      return await loadV2Pack(root, manifest);
     }
     invalidManifest();
   } catch (error) {
@@ -127,19 +128,21 @@ async function loadV2Pack(
   root: string,
   manifest: DesignSystemPackV2,
 ): Promise<LoadedDesignSystemPackV2> {
-  const [documents, reactRenderRecipes, reactStylePolicy] = await Promise.all([
-    loadCommonDocuments(root, manifest),
-    readAndValidate(
-      root,
-      manifest.files.reactRenderRecipes,
-      ReactRenderRecipesSchema,
-    ),
-    readAndValidate(
-      root,
-      manifest.files.reactStylePolicy,
-      ReactStylePolicySchema,
-    ),
-  ]);
+  const [documents, rawReactRenderRecipes, reactStylePolicy] =
+    await Promise.all([
+      loadCommonDocuments(root, manifest),
+      readAndValidate(
+        root,
+        manifest.files.reactRenderRecipes,
+        ReactRenderRecipesSchema,
+      ),
+      readAndValidate(
+        root,
+        manifest.files.reactStylePolicy,
+        ReactStylePolicySchema,
+      ),
+    ]);
+  const reactRenderRecipes = normalizeReactRenderRecipes(rawReactRenderRecipes);
   const indexes = validateCommonDocuments(documents);
   validateReactRecipes({
     componentsById: indexes.componentsById,

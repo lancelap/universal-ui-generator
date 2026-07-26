@@ -330,8 +330,11 @@ function packFixture(input: {
     tokens: { schema: "design-tokens/v1", tokens: {} },
     verification: { schema: "component-verification/v1", components: [] },
     reactRenderRecipes: {
-      schema: "react-render-recipes/v1",
-      components: input.recipes,
+      schema: "react-render-recipes/v2",
+      components: input.recipes.map((recipe) => ({
+        ...recipe,
+        staticProps: [],
+      })),
       compositions: input.composition
         ? [
             {
