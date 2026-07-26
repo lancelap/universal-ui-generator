@@ -1,0 +1,55 @@
+{
+  "schema": "component-verification/v1",
+  "components": [
+    {
+      "componentId": "base.Button",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.Field",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.FormControl",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.FormLabel",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.Modal",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.ModalHeader",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.ModalBody",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.ModalFooter",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.Stack",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.Typography",
+      "status": "verified",
+      "source": "gigacode-mcp catalog"
+    }
+  ]
+}

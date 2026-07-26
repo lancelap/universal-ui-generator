@@ -1,0 +1,15 @@
+{
+  "schema": "composition-rules/v1",
+  "rules": [
+    {
+      "id": "mui-dialog",
+      "semanticRole": "dialog",
+      "rootComponentId": "mui.Dialog",
+      "slots": {
+        "heading": "mui.DialogTitle",
+        "body": "mui.DialogContent",
+        "actions": "mui.DialogActions"
+      }
+    }
+  ]
+}

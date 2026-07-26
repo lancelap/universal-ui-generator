@@ -1,0 +1,19 @@
+{
+  "schema": "pixso-map/v1",
+  "mappings": [
+    {
+      "componentKey": "MuiButton",
+      "variant": "contained",
+      "kind": "action",
+      "role": "primaryAction"
+    },
+    {
+      "componentKey": "MuiButton",
+      "variant": "outlined",
+      "kind": "action",
+      "role": "secondaryAction"
+    },
+    { "componentKey": "MuiTextField", "kind": "control", "role": "textInput" },
+    { "componentKey": "MuiDialog", "kind": "overlay", "role": "dialog" }
+  ]
+}

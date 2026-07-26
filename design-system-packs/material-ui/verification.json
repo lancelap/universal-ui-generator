@@ -1,0 +1,50 @@
+{
+  "schema": "component-verification/v1",
+  "components": [
+    {
+      "componentId": "mui.Button",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.TextField",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.Dialog",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.DialogTitle",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.DialogContent",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.DialogActions",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.Alert",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.Stack",
+      "status": "verified",
+      "source": "MUI public API"
+    },
+    {
+      "componentId": "mui.Typography",
+      "status": "verified",
+      "source": "MUI public API"
+    }
+  ]
+}

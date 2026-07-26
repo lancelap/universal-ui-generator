@@ -1,0 +1,19 @@
+{
+  "schema": "pixso-map/v1",
+  "mappings": [
+    {
+      "componentKey": "Button/Primary",
+      "variant": "size=m",
+      "kind": "action",
+      "role": "primaryAction"
+    },
+    {
+      "componentKey": "Button/Secondary",
+      "variant": "size=m",
+      "kind": "action",
+      "role": "secondaryAction"
+    },
+    { "componentKey": "Field/Text", "kind": "control", "role": "textInput" },
+    { "componentKey": "Modal", "kind": "overlay", "role": "dialog" }
+  ]
+}

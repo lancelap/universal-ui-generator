@@ -1,0 +1,171 @@
+{
+  "schema": "component-catalog/v1",
+  "components": [
+    {
+      "id": "mui.Button",
+      "package": "@mui/material",
+      "export": "Button",
+      "exportKind": "named",
+      "semanticRoles": ["action", "primaryAction", "secondaryAction"],
+      "capabilities": ["label", "disabled", "click"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.TextField",
+      "package": "@mui/material",
+      "export": "TextField",
+      "exportKind": "named",
+      "semanticRoles": ["textInput", "combobox"],
+      "capabilities": ["label", "value", "disabled", "select"],
+      "formAdapters": ["controlled"],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.Dialog",
+      "package": "@mui/material",
+      "export": "Dialog",
+      "exportKind": "named",
+      "semanticRoles": ["dialog"],
+      "capabilities": ["overlay", "open-state"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [
+        "mui.DialogTitle",
+        "mui.DialogContent",
+        "mui.DialogActions"
+      ],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.DialogTitle",
+      "package": "@mui/material",
+      "export": "DialogTitle",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["heading-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.DialogContent",
+      "package": "@mui/material",
+      "export": "DialogContent",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["body-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.DialogActions",
+      "package": "@mui/material",
+      "export": "DialogActions",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["actions-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.Alert",
+      "package": "@mui/material",
+      "export": "Alert",
+      "exportKind": "named",
+      "semanticRoles": ["warning"],
+      "capabilities": ["severity", "content"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": { "severity": "warning" },
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.Stack",
+      "package": "@mui/material",
+      "export": "Stack",
+      "exportKind": "named",
+      "semanticRoles": ["actionGroup", "verticalGroup", "horizontalGroup"],
+      "capabilities": ["direction", "gap"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    },
+    {
+      "id": "mui.Typography",
+      "package": "@mui/material",
+      "export": "Typography",
+      "exportKind": "named",
+      "semanticRoles": ["heading", "content"],
+      "capabilities": ["text", "typography"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "official-public-api",
+        "source": "MUI component exports"
+      }
+    }
+  ]
+}

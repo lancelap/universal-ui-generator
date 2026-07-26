@@ -1,0 +1,21 @@
+{
+  "schema": "composition-rules/v1",
+  "rules": [
+    {
+      "id": "sber-dialog",
+      "semanticRole": "dialog",
+      "rootComponentId": "base.Modal",
+      "slots": {
+        "heading": "base.ModalHeader",
+        "body": "base.ModalBody",
+        "actions": "base.ModalFooter"
+      }
+    },
+    {
+      "id": "sber-text-input",
+      "semanticRole": "textInput",
+      "rootComponentId": "base.Field",
+      "slots": { "control": "base.FormControl", "label": "base.FormLabel" }
+    }
+  ]
+}

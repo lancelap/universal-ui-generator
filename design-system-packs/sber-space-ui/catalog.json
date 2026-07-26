@@ -1,0 +1,189 @@
+{
+  "schema": "component-catalog/v1",
+  "components": [
+    {
+      "id": "base.Button",
+      "package": "@sber-space-ui/button",
+      "export": "Button",
+      "exportKind": "named",
+      "semanticRoles": ["action", "primaryAction", "secondaryAction"],
+      "capabilities": ["label", "disabled", "click"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.Field",
+      "package": "@sber-space-ui/field",
+      "export": "Field",
+      "exportKind": "named",
+      "semanticRoles": ["textInput"],
+      "capabilities": ["label", "value", "disabled"],
+      "formAdapters": ["controlled"],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": ["base.FormControl", "base.FormLabel"],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.FormControl",
+      "package": "@sber-space-ui/form-control",
+      "export": "FormControl",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["form-control"],
+      "formAdapters": ["controlled"],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.FormLabel",
+      "package": "@sber-space-ui/form-control",
+      "export": "FormLabel",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["label"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.Modal",
+      "package": "@sber-space-ui/modal",
+      "export": "Modal",
+      "exportKind": "named",
+      "semanticRoles": ["dialog"],
+      "capabilities": ["overlay", "open-state"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [
+        "base.ModalHeader",
+        "base.ModalBody",
+        "base.ModalFooter"
+      ],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.ModalHeader",
+      "package": "@sber-space-ui/modal",
+      "export": "ModalHeader",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["heading-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.ModalBody",
+      "package": "@sber-space-ui/modal",
+      "export": "ModalBody",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["body-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.ModalFooter",
+      "package": "@sber-space-ui/modal",
+      "export": "ModalFooter",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["actions-slot"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.Stack",
+      "package": "@sber-space-ui/atom",
+      "export": "Stack",
+      "exportKind": "named",
+      "semanticRoles": ["actionGroup", "verticalGroup", "horizontalGroup"],
+      "capabilities": ["direction", "gap"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    },
+    {
+      "id": "base.Typography",
+      "package": "@sber-space-ui/atom",
+      "export": "Typography",
+      "exportKind": "named",
+      "semanticRoles": ["heading", "content"],
+      "capabilities": ["text", "typography"],
+      "formAdapters": [],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "existing-catalog",
+        "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
+      }
+    }
+  ]
+}

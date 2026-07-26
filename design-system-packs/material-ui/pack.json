@@ -1,0 +1,15 @@
+{
+  "schema": "design-system-pack/v1",
+  "id": "material-ui",
+  "name": "Material UI",
+  "version": "1.0.0",
+  "framework": "react",
+  "files": {
+    "catalog": "catalog.json",
+    "semanticPolicy": "semantic-policy.json",
+    "pixsoMap": "pixso-map.json",
+    "compositionRules": "composition-rules.json",
+    "tokens": "tokens.json",
+    "verification": "verification.json"
+  }
+}

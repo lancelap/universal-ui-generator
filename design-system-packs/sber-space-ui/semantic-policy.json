@@ -1,0 +1,77 @@
+{
+  "schema": "semantic-policy/v1",
+  "roles": {
+    "dialog": {
+      "allowedDecisions": ["reuse", "compose", "blocked"],
+      "candidateComponentIds": ["base.Modal"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "heading": {
+      "allowedDecisions": ["reuse", "blocked"],
+      "candidateComponentIds": ["base.Typography"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "textInput": {
+      "allowedDecisions": ["reuse", "compose", "blocked"],
+      "candidateComponentIds": ["base.Field"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "combobox": {
+      "allowedDecisions": ["blocked"],
+      "candidateComponentIds": [],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "warning": {
+      "allowedDecisions": ["fallback", "blocked"],
+      "candidateComponentIds": [],
+      "nativeFallback": true,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "actionGroup": {
+      "allowedDecisions": ["reuse", "blocked"],
+      "candidateComponentIds": ["base.Stack"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "verticalGroup": {
+      "allowedDecisions": ["reuse", "fallback", "blocked"],
+      "candidateComponentIds": ["base.Stack"],
+      "nativeFallback": true,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "horizontalGroup": {
+      "allowedDecisions": ["reuse", "fallback", "blocked"],
+      "candidateComponentIds": ["base.Stack"],
+      "nativeFallback": true,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "action": {
+      "allowedDecisions": ["reuse", "blocked"],
+      "candidateComponentIds": ["base.Button"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "primaryAction": {
+      "allowedDecisions": ["reuse", "compose", "blocked"],
+      "candidateComponentIds": ["base.Button"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "secondaryAction": {
+      "allowedDecisions": ["reuse", "compose", "blocked"],
+      "candidateComponentIds": ["base.Button"],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    },
+    "unresolved": {
+      "allowedDecisions": ["blocked"],
+      "candidateComponentIds": [],
+      "nativeFallback": false,
+      "unresolvedCode": "COMPONENT_UNRESOLVED"
+    }
+  }
+}
