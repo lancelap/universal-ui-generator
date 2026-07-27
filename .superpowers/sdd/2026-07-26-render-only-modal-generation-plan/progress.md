@@ -21,3 +21,6 @@ Task 7: fix round 2/5 (4 addressed, 0 open — complete root binding reservation
 Task 7: complete (commits 34b6411..debe96a, review clean after fix round 2)
 Task 8: fix round 1/5 (6 addressed, 0 open — unambiguous text provenance, standalone Sber Field, complete candidate/provenance evidence; commit e2a5c06).
 Task 8: complete (commits 8ffac22..e2a5c06, review clean after fix round 1).
+Final review: fix round 1/5 (4 addressed, 1 open — canonical resolution authorization, planner-produced text inputs, stale docs; commit 4653126).
+Final review: fix round 2/5 (1 addressed, 0 open — canonical blocking diagnostics are monotonic and cannot be deleted by stored plans; commit 67d56d6).
+Final review: complete (range 2f6c7b5..67d56d6, whole-branch review clean after fix round 2).
