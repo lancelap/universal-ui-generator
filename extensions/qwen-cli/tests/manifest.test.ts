@@ -86,4 +86,28 @@ describe("Qwen extension manifest and commands", () => {
       combinedCommand.indexOf("uig_generate"),
     );
   });
+
+  it("documents installation, lifecycle, usage, and boundaries", async () => {
+    const readme = await readFile(join(repoRoot, "README.md"), "utf8");
+    for (const required of [
+      "Qwen Code 0.21.0",
+      "qwen extensions install lancelap/universal-ui-generator",
+      "qwen extensions update universal-ui-generator",
+      "qwen extensions enable universal-ui-generator",
+      "qwen extensions disable universal-ui-generator",
+      "qwen extensions uninstall universal-ui-generator",
+      'qwen extensions settings set universal-ui-generator "Pixso access token"',
+      "/uig:plan",
+      "/uig:generate",
+      "/uig:pixso-to-react",
+      "qwen extensions link",
+      ".uig",
+      "business logic",
+    ]) {
+      expect(readme).toContain(required);
+    }
+    expect(readme).not.toMatch(
+      /dsl-ui-direct|gigacode-extension|gigacode-mcp|your_access_token|\/Users\//,
+    );
+  });
 });

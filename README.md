@@ -161,3 +161,140 @@ Generated code is presentation-only. `targetTypecheck` remains `"not-run"`;
 the generator does not install dependencies, mutate a target project, create
 state, load option data, call APIs, integrate a form library, or supply business
 callbacks. Those are later integration concerns.
+
+## Qwen Code extension
+
+The repository is also a portable extension for **Qwen Code 0.21.0**. It
+requires Node.js 22 or newer. Installation uses the committed
+`dist/qwen-adapter.mjs`; the installed Git copy does not run `pnpm install`
+and does not need its own `node_modules`.
+
+Install from the stable `main` branch:
+
+```bash
+qwen extensions install lancelap/universal-ui-generator
+qwen extensions settings set universal-ui-generator "Pixso access token"
+```
+
+The second command prompts for a sensitive value. Qwen supplies it to the
+extension MCP process as `PIXSO_ACCESS_TOKEN`; it is not a tool argument or
+part of a generated artifact. A workspace-specific setting can be configured
+with:
+
+```bash
+qwen extensions settings set \
+  --scope=workspace \
+  universal-ui-generator \
+  PIXSO_ACCESS_TOKEN
+```
+
+The default design system is `sber-space-ui`. The extension adds:
+
+```text
+/uig:plan <pixso-url> [design-system]
+/uig:generate <run-id>
+/uig:pixso-to-react <pixso-url> [design-system]
+```
+
+`/uig:plan` creates a durable checkpoint and stops. A ready result contains
+the run path, pack proof, resolution counts, and compact diagnostics:
+
+```json
+{
+  "status": "ready",
+  "runId": "run_20260727T000000000Z_4-314",
+  "runPath": ".uig/runs/run_20260727T000000000Z_4-314",
+  "target": {
+    "designSystem": "sber-space-ui",
+    "designSystemVersion": "2.0.0",
+    "packSha256": "32c631516cf99d85d6f342227e95041ffff41d1c32839a260bc0d8284bc5e53b"
+  },
+  "summary": {
+    "reuse": 3,
+    "compose": 1,
+    "fallback": 0,
+    "blocked": 0
+  },
+  "diagnostics": {
+    "totalCount": 1,
+    "returnedCount": 1,
+    "truncated": false
+  }
+}
+```
+
+`/uig:generate` replays a validated run without another Pixso request. Its
+result reports the output path, file hashes, verified imports, render-only
+props, and diagnostics. The exact generated files remain under
+`.uig/runs/<run-id>/generated`; the extension does not copy them into an
+application:
+
+```json
+{
+  "status": "generated",
+  "outputPath": ".uig/runs/run_20260727T000000000Z_4-314/generated",
+  "files": [
+    {
+      "path": "GeneratedModal.tsx",
+      "sha256": "4bfda90a859c940f38917797b6edbbc2823fd79ee800516e4a7ae119236e4c51"
+    }
+  ],
+  "imports": [
+    {
+      "package": "@sber-space-ui/modal",
+      "exports": ["Modal", "ModalBody", "ModalFooter"]
+    }
+  ],
+  "renderOnlyProps": [
+    {
+      "manifestNodeId": "ui_combobox_4-316",
+      "targets": ["mode", "onChange", "options", "value"]
+    }
+  ]
+}
+```
+
+`/uig:pixso-to-react` runs those two stages sequentially. If planning is
+blocked, it reports the durable diagnostics path and stops. A blocked result
+does not authorize TSX, and Qwen must not repair or bypass it.
+
+The generated bundle is presentation-only. The extension does not implement
+business logic, state, API calls, form integration, or application callbacks.
+
+### Extension lifecycle and local development
+
+```bash
+qwen extensions update universal-ui-generator
+qwen extensions enable universal-ui-generator
+qwen extensions disable universal-ui-generator
+qwen extensions uninstall universal-ui-generator
+```
+
+From a repository checkout, link the current files during development:
+
+```bash
+qwen extensions link "$(git rev-parse --show-toplevel)"
+qwen extensions list
+```
+
+Rebuild and verify the committed runtime before testing a source change:
+
+```bash
+pnpm build:qwen-extension
+pnpm verify:qwen-extension-bundle
+pnpm test:qwen-extension
+```
+
+### Extension troubleshooting
+
+- `UIG_PROVIDER_CONFIG_MISSING`: configure the sensitive Pixso setting; do
+  not put the token in the manifest or command text.
+- Node startup failure: verify `node --version` is 22 or newer and the
+  extension is enabled.
+- Blocked resolution: inspect the returned diagnostics artifact under
+  `.uig/runs/<run-id>` and fix the design-system capability gap rather than
+  bypassing it.
+- MCP startup failure: run Qwen with `qwen --debug`, keeping the sensitive
+  setting out of copied logs.
+- No application source change: this slice intentionally writes only to
+  `.uig`; application installation and business integration are separate.
