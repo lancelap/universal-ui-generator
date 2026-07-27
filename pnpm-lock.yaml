@@ -67,6 +67,9 @@ importers:
       "@uig/contracts":
         specifier: workspace:*
         version: link:../../packages/contracts
+      "@uig/generator-react":
+        specifier: workspace:*
+        version: link:../../packages/generator-react
       "@uig/provider-pixso":
         specifier: workspace:*
         version: link:../../packages/provider-pixso
