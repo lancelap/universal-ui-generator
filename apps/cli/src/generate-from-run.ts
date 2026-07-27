@@ -118,6 +118,7 @@ async function runPinnedWorker(input: {
     input.workerEntrypoint.args,
     {
       cwd: input.canonicalRunDir,
+      env: withoutPixsoToken(process.env),
       execArgv: input.workerEntrypoint.execArgv,
       stdio: ["ignore", "ignore", "ignore", "ipc"],
     },
@@ -138,6 +139,12 @@ async function runPinnedWorker(input: {
     worker.kill();
     throw error;
   }
+}
+
+function withoutPixsoToken(environment: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
+  const sanitized = { ...environment };
+  delete sanitized.PIXSO_ACCESS_TOKEN;
+  return sanitized;
 }
 
 function defaultWorkerEntrypoint(): GenerationWorkerEntrypoint {

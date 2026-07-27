@@ -1,5 +1,12 @@
 import { createHash } from "node:crypto";
-import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  mkdtemp,
+  readFile,
+  rm,
+  symlink,
+  writeFile,
+} from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -85,6 +92,34 @@ describe("createUigTools", () => {
     expect(JSON.stringify(result)).not.toContain(sentinelToken);
   });
 
+  it("rejects a workspace .uig symlink before planning writes", async () => {
+    const workspaceDir = await temporaryWorkspace(roots);
+    const outside = await temporaryWorkspace(roots);
+    await symlink(outside, join(workspaceDir, ".uig"));
+    let called = false;
+    const tools = createUigTools(
+      dependencies(workspaceDir, {
+        planFromUrl: async () => {
+          called = true;
+          throw new Error("must not run");
+        },
+      }),
+    );
+
+    await expect(
+      tools.plan({
+        url: "https://pixso.net/app/design/file?item-id=4:314",
+        designSystem: "sber-space-ui",
+      }),
+    ).rejects.toMatchObject({
+      code: "UIG_FILESYSTEM_FAILED",
+    });
+    expect(called).toBe(false);
+    await expect(readFile(join(outside, "run.json"))).rejects.toMatchObject({
+      code: "ENOENT",
+    });
+  });
+
   it("uses the recorded pack and self-fork entrypoint for generation", async () => {
     const workspaceDir = await temporaryWorkspace(roots);
     const fixture = planFixture();
@@ -143,6 +178,38 @@ describe("createUigTools", () => {
       sha256: createHash("sha256")
         .update(stableStringify(report))
         .digest("hex"),
+    });
+  });
+
+  it("rejects a generated publication link that escapes the selected run", async () => {
+    const workspaceDir = await temporaryWorkspace(roots);
+    const outside = await temporaryWorkspace(roots);
+    const fixture = planFixture();
+    const report = generatedReport();
+    await writePlanArtifacts(workspaceDir, fixture);
+    await writeFile(
+      join(outside, "generation-report.json"),
+      stableStringify(report),
+    );
+    const tools = createUigTools(
+      dependencies(workspaceDir, {
+        generateFromRun: async () => {
+          await symlink(
+            outside,
+            join(workspaceDir, ".uig", "runs", runId, "generated"),
+          );
+          return {
+            outputPath: `.uig/runs/${runId}/generated`,
+            status: "generated",
+            writeStatus: "written",
+          };
+        },
+      }),
+    );
+
+    await expect(tools.generate({ runId })).rejects.toMatchObject({
+      code: "UIG_GENERATION_FAILED",
+      message: "Generated report is invalid",
     });
   });
 
@@ -482,12 +549,15 @@ async function writeGenerationReport(
   workspaceDir: string,
   report: ReactGenerationReportV2,
 ): Promise<void> {
-  const output = join(workspaceDir, ".uig", "runs", runId, "generated");
+  const runDir = join(workspaceDir, ".uig", "runs", runId);
+  const targetName = "generated.content-00000000-0000-4000-8000-000000000000";
+  const output = join(runDir, targetName);
   await mkdir(output, { recursive: true });
   await writeFile(
     join(output, "generation-report.json"),
     stableStringify(report),
   );
+  await symlink(targetName, join(runDir, "generated"));
 }
 
 function generatedReport(): ReactGenerationReportV2 {

@@ -37,7 +37,7 @@ export async function buildQwenAdapterBundle(input: {
     target: "node22",
     packages: "bundle",
     sourcemap: false,
-    legalComments: "none",
+    legalComments: "eof",
     charset: "utf8",
     minify: false,
     treeShaking: true,
@@ -52,6 +52,12 @@ export async function buildQwenAdapterBundle(input: {
       ].join("\n"),
     },
   });
+
+  const emittedBundle = await readFile(input.outfile, "utf8");
+  const normalizedBundle = emittedBundle.replace(/[ \t]+$/gm, "");
+  if (normalizedBundle !== emittedBundle) {
+    await writeFile(input.outfile, normalizedBundle, "utf8");
+  }
 
   const [bundleBytes, lockfileBytes] = await Promise.all([
     readFile(input.outfile),

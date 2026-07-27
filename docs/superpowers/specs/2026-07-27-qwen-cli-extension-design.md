@@ -180,8 +180,9 @@ The implementation must validate the exact manifest fields against Qwen Code
 instead of the installed extension directory.
 
 The adapter entry point is resolved only through `${extensionPath}`. The
-separator uses `${/}` so the manifest remains portable across macOS, Linux, and
-Windows wherever the bundled Node runtime behavior is supported.
+separator uses `${/}` so the manifest syntax remains platform-neutral. The
+v0.1 runtime is intentionally limited to macOS and Linux because safe artifact
+access depends on POSIX `O_NOFOLLOW`; Windows support is not claimed.
 
 ## 7. Authority boundary
 
@@ -588,6 +589,16 @@ Existing protections remain active:
 
 The extension does not modify the target application's source tree. It only
 writes ordinary `.uig` run artifacts in this slice.
+
+The filesystem threat model covers a workspace that already contains malicious
+symlinks or paths escaping the authorized workspace and extension roots. The
+adapter validates each storage directory, pack, selected run, and generated
+publication path before using it. Concurrent same-user replacement of those
+paths while a command is running is outside the v0.1 threat model. Users must
+not run the extension in a workspace whose `.uig` tree is concurrently
+controlled by an untrusted process. Closing that remaining TOCTOU class would
+require descriptor-relative filesystem operations that Node.js does not expose
+for this workflow.
 
 ## 16. Error behavior
 

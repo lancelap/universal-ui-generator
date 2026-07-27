@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { constants } from "node:fs";
-import { lstat, open } from "node:fs/promises";
-import { join, resolve, sep } from "node:path";
+import { lstat, open, readlink, realpath } from "node:fs/promises";
+import { basename, join, resolve, sep } from "node:path";
 
 import {
   type GenerationWorkerEntrypoint,
@@ -17,6 +17,7 @@ import {
   ResolutionPlanV2Schema,
   validateWithSchema,
 } from "@uig/contracts";
+import { ensureContainedDirectoryTree } from "@uig/design-context";
 import { ReactGenerationError } from "@uig/generator-react";
 import { type PixsoDslClient, PixsoProviderError } from "@uig/provider-pixso";
 import { ZodError } from "zod";
@@ -73,6 +74,7 @@ export function createUigTools(dependencies: UigToolDependencies): {
         dependencies.extensionRoot,
         parsed.designSystem,
       );
+      await assertSafeWorkspaceStorage(dependencies.workspaceDir);
 
       let pixsoClient: PixsoDslClient;
       try {
@@ -93,6 +95,7 @@ export function createUigTools(dependencies: UigToolDependencies): {
             now: dependencies.now,
           }),
         );
+        await assertSafeWorkspaceStorage(dependencies.workspaceDir);
       } catch (error) {
         if (error instanceof PixsoProviderError) {
           throw providerFailure(error);
@@ -144,6 +147,7 @@ export function createUigTools(dependencies: UigToolDependencies): {
 
     async generate(input) {
       const parsed = parseGenerateInput(input);
+      await assertSafeWorkspaceStorage(dependencies.workspaceDir);
       let selected: Awaited<ReturnType<typeof readSelectedRun>>;
       let resolutionPlan: ReturnType<
         typeof validateWithSchema<typeof ResolutionPlanV2Schema>
@@ -205,8 +209,8 @@ export function createUigTools(dependencies: UigToolDependencies): {
 
       try {
         const reportBytes = await readSafeGeneratedReport(
-          dependencies.workspaceDir,
-          parsed.runId,
+          (await readSelectedRun(dependencies.workspaceDir, parsed.runId))
+            .runDir,
         );
         const report = validateWithSchema(
           ReactGenerationReportSchema,
@@ -240,6 +244,23 @@ export function createUigTools(dependencies: UigToolDependencies): {
       }
     },
   };
+}
+
+async function assertSafeWorkspaceStorage(workspaceDir: string): Promise<void> {
+  try {
+    await ensureContainedDirectoryTree(workspaceDir, [
+      ".uig",
+      join(".uig", "cache"),
+      join(".uig", "cache", "sha256"),
+      join(".uig", "artifacts"),
+      join(".uig", "runs"),
+    ]);
+  } catch {
+    throw new UigToolError(
+      "UIG_FILESYSTEM_FAILED",
+      "Workspace storage path is unsafe",
+    );
+  }
 }
 
 function parsePlanInput(input: unknown) {
@@ -284,17 +305,29 @@ async function resolvePackPath(
     throw new UigToolError("UIG_INPUT_INVALID", "Unsafe design-system ID");
   }
   try {
+    const canonicalExtensionRoot = await realpath(extensionRoot);
+    const canonicalPacksRoot = await realpath(packsRoot);
+    if (
+      canonicalPacksRoot !== canonicalExtensionRoot &&
+      !canonicalPacksRoot.startsWith(`${canonicalExtensionRoot}${sep}`)
+    ) {
+      throw new Error("Pack root escapes the extension");
+    }
     const metadata = await lstat(candidate);
     if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
       throw new Error("Pack is not an ordinary directory");
     }
+    const canonicalCandidate = await realpath(candidate);
+    if (!canonicalCandidate.startsWith(`${canonicalPacksRoot}${sep}`)) {
+      throw new Error("Pack resolves outside the pack root");
+    }
+    return canonicalCandidate;
   } catch {
     throw new UigToolError(
       "UIG_PACK_INVALID",
       `Design-system pack ${JSON.stringify(designSystem)} is unavailable`,
     );
   }
-  return candidate;
 }
 
 async function readSelectedRun(
@@ -304,10 +337,19 @@ async function readSelectedRun(
   runDir: string;
   run: GenerationRun;
 }> {
-  const runDir = join(workspaceDir, ".uig", "runs", runId);
-  const metadata = await lstat(runDir);
+  const canonicalWorkspace = await realpath(workspaceDir);
+  const canonicalRuns = await realpath(join(workspaceDir, ".uig", "runs"));
+  if (!canonicalRuns.startsWith(`${canonicalWorkspace}${sep}`)) {
+    throw new Error("Runs directory escapes the workspace");
+  }
+  const selectedRunDir = join(workspaceDir, ".uig", "runs", runId);
+  const metadata = await lstat(selectedRunDir);
   if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
     throw new Error("Run path is not an ordinary directory");
+  }
+  const runDir = await realpath(selectedRunDir);
+  if (!runDir.startsWith(`${canonicalRuns}${sep}`)) {
+    throw new Error("Run directory escapes the runs root");
   }
   const run = validateWithSchema(
     GenerationRunSchema,
@@ -358,18 +400,29 @@ async function readSafeArtifact(
   }
 }
 
-async function readSafeGeneratedReport(
-  workspaceDir: string,
-  runId: string,
-): Promise<Uint8Array> {
-  const path = join(
-    workspaceDir,
-    ".uig",
-    "runs",
-    runId,
-    "generated",
-    "generation-report.json",
-  );
+async function readSafeGeneratedReport(runDir: string): Promise<Uint8Array> {
+  const generatedLink = join(runDir, "generated");
+  const generatedMetadata = await lstat(generatedLink);
+  if (!generatedMetadata.isSymbolicLink()) {
+    throw new Error("Generated output is not an atomic publication link");
+  }
+  const targetName = await readlink(generatedLink);
+  if (
+    basename(targetName) !== targetName ||
+    !/^generated\.content-[0-9a-f-]{36}$/.test(targetName)
+  ) {
+    throw new Error("Generated output link has an unsafe target");
+  }
+  const generatedDirectory = resolve(runDir, targetName);
+  const canonicalGenerated = await realpath(generatedDirectory);
+  if (!canonicalGenerated.startsWith(`${runDir}${sep}`)) {
+    throw new Error("Generated output escapes the selected run");
+  }
+  const targetMetadata = await lstat(canonicalGenerated);
+  if (!targetMetadata.isDirectory() || targetMetadata.isSymbolicLink()) {
+    throw new Error("Generated output target is not an ordinary directory");
+  }
+  const path = join(canonicalGenerated, "generation-report.json");
   const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
     const metadata = await handle.stat();

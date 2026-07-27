@@ -169,6 +169,20 @@ requires Node.js 22 or newer. Installation uses the committed
 `dist/qwen-adapter.mjs`; the installed Git copy does not run `pnpm install`
 and does not need its own `node_modules`.
 
+Supported extension runtime: macOS and Linux. Windows support is not claimed
+for v0.1.0 because safe artifact access currently requires POSIX
+`O_NOFOLLOW`; the adapter fails closed when that primitive is unavailable.
+
+The adapter rejects pre-existing symlinked `.uig`, cache, artifact, run, and
+publication paths and rejects paths that resolve outside their authorized
+roots.
+
+Concurrent same-user filesystem mutation is outside the v0.1 threat model.
+Do not run the extension in a workspace whose `.uig` tree is being modified at
+the same time by an untrusted process. Fully defending that case requires
+descriptor-relative filesystem operations that Node.js does not currently
+expose for this workflow.
+
 Install from the stable `main` branch:
 
 ```bash

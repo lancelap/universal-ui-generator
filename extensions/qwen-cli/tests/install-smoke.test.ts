@@ -1,4 +1,4 @@
-import { cp, mkdtemp, readFile, rm } from "node:fs/promises";
+import { cp, mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -20,6 +20,7 @@ describe("Qwen Git installation copy", () => {
     const workspace = join(root, "workspace");
     try {
       await Promise.all([
+        mkdir(workspace),
         cp(
           join(repoRoot, "qwen-extension.json"),
           join(installRoot, "qwen-extension.json"),

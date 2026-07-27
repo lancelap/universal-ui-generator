@@ -103,6 +103,8 @@ describe("Qwen extension manifest and commands", () => {
       "qwen extensions link",
       "export PIXSO_ACCESS_TOKEN",
       "Qwen Code 0.21.0 setting fallback",
+      "Supported extension runtime: macOS and Linux",
+      "Concurrent same-user filesystem mutation is outside the v0.1 threat model",
       ".uig",
       "business logic",
     ]) {

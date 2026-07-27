@@ -1,6 +1,6 @@
 import minimalPixsoDsl from "../../../packages/design-normalizer/src/__fixtures__/minimal-pixso-dsl.json";
 
-import { mkdtemp, readFile, rm } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, symlink } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -92,4 +92,56 @@ describe("planFromUrl", () => {
       diagnostics: "diagnostics.json",
     });
   });
+
+  it("rejects a pre-existing workspace .uig symlink", async () => {
+    const workspaceDir = await mkdtemp(join(tmpdir(), "uig-run-"));
+    const outside = await mkdtemp(join(tmpdir(), "uig-outside-"));
+    roots.push(workspaceDir, outside);
+    await symlink(outside, join(workspaceDir, ".uig"));
+    let fetched = false;
+
+    await expect(
+      planFromUrl({
+        url: "https://pixso.net/app/design/WSLukjrKancvZG0zbaMnyA?item-id=4:314",
+        designSystemPackPath: sberPack,
+        workspaceDir,
+        pixsoClient: {
+          getNodeDsl: async () => {
+            fetched = true;
+            return new Uint8Array();
+          },
+        },
+        now: () => new Date("2026-07-26T10:30:00.000Z"),
+      }),
+    ).rejects.toThrow("Storage path must be an ordinary directory");
+    expect(fetched).toBe(false);
+  });
+
+  it.each(["cache", "artifacts", "runs"])(
+    "rejects a pre-existing .uig/%s symlink",
+    async (directory) => {
+      const workspaceDir = await mkdtemp(join(tmpdir(), "uig-run-"));
+      const outside = await mkdtemp(join(tmpdir(), "uig-outside-"));
+      roots.push(workspaceDir, outside);
+      await mkdir(join(workspaceDir, ".uig"));
+      await symlink(outside, join(workspaceDir, ".uig", directory));
+      let fetched = false;
+
+      await expect(
+        planFromUrl({
+          url: "https://pixso.net/app/design/WSLukjrKancvZG0zbaMnyA?item-id=4:314",
+          designSystemPackPath: sberPack,
+          workspaceDir,
+          pixsoClient: {
+            getNodeDsl: async () => {
+              fetched = true;
+              return new Uint8Array();
+            },
+          },
+          now: () => new Date("2026-07-26T10:30:00.000Z"),
+        }),
+      ).rejects.toThrow("Storage path must be an ordinary directory");
+      expect(fetched).toBe(false);
+    },
+  );
 });

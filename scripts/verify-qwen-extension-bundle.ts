@@ -116,6 +116,9 @@ function assertSafeBundle(bundle: string): void {
       throw new Error(`Qwen adapter bundle contains ${label}`);
     }
   }
+  if (!/@license|@preserve|Copyright/i.test(bundle)) {
+    throw new Error("Qwen adapter bundle is missing third-party legal notices");
+  }
 }
 
 function sha256(bytes: Uint8Array): string {

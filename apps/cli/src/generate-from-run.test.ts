@@ -123,6 +123,46 @@ describe("generateFromRun", () => {
     ).toBe(fixture.run.runId);
   });
 
+  it("does not pass the Pixso token to the generation worker", async () => {
+    const fixture = await runFixture(roots);
+    const proxyPath = join(fixture.workspace, "worker-proxy.mjs");
+    const markerPath = join(fixture.workspace, "worker-token-state");
+    await writeFile(
+      proxyPath,
+      [
+        'import { writeFile } from "node:fs/promises";',
+        `import { runGenerateWorker } from ${JSON.stringify(
+          pathToFileURL(
+            join(import.meta.dirname, "generate-from-run-worker.ts"),
+          ).href,
+        )};`,
+        `await writeFile(${JSON.stringify(markerPath)}, process.env.PIXSO_ACCESS_TOKEN === undefined ? "absent\\n" : "present\\n");`,
+        "await runGenerateWorker();",
+      ].join("\n"),
+    );
+    const previousToken = process.env.PIXSO_ACCESS_TOKEN;
+    process.env.PIXSO_ACCESS_TOKEN = "worker-must-not-receive-this";
+    try {
+      await generateFromRun({
+        runId: fixture.run.runId,
+        workspaceDir: fixture.workspace,
+        workerEntrypoint: {
+          modulePath: proxyPath,
+          args: [],
+          execArgv: ["--import", require.resolve("tsx")],
+        },
+      });
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.PIXSO_ACCESS_TOKEN;
+      } else {
+        process.env.PIXSO_ACCESS_TOKEN = previousToken;
+      }
+    }
+
+    expect(await readFile(markerPath, "utf8")).toBe("absent\n");
+  });
+
   it("rejects run traversal before reading or writing outside the chosen run", async () => {
     const fixture = await runFixture(roots);
     const outside = join(fixture.workspace, ".uig", "runs", "generated");

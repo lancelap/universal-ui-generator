@@ -17,6 +17,8 @@
 - Planning and generation call the shared `planFromUrl` and `generateFromRun` services directly; the adapter never shells out to `pnpm`, parses CLI prose, starts Qwen, or implements a second planner or generator.
 - The MCP process working directory is the only workspace authority. Tool inputs never accept a workspace path.
 - All durable artifacts stay under `${workspacePath}/.uig`; the extension does not edit target-application source files.
+- Pre-existing symlink and containment attacks against workspace storage are rejected. Concurrent same-user replacement of validated paths during a command is outside the v0.1 threat model and must be documented; fully closing that TOCTOU class requires descriptor-relative filesystem primitives not exposed by Node.js for this workflow.
+- The v0.1 runtime supports macOS and Linux only because safe artifact reads require POSIX `O_NOFOLLOW`; Windows support is not claimed.
 - Qwen never receives raw Pixso DSL, DesignIR, a full UI manifest, a full resolution plan, diagnostic evidence, or `PIXSO_ACCESS_TOKEN`.
 - Compact results contain no more than 50 diagnostics, retain canonical artifact order, and point to the complete durable artifact.
 - `PIXSO_ACCESS_TOKEN` is a sensitive extension setting and must not occur in tool inputs, tool outputs, logs, fixtures, generated source, committed bundle bytes, or Git history.
@@ -980,7 +982,7 @@ await build({
   target: "node22",
   packages: "bundle",
   sourcemap: false,
-  legalComments: "none",
+  legalComments: "eof",
   charset: "utf8",
   minify: false,
   treeShaking: true,
@@ -1016,7 +1018,8 @@ Add root scripts:
    - `C:\\Users\\`;
    - `sourceMappingURL`;
    - `fixtures/`;
-   - `.uig/runs/`;
+   - machine-specific `.uig/runs/run_<timestamp>_<node>` artifact data (the
+     static `.uig/runs/<run-id>` runtime path template is required);
    - `your_access_token`;
    - PEM private-key headers;
    - token assignment patterns;
