@@ -1,3 +1,4 @@
+import { realpathSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -134,7 +135,7 @@ async function toolResponse<T extends UigPlanResult | UigGenerateResult>(
 function isMainModule(): boolean {
   return (
     process.argv[1] !== undefined &&
-    import.meta.url === pathToFileURL(process.argv[1]).href
+    import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href
   );
 }
 

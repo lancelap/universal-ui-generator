@@ -210786,6 +210786,7 @@ Additional information: BADCLIENT: Bad error code, ${badCode} not found in range
 });
 
 // extensions/qwen-cli/src/server.ts
+import { realpathSync } from "node:fs";
 import { dirname as dirname2, resolve as resolve4 } from "node:path";
 import { fileURLToPath as fileURLToPath3, pathToFileURL } from "node:url";
 
@@ -266606,7 +266607,7 @@ async function toolResponse(action2) {
   }
 }
 function isMainModule() {
-  return process.argv[1] !== void 0 && import.meta.url === pathToFileURL(process.argv[1]).href;
+  return process.argv[1] !== void 0 && import.meta.url === pathToFileURL(realpathSync(process.argv[1])).href;
 }
 if (isMainModule()) {
   const workerMode = process.argv.length === 3 && process.argv[2] === "--generation-worker";
