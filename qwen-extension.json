@@ -1,0 +1,21 @@
+{
+  "name": "universal-ui-generator",
+  "version": "0.1.0",
+  "contextFileName": "QWEN.md",
+  "commands": "commands",
+  "mcpServers": {
+    "uig": {
+      "command": "node",
+      "args": ["${extensionPath}${/}dist${/}qwen-adapter.mjs"],
+      "cwd": "${workspacePath}"
+    }
+  },
+  "settings": [
+    {
+      "name": "Pixso access token",
+      "description": "Access token used only by the Pixso Remote MCP client",
+      "envVar": "PIXSO_ACCESS_TOKEN",
+      "sensitive": true
+    }
+  ]
+}
