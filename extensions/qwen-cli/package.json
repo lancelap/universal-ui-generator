@@ -10,5 +10,8 @@
     "@uig/generator-react": "workspace:*",
     "@uig/provider-pixso": "workspace:*",
     "zod": "4.2.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.0.0-beta.5"
   }
 }
