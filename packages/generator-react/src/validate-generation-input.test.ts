@@ -4,10 +4,10 @@ import {
   loadDesignSystemPackV2,
   type LoadedDesignSystemPackV2,
 } from "@uig/component-catalog";
+import { resolveUiManifestV2 } from "@uig/component-resolver";
 import {
   type DesignIRV2,
   type Diagnostic,
-  type ResolutionPlanV2,
   stableStringify,
   type UiManifestV2,
 } from "@uig/contracts";
@@ -146,39 +146,129 @@ describe("validateGenerationInput", () => {
 
   it.each([
     [
-      "a blocking diagnostic",
+      "reuse binding package",
       (input: ReactGenerationInput) => {
-        const diagnostic: Diagnostic = {
-          severity: "error",
-          blocking: true,
-          stage: "component-resolution",
-          code: "COMPONENT_UNRESOLVED",
-          message: "The component cannot be resolved",
-          source: { manifestNodeId: "ui_action" },
-          evidence: {},
-        };
-        input.resolutionPlan.diagnostics.push(diagnostic);
+        const resolution = input.resolutionPlan.nodes[0]!;
+        if (resolution.decision === "reuse") {
+          resolution.binding.package = "@attacker/components";
+        }
       },
     ],
     [
-      "a blocked resolution summary",
+      "reuse binding export",
       (input: ReactGenerationInput) => {
-        const current = input.resolutionPlan.nodes[1]!;
-        input.resolutionPlan.nodes[1] = {
-          manifestNodeId: current.manifestNodeId,
-          semanticRole: current.semanticRole,
-          confidence: current.confidence,
-          evidence: current.evidence,
-          decision: "blocked",
-          diagnosticCodes: ["COMPONENT_UNRESOLVED"],
-        };
-        input.resolutionPlan.summary.reuse = 1;
-        input.resolutionPlan.summary.blocked = 1;
+        const resolution = input.resolutionPlan.nodes[0]!;
+        if (resolution.decision === "reuse") {
+          resolution.binding.export = "AttackerStack";
+        }
       },
     ],
-  ])("returns a typed blocked result for %s", (_, mutate) => {
+    [
+      "reuse binding export kind",
+      (input: ReactGenerationInput) => {
+        const resolution = input.resolutionPlan.nodes[0]!;
+        if (resolution.decision === "reuse") {
+          resolution.binding.exportKind = "default";
+        }
+      },
+    ],
+    [
+      "reuse binding component",
+      (input: ReactGenerationInput) => {
+        const resolution = input.resolutionPlan.nodes[0]!;
+        if (resolution.decision === "reuse") {
+          resolution.binding.componentId = "mui.Button";
+        }
+      },
+    ],
+    [
+      "reuse default props",
+      (input: ReactGenerationInput) => {
+        const resolution = input.resolutionPlan.nodes[0]!;
+        if (resolution.decision === "reuse") {
+          resolution.props = { direction: "attacker-controlled" };
+        }
+      },
+    ],
+    [
+      "decision",
+      (input: ReactGenerationInput) => {
+        const resolution = input.resolutionPlan.nodes[1]!;
+        input.resolutionPlan.nodes[1] = {
+          manifestNodeId: resolution.manifestNodeId,
+          semanticRole: resolution.semanticRole,
+          confidence: resolution.confidence,
+          evidence: resolution.evidence,
+          decision: "fallback",
+          localComponentName: "GeneratedPrimaryAction",
+          styleStrategy: "css-module",
+          diagnosticCodes: [],
+        };
+        input.resolutionPlan.summary = {
+          reuse: 1,
+          compose: 0,
+          fallback: 1,
+          blocked: 0,
+        };
+      },
+    ],
+  ])("rejects a pack-unauthorized %s", (_, mutate) => {
     const input = validInput(pack);
     mutate(input);
+
+    expect(() => validateGenerationInput(input)).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_INPUT_INVALID",
+      }),
+    );
+  });
+
+  it.each([
+    ["root binding", 0],
+    ["required member binding", 1],
+    ["slot binding", 3],
+  ] as const)("rejects an unauthorized composition %s", (_, bindingIndex) => {
+    const input = composedInput(pack);
+    const resolution = input.resolutionPlan.nodes[0]!;
+    if (resolution.decision !== "compose") {
+      throw new Error("Expected a composed dialog fixture");
+    }
+    resolution.bindings[bindingIndex]!.package = "@attacker/components";
+
+    expect(() => validateGenerationInput(input)).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_INPUT_INVALID",
+      }),
+    );
+  });
+
+  it("rejects unauthorized composition props", () => {
+    const input = composedInput(pack);
+    const resolution = input.resolutionPlan.nodes[0]!;
+    if (resolution.decision !== "compose") {
+      throw new Error("Expected a composed dialog fixture");
+    }
+    resolution.props = { open: true };
+
+    expect(() => validateGenerationInput(input)).toThrowError(
+      expect.objectContaining<Partial<ReactGenerationError>>({
+        code: "GENERATION_INPUT_INVALID",
+      }),
+    );
+  });
+
+  it("preserves a stored blocking diagnostic without treating it as authority", () => {
+    const input = validInput(pack);
+    const diagnostic: Diagnostic = {
+      severity: "error",
+      blocking: true,
+      stage: "component-resolution",
+      code: "COMPONENT_UNRESOLVED",
+      message: "The component cannot be resolved",
+      source: { manifestNodeId: "ui_action" },
+      evidence: {},
+    };
+    input.resolutionPlan.diagnostics.push(diagnostic);
 
     const result = validateGenerationInput(input);
 
@@ -238,34 +328,11 @@ function validInput(pack: LoadedDesignSystemPackV2): ReactGenerationInput {
     },
     diagnostics: [],
   };
-  const resolutionPlan: ResolutionPlanV2 = {
-    schema: "resolution-plan/v2",
-    source: {
-      designIr: {
-        artifactId: designIr.sourceArtifactId,
-        schema: "design-ir/v2",
-        sha256: sha256(stableStringify(designIr)),
-      },
-      uiManifest: {
-        artifactId: uiManifest.sourceArtifactId,
-        schema: "ui-manifest/v2",
-        sha256: sha256(stableStringify(uiManifest)),
-      },
-    },
-    target: {
-      framework: "react",
-      language: "typescript",
-      designSystem: pack.manifest.id,
-      designSystemVersion: pack.manifest.version,
-      packSha256: pack.sha256,
-    },
-    nodes: [
-      reuseResolution("ui_root", "verticalGroup", "mui.Stack", "Stack"),
-      reuseResolution("ui_action", "primaryAction", "mui.Button", "Button"),
-    ],
-    diagnostics: [],
-    summary: { reuse: 2, compose: 0, fallback: 0, blocked: 0 },
-  };
+  const resolutionPlan = resolveUiManifestV2({
+    manifest: uiManifest,
+    designIr,
+    pack,
+  });
   return {
     sourceRunId: "run_fixture",
     designIr,
@@ -297,27 +364,17 @@ function designNode(
   };
 }
 
-function reuseResolution(
-  manifestNodeId: string,
-  semanticRole: string,
-  componentId: string,
-  exportName: string,
-): ResolutionPlanV2["nodes"][number] {
-  return {
-    manifestNodeId,
-    semanticRole,
-    confidence: 1,
-    evidence: [{ kind: "semantic-role", value: semanticRole }],
-    diagnosticCodes: [],
-    decision: "reuse",
-    binding: {
-      componentId,
-      package: "@mui/material",
-      export: exportName,
-      exportKind: "named",
-    },
-    props: {},
-  };
+function composedInput(pack: LoadedDesignSystemPackV2): ReactGenerationInput {
+  const input = validInput(pack);
+  input.uiManifest.root.kind = "overlay";
+  input.uiManifest.root.role = "dialog";
+  input.uiManifest.root.evidence = [{ kind: "semantic-role", value: "dialog" }];
+  input.resolutionPlan = resolveUiManifestV2({
+    manifest: input.uiManifest,
+    designIr: input.designIr,
+    pack,
+  });
+  return input;
 }
 
 function refreshManifestHash(input: ReactGenerationInput): void {

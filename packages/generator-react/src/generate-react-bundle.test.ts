@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
 
 import { loadDesignSystemPackV2 } from "@uig/component-catalog";
+import { resolveUiManifestV2 } from "@uig/component-resolver";
 import {
   type DesignIRV2,
   type ResolutionPlanV2,
@@ -19,12 +20,19 @@ import {
 const materialUiPack = fileURLToPath(
   new URL("../../../design-system-packs/material-ui", import.meta.url),
 );
+const sberUiPack = fileURLToPath(
+  new URL("../../../design-system-packs/sber-space-ui", import.meta.url),
+);
 
 describe("generateReactBundle", () => {
   let input: ReactGenerationInput;
+  let fallbackInput: ReactGenerationInput;
+  let fallbackContainerInput: ReactGenerationInput;
 
   beforeAll(async () => {
     input = await fixture();
+    fallbackInput = await fallbackFixture();
+    fallbackContainerInput = await fixture(sberUiPack);
   });
 
   it("emits a deterministic, integrity-checked v2 source bundle", () => {
@@ -101,21 +109,13 @@ describe("generateReactBundle", () => {
   });
 
   it("keeps blocked output report-only", () => {
-    const blocked = {
-      ...input,
-      resolutionPlan: structuredClone(input.resolutionPlan),
-    };
-    blocked.resolutionPlan.nodes[0] = {
-      ...resolutionBase(blocked.resolutionPlan.nodes[0]!),
-      decision: "blocked",
-      diagnosticCodes: ["COMPONENT_UNRESOLVED"],
-    };
-    blocked.resolutionPlan.summary = {
-      reuse: 0,
-      compose: 0,
-      fallback: 0,
-      blocked: 1,
-    };
+    const blocked = structuredClone(input) as ReactGenerationInput;
+    blocked.uiManifest.root.requiredCapabilities = ["unsupported-capability"];
+    blocked.resolutionPlan = resolveUiManifestV2({
+      manifest: blocked.uiManifest,
+      designIr: blocked.designIr,
+      pack: blocked.pack,
+    });
 
     const result = generateReactBundle(blocked);
 
@@ -133,24 +133,7 @@ describe("generateReactBundle", () => {
   });
 
   it("emits linked fallback TSX and CSS-module artifacts", () => {
-    const fallback = {
-      ...input,
-      resolutionPlan: structuredClone(input.resolutionPlan),
-    };
-    fallback.resolutionPlan.nodes[0] = {
-      ...resolutionBase(fallback.resolutionPlan.nodes[0]!),
-      decision: "fallback",
-      localComponentName: "generated warning",
-      styleStrategy: "css-module",
-    };
-    fallback.resolutionPlan.summary = {
-      reuse: 0,
-      compose: 0,
-      fallback: 1,
-      blocked: 0,
-    };
-
-    const result = generateReactBundle(fallback);
+    const result = generateReactBundle(fallbackInput);
     const rootTsx = new TextDecoder().decode(
       result.files.find((file) => file.path === "GeneratedModal.tsx")!.bytes,
     );
@@ -195,7 +178,7 @@ describe("generateReactBundle", () => {
   });
 
   it("reserves stable unique names for repeated fallback components", () => {
-    const repeated = withFallbackChildren(input, [
+    const repeated = withCanonicalFallbackChildren(fallbackContainerInput, [
       {
         manifestNodeId: "ui_warning_a",
         designNodeId: "4:401",
@@ -245,25 +228,9 @@ describe("generateReactBundle", () => {
       },
     ]);
 
-    const result = generateReactBundle(colliding);
-    const rootTsx = source(result, "GeneratedModal.tsx");
-
-    expect(result.files.map((file) => file.path)).toContain(
-      "fallbacks/GeneratedModal_4890a208.tsx",
+    expect(() => generateReactBundle(colliding)).toThrowError(
+      expect.objectContaining({ code: "GENERATION_INPUT_INVALID" }),
     );
-    expect(result.files.map((file) => file.path)).toContain(
-      "fallbacks/Stack_f5dadec6.tsx",
-    );
-    expect(rootTsx).toContain(
-      'import { GeneratedModal_4890a208 } from "./fallbacks/GeneratedModal_4890a208";',
-    );
-    expect(rootTsx).toContain(
-      'import { Stack_f5dadec6 } from "./fallbacks/Stack_f5dadec6";',
-    );
-    expect(rootTsx).not.toContain(
-      'import { GeneratedModal } from "./fallbacks/GeneratedModal";',
-    );
-    expect(rootTsx).not.toContain('import { Stack } from "./fallbacks/Stack";');
   });
 
   it("reserves fallback names that collide with generated root bindings", () => {
@@ -275,18 +242,9 @@ describe("generateReactBundle", () => {
       },
     ]);
 
-    const result = generateReactBundle(colliding);
-    const rootTsx = source(result, "GeneratedModal.tsx");
-
-    expect(result.files.map((file) => file.path)).toContain(
-      "fallbacks/GeneratedModalProps_8f8cf89d.tsx",
+    expect(() => generateReactBundle(colliding)).toThrowError(
+      expect.objectContaining({ code: "GENERATION_INPUT_INVALID" }),
     );
-    expect(rootTsx).toContain(
-      'import { GeneratedModalProps_8f8cf89d } from "./fallbacks/GeneratedModalProps_8f8cf89d";',
-    );
-    expect(rootTsx).toContain("export interface GeneratedModalProps");
-    expect(rootTsx).toContain("<GeneratedModalProps_8f8cf89d />");
-    expect(() => assertReactGenerationBundleIntegrity(result)).not.toThrow();
   });
 
   it("counts grouped named component imports by binding", () => {
@@ -388,6 +346,23 @@ function withFallbackChildren(
   return { ...input, designIr, uiManifest, resolutionPlan };
 }
 
+function withCanonicalFallbackChildren(
+  input: ReactGenerationInput,
+  fallbacks: Array<{
+    manifestNodeId: string;
+    designNodeId: string;
+    localComponentName: string;
+  }>,
+): ReactGenerationInput {
+  const changed = withFallbackChildren(input, fallbacks);
+  changed.resolutionPlan = resolveUiManifestV2({
+    manifest: changed.uiManifest,
+    designIr: changed.designIr,
+    pack: changed.pack,
+  });
+  return changed;
+}
+
 function withReuseWarningChild(
   input: ReactGenerationInput,
 ): ReactGenerationInput {
@@ -411,40 +386,11 @@ function withReuseWarningChild(
       children: [],
     },
   ];
-  const resolutionPlan = structuredClone(input.resolutionPlan);
-  resolutionPlan.source = {
-    designIr: {
-      artifactId: designIr.sourceArtifactId,
-      schema: "design-ir/v2",
-      sha256: sha256(stableStringify(designIr)),
-    },
-    uiManifest: {
-      artifactId: uiManifest.sourceArtifactId,
-      schema: "ui-manifest/v2",
-      sha256: sha256(stableStringify(uiManifest)),
-    },
-  };
-  resolutionPlan.nodes.push({
-    manifestNodeId: "ui_warning",
-    semanticRole: "warning",
-    confidence: 1,
-    evidence: [{ kind: "semantic-role", value: "warning" }],
-    diagnosticCodes: [],
-    decision: "reuse",
-    binding: {
-      componentId: "mui.Alert",
-      package: "@mui/material",
-      export: "Alert",
-      exportKind: "named",
-    },
-    props: { severity: "warning" },
+  const resolutionPlan = resolveUiManifestV2({
+    manifest: uiManifest,
+    designIr,
+    pack: input.pack,
   });
-  resolutionPlan.summary = {
-    reuse: 2,
-    compose: 0,
-    fallback: 0,
-    blocked: 0,
-  };
   return { ...input, designIr, uiManifest, resolutionPlan };
 }
 
@@ -516,8 +462,10 @@ function resolutionBase(
   };
 }
 
-async function fixture(): Promise<ReactGenerationInput> {
-  const pack = await loadDesignSystemPackV2(materialUiPack);
+async function fixture(
+  packPath = materialUiPack,
+): Promise<ReactGenerationInput> {
+  const pack = await loadDesignSystemPackV2(packPath);
   const designIr: DesignIRV2 = {
     schema: "design-ir/v2",
     sourceArtifactId: "pixso_fixture",
@@ -544,47 +492,11 @@ async function fixture(): Promise<ReactGenerationInput> {
     },
     diagnostics: [],
   };
-  const resolutionPlan: ResolutionPlanV2 = {
-    schema: "resolution-plan/v2",
-    source: {
-      designIr: {
-        artifactId: "pixso_fixture",
-        schema: "design-ir/v2",
-        sha256: sha256(stableStringify(designIr)),
-      },
-      uiManifest: {
-        artifactId: "pixso_fixture",
-        schema: "ui-manifest/v2",
-        sha256: sha256(stableStringify(uiManifest)),
-      },
-    },
-    target: {
-      framework: "react",
-      language: "typescript",
-      designSystem: pack.manifest.id,
-      designSystemVersion: pack.manifest.version,
-      packSha256: pack.sha256,
-    },
-    nodes: [
-      {
-        manifestNodeId: "ui_actions",
-        semanticRole: "actionGroup",
-        confidence: 1,
-        evidence: [{ kind: "semantic-role", value: "actionGroup" }],
-        diagnosticCodes: [],
-        decision: "reuse",
-        binding: {
-          componentId: "mui.Stack",
-          package: "@mui/material",
-          export: "Stack",
-          exportKind: "named",
-        },
-        props: {},
-      },
-    ],
-    diagnostics: [],
-    summary: { reuse: 1, compose: 0, fallback: 0, blocked: 0 },
-  };
+  const resolutionPlan = resolveUiManifestV2({
+    manifest: uiManifest,
+    designIr,
+    pack,
+  });
   return {
     sourceRunId: "run_fixture",
     designIr,
@@ -592,6 +504,21 @@ async function fixture(): Promise<ReactGenerationInput> {
     resolutionPlan,
     pack,
   };
+}
+
+async function fallbackFixture(): Promise<ReactGenerationInput> {
+  const input = await fixture(sberUiPack);
+  input.uiManifest.root.kind = "content";
+  input.uiManifest.root.role = "warning";
+  input.uiManifest.root.evidence = [
+    { kind: "semantic-role", value: "warning" },
+  ];
+  input.resolutionPlan = resolveUiManifestV2({
+    manifest: input.uiManifest,
+    designIr: input.designIr,
+    pack: input.pack,
+  });
+  return input;
 }
 
 function designNode(

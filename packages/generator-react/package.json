@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@uig/component-catalog": "workspace:*",
+    "@uig/component-resolver": "workspace:*",
     "@uig/contracts": "workspace:*",
     "@uig/design-context": "workspace:*",
     "typescript": "^5.9.3"

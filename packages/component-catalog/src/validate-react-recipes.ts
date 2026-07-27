@@ -99,13 +99,26 @@ function validateRecipeCoverage(
 function validatePropTargets(recipes: ReactComponentRecipeV2[]): void {
   for (const recipe of recipes) {
     const targets = [
-      ...(recipe.content ? [recipe.content.target] : []),
       ...recipe.stateProps.map((mapping) => mapping.target),
       ...recipe.eventProps.map((mapping) => mapping.target),
       ...(recipe.classNameProp ? [recipe.classNameProp] : []),
     ];
     if (new Set(targets).size !== targets.length) {
       recipeConflict(recipe.componentId, "maps multiple sources to one prop");
+    }
+    if (recipe.content && targets.includes(recipe.content.target)) {
+      const optionalStateFallback =
+        recipe.content.required === false &&
+        recipe.stateProps.some(
+          (mapping) => mapping.target === recipe.content!.target,
+        ) &&
+        !recipe.eventProps.some(
+          (mapping) => mapping.target === recipe.content!.target,
+        ) &&
+        recipe.classNameProp !== recipe.content.target;
+      if (!optionalStateFallback) {
+        recipeConflict(recipe.componentId, "maps multiple sources to one prop");
+      }
     }
 
     const staticTargets = recipe.staticProps.map((prop) => prop.target);

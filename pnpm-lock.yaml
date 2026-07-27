@@ -97,6 +97,9 @@ importers:
       "@uig/component-catalog":
         specifier: workspace:*
         version: link:../component-catalog
+      "@uig/component-resolver":
+        specifier: workspace:*
+        version: link:../component-resolver
       "@uig/contracts":
         specifier: workspace:*
         version: link:../contracts

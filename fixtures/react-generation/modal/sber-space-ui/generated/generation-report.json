@@ -16,7 +16,15 @@
       "sha256": "aaa2ed243dab7009f7ecf49e4b66c45607de32e7f28f6bd75ac3cdad4e215a0d"
     }
   ],
-  "renderOnlyProps": [],
+  "renderOnlyProps": [
+    {
+      "componentId": "base.Field",
+      "manifestNodeId": "ui_text_input",
+      "propNames": [
+        "value"
+      ]
+    }
+  ],
   "schema": "react-generation-report/v2",
   "sourceRunId": "run_acceptance_neutral_modal",
   "statistics": {

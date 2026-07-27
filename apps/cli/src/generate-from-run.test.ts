@@ -15,6 +15,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { loadDesignSystemPackV2 } from "@uig/component-catalog";
+import { resolveUiManifestV2 } from "@uig/component-resolver";
 import {
   type DesignIRV2,
   type GenerationRun,
@@ -22,7 +23,6 @@ import {
   stableStringify,
   type UiManifestV2,
 } from "@uig/contracts";
-import { sha256 } from "@uig/design-context";
 import {
   generateReactBundle,
   type ReactGenerationInput,
@@ -526,57 +526,14 @@ async function runFixture(
     },
     diagnostics: [],
   };
-  const resolutionNodeBase = {
-    manifestNodeId: "ui_actions",
-    semanticRole: "actionGroup" as const,
-    confidence: 1,
-    evidence: [{ kind: "semantic-role" as const, value: "actionGroup" }],
-    diagnosticCodes: options.blocked ? ["COMPONENT_UNRESOLVED"] : [],
-  };
-  const resolutionPlan: ResolutionPlanV2 = {
-    schema: "resolution-plan/v2",
-    source: {
-      designIr: {
-        artifactId: "pixso_fixture",
-        schema: "design-ir/v2",
-        sha256: sha256(stableStringify(designIr)),
-      },
-      uiManifest: {
-        artifactId: "pixso_fixture",
-        schema: "ui-manifest/v2",
-        sha256: sha256(stableStringify(uiManifest)),
-      },
-    },
-    target: {
-      framework: "react",
-      language: "typescript",
-      designSystem: pack.manifest.id,
-      designSystemVersion: pack.manifest.version,
-      packSha256: pack.sha256,
-    },
-    nodes: [
-      options.blocked
-        ? {
-            ...resolutionNodeBase,
-            decision: "blocked",
-          }
-        : {
-            ...resolutionNodeBase,
-            decision: "reuse",
-            binding: {
-              componentId: "mui.Stack",
-              package: "@mui/material",
-              export: "Stack",
-              exportKind: "named",
-            },
-            props: {},
-          },
-    ],
-    diagnostics: [],
-    summary: options.blocked
-      ? { reuse: 0, compose: 0, fallback: 0, blocked: 1 }
-      : { reuse: 1, compose: 0, fallback: 0, blocked: 0 },
-  };
+  if (options.blocked) {
+    uiManifest.root.requiredCapabilities = ["unsupported-capability"];
+  }
+  const resolutionPlan = resolveUiManifestV2({
+    manifest: uiManifest,
+    designIr,
+    pack,
+  });
   const run: GenerationRun = {
     schema: "generation-run/v1",
     runId,

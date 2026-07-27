@@ -58,6 +58,63 @@ describe("buildUiManifestV2", () => {
     expect(findRole(manifest.root, "textInput")?.interactions).toBeUndefined();
   });
 
+  it("projects one visible direct placeholder from an exact text input", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "Field/Text" };
+    design.nodes["4:314"]!.children = ["4:319"];
+    design.nodes["4:319"] = textNode("4:319", "Введите название", true);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "Field/Text",
+          kind: "control",
+          role: "textInput",
+        },
+      ],
+    });
+
+    expect(manifest.root).toMatchObject({
+      role: "textInput",
+      content: { label: "Введите название" },
+      sourceNodeIds: ["4:314", "4:319"],
+      evidence: expect.arrayContaining([
+        { kind: "direct-text-source-node", value: "4:319" },
+        {
+          kind: "direct-text-selection-rule",
+          value: "single-visible-direct-text",
+        },
+      ]),
+      children: [],
+    });
+  });
+
+  it("does not choose a placeholder between multiple text-input children", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "Field/Text" };
+    design.nodes["4:314"]!.children = ["4:319", "4:320"];
+    design.nodes["4:319"] = textNode("4:319", "Label", true);
+    design.nodes["4:320"] = textNode("4:320", "Value", true);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "Field/Text",
+          kind: "control",
+          role: "textInput",
+        },
+      ],
+    });
+
+    expect(manifest.root.content).toBeUndefined();
+    expect(manifest.root.sourceNodeIds).toEqual(["4:314"]);
+    expect(manifest.root.evidence).not.toContainEqual(
+      expect.objectContaining({ kind: "direct-text-source-node" }),
+    );
+  });
+
   it("keeps an exactly recognized action group as a boundary", () => {
     const design = structuredClone(designFixture);
     design.nodes["4:314"]!.component = { key: "ActionGroup" };

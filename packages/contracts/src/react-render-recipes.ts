@@ -110,6 +110,7 @@ export const ReactComponentRecipeV2Schema = closedObject({
     closedObject({
       source: ContentSourceSchema,
       target: Type.String({ minLength: 1 }),
+      required: Type.Optional(Type.Boolean()),
     }),
   ),
   staticProps: Type.Array(StaticRenderPropSchema),

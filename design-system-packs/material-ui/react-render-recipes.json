@@ -23,8 +23,18 @@
     },
     {
       "componentId": "mui.TextField",
-      "staticProps": [],
-      "content": { "source": "content.label", "target": "label" },
+      "staticProps": [
+        {
+          "target": "value",
+          "value": { "kind": "literal", "value": "" },
+          "reason": "render-only"
+        }
+      ],
+      "content": {
+        "source": "content.label",
+        "target": "label",
+        "required": false
+      },
       "stateProps": [
         {
           "source": "state.disabled",

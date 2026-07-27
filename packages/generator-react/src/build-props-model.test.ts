@@ -203,6 +203,64 @@ describe("buildPropsModel", () => {
     );
   });
 
+  it("omits an optional content prop when semantic evidence is absent", () => {
+    const recipe = recipeWithStaticProps({
+      staticProps: [
+        {
+          target: "value",
+          value: { kind: "literal", value: "" },
+          reason: "render-only",
+        },
+      ],
+      content: {
+        source: "content.label",
+        target: "placeholder",
+        required: false,
+      },
+    });
+
+    expect(
+      buildPropsModel(actionNode({}), reuseResolution({}), recipe),
+    ).toMatchObject({
+      elementProps: [{ name: "value", value: { kind: "literal", value: "" } }],
+      renderOnlyPropNames: ["value"],
+    });
+  });
+
+  it("uses semantic state over optional fallback content on one prop", () => {
+    const recipe = recipeWithStaticProps({
+      staticProps: [],
+      content: {
+        source: "content.label",
+        target: "placeholder",
+        required: false,
+      },
+      stateProps: [
+        {
+          source: "state.placeholder",
+          target: "placeholder",
+          valueType: "string",
+        },
+      ],
+    });
+
+    expect(
+      buildPropsModel(
+        actionNode({
+          content: { label: "Label fallback" },
+          state: { placeholder: "Explicit placeholder" },
+        }),
+        reuseResolution({}),
+        recipe,
+      ).elementProps,
+    ).toEqual([
+      {
+        name: "placeholder",
+        value: { kind: "literal", value: "Explicit placeholder" },
+      },
+    ]);
+  });
+
   it("does not invent a callback when the semantic node has no interaction", () => {
     const result = buildPropsModel(
       actionNode({ content: { label: "Continue" } }),

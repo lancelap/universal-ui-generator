@@ -90,10 +90,22 @@ interactions. `resolution-plan/v2` records immutable SHA-256 references to the
 exact DesignIR and manifest plus the loaded pack version and SHA-256. The v1
 contracts remain readable historical formats; new generation consumes v2.
 
-For exactly recognized content or action boundaries, semantic planning may
-project the first visible direct text child in source order into `content`.
-It does not recurse through an exact component boundary and does not invent
-content when no direct text evidence exists.
+For exactly recognized content or action boundaries, and for an exact
+`control` boundary with role `textInput`, semantic planning may project direct
+text into `content` only under one of two deterministic rules:
+
+- exactly one eligible visible direct text child exists; or
+- for a `heading` only, exactly one child is first by geometry and its geometry
+  height is strictly greater than every other eligible visible direct text
+  child.
+
+Any tie, multiple text-input candidates, or non-dominant heading is ambiguous
+and produces no projected content. The planner does not recurse through an
+exact component boundary. When projection succeeds, the selected child is
+added to `sourceNodeIds`, while `direct-text-source-node` and
+`direct-text-selection-rule` evidence record the selected node and rule.
+Exact text inputs project the selected text as `content.label`; content and
+action boundaries retain their text-and-label projection.
 
 ## React recipe, report, and bundle versions
 
@@ -108,6 +120,12 @@ Recipe v2 adds required `staticProps` with only three closed value opcodes:
 Every static value has reason `render-only`; packs cannot inject expressions or
 function bodies. `semanticChildrenPolicy: "render-only-optional"` permits a
 proven structural group with no semantic children but never invents them.
+
+Recipe v2 may mark a content mapping with `required: false`. Missing semantic
+content then omits that prop instead of blocking generation; v1 mappings and
+v2 mappings without this flag remain required. This is used only as an
+evidence-backed presentation fallback. A higher-precedence semantic state
+mapping may replace the optional content value on the same target.
 
 `react-generation-report/v2` discloses sorted render-only prop names and keeps
 `targetTypecheck: "not-run"`. `react-generation-bundle/v2` contains the report

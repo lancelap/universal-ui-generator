@@ -86,11 +86,18 @@ by the v2 generation report. The Sber `base.Autocomplete` recipe, for example,
 owns the verified `mode`, `value`, `options`, and `onChange` render shape; the
 generic generator contains no Sber or combobox branch.
 
+Controlled text-input APIs receive a pack-owned render-only `value: ""`;
+design evidence is not rewritten as a runtime value. A single exact direct-text
+placeholder is mapped optionally to Sber Field `placeholder` or Material UI
+TextField `label`, and is omitted when that evidence is absent. The generation
+report discloses the static `value`.
+
 `render-only-optional` permits an already proven structural group to stay empty
 and produces `GENERATION_RENDER_ONLY_CHILDREN_MISSING`. It never authorizes
 synthetic buttons or callbacks.
 
-The neutral Sber acceptance currently follows the verified Field composition
-and therefore renders empty `FormControl` and `FormLabel` slots when no
-separate semantic children exist. This is reviewed presentation evidence, not
-a claim of complete form integration.
+The current Sber text-input resolution is the verified standalone
+`base.Field`; it does not emit empty `FormControl` or `FormLabel` slots. A
+future conditional recipe may choose a `FormControl`-rooted composition only
+when separately recognized semantic children provide the required label,
+message, or companion content. Composition slots are never emitted empty.

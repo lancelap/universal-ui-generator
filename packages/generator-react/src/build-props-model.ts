@@ -64,20 +64,26 @@ export function buildPropsModel(
   if (recipe.content) {
     const value = readContent(node, recipe.content.source);
     if (value === undefined) {
-      throw new ReactGenerationError(
-        "GENERATION_INPUT_INCOMPLETE",
-        `Node ${node.id} has no ${recipe.content.source}`,
-      );
-    }
-    if (recipe.content.target === "children") {
-      textChild = { kind: "text", value };
-      removeElementProp(elementProps, recipe.content.target);
-      renderOnlyNames.delete(recipe.content.target);
+      if (
+        !("required" in recipe.content) ||
+        recipe.content.required !== false
+      ) {
+        throw new ReactGenerationError(
+          "GENERATION_INPUT_INCOMPLETE",
+          `Node ${node.id} has no ${recipe.content.source}`,
+        );
+      }
     } else {
-      setHigherPrecedenceProp(elementProps, renderOnlyNames, {
-        name: recipe.content.target,
-        value: { kind: "literal", value },
-      });
+      if (recipe.content.target === "children") {
+        textChild = { kind: "text", value };
+        removeElementProp(elementProps, recipe.content.target);
+        renderOnlyNames.delete(recipe.content.target);
+      } else {
+        setHigherPrecedenceProp(elementProps, renderOnlyNames, {
+          name: recipe.content.target,
+          value: { kind: "literal", value },
+        });
+      }
     }
   }
 

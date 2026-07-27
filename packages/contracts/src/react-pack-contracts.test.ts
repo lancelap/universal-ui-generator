@@ -157,6 +157,34 @@ describe("React pack contracts", () => {
     ).toEqual(recipesFixture);
   });
 
+  it("accepts an optional semantic content mapping in recipe v2", () => {
+    expect(
+      validateWithSchema(ReactRenderRecipesV2Schema, {
+        ...recipesV2Fixture,
+        components: [
+          {
+            ...recipesV2Fixture.components[0],
+            content: {
+              source: "content.label",
+              target: "placeholder",
+              required: false,
+            },
+          },
+        ],
+      }),
+    ).toMatchObject({
+      components: [
+        {
+          content: {
+            source: "content.label",
+            target: "placeholder",
+            required: false,
+          },
+        },
+      ],
+    });
+  });
+
   it("narrows the read union to v2 static props", () => {
     const recipes: ReactRenderRecipes = validateWithSchema(
       ReactRenderRecipesSchema,

@@ -38,18 +38,18 @@ inputs stay self-closing `Field` elements.
     },
     {
       "path": "modal/material-ui/generated/GeneratedModal.tsx",
-      "byteLength": 1250,
-      "sha256": "edb346b3b940da0c62ea4139a63a2240bc27c8ad8fdab7a4d4c34a04eff18fe8"
+      "byteLength": 1259,
+      "sha256": "29062c8c1a1d31edeaec8ef8df4fa43edee3a12f0a5ce1650fe77ef6bc054eca"
     },
     {
       "path": "modal/material-ui/generated/generation-report.json",
-      "byteLength": 1526,
-      "sha256": "e77a469d23fcf7b775ba0720515b7afba9f263642085054757822c5af5a0b583"
+      "byteLength": 1665,
+      "sha256": "0a1fb22e1bbba6e98ab1c5cc397d631a14c3ef1ff7cfc63aae22122fda923125"
     },
     {
       "path": "modal/material-ui/resolution-plan.json",
       "byteLength": 6178,
-      "sha256": "696b97523e4e2c591c39e6bc66c957cd7affa8de200e545dd49664267e54c7ff"
+      "sha256": "b45ef1158e130c403281c8faa7a55048fb95fee40bf86bc924150dd6c47bd9e4"
     },
     {
       "path": "modal/sber-space-ui/generated/GeneratedModal.module.css",
@@ -63,13 +63,13 @@ inputs stay self-closing `Field` elements.
     },
     {
       "path": "modal/sber-space-ui/generated/generation-report.json",
-      "byteLength": 1045,
-      "sha256": "2eb6d257d73aa6d62397b839037e76ed6d847b07bc887021c92b20a22ed48e1e"
+      "byteLength": 1181,
+      "sha256": "2dab02f2817dbf421dfb45affac986551f6725707fce294c5f1a57f2a6068f43"
     },
     {
       "path": "modal/sber-space-ui/resolution-plan.json",
       "byteLength": 5761,
-      "sha256": "d89af2233b8936e36b2a8f91dd2c9687fba9bc5ee550d46b56dfb044835f664d"
+      "sha256": "32b8d0daee9d59f454b2975996b5eb91fa135a91aef98cc097beea75c67de5d4"
     },
     {
       "path": "modal/source.design-ir.json",

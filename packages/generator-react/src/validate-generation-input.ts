@@ -9,6 +9,7 @@ import {
   stableStringify,
   validateWithSchema,
 } from "@uig/contracts";
+import { resolveUiManifestV2 } from "@uig/component-resolver";
 import { sha256 } from "@uig/design-context";
 
 import { ReactGenerationError } from "./errors.js";
@@ -33,6 +34,7 @@ export function validateGenerationInput(
 
   assertSourceProofs(input);
   assertPackProof(input);
+  assertResolutionAuthorization(input);
 
   const manifestNodes = flatten(input.uiManifest.root);
   const resolutionsByManifestNodeId = indexResolutions(input);
@@ -63,6 +65,36 @@ export function validateGenerationInput(
   }
 
   return { ...common, status: "ready" };
+}
+
+function assertResolutionAuthorization(input: ReactGenerationInput): void {
+  let canonical: ReturnType<typeof resolveUiManifestV2>;
+  try {
+    canonical = resolveUiManifestV2({
+      manifest: input.uiManifest,
+      designIr: input.designIr,
+      pack: input.pack,
+    });
+  } catch (error) {
+    invalid("Canonical component resolution failed", error);
+  }
+
+  const storedAuthorization = {
+    nodes: input.resolutionPlan.nodes,
+    summary: input.resolutionPlan.summary,
+  };
+  const canonicalAuthorization = {
+    nodes: canonical.nodes,
+    summary: canonical.summary,
+  };
+  if (
+    stableStringify(storedAuthorization) !==
+    stableStringify(canonicalAuthorization)
+  ) {
+    invalid(
+      "Resolution decisions are not authorized by the loaded design-system pack",
+    );
+  }
 }
 
 function assertSourceProofs(input: ReactGenerationInput): void {

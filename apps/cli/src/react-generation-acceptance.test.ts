@@ -157,6 +157,93 @@ describe("reviewed React generation acceptance", () => {
     }
   });
 
+  it.each([
+    ["sber-space-ui", "Field/Text", "placeholder", "Field"],
+    ["material-ui", "MuiTextField", "label", "TextField"],
+  ] as const)(
+    "generates an ordinary %s text input with only design-backed placeholder text",
+    async (packId, componentKey, textProp, exportName) => {
+      const pack = await loadDesignSystemPackV2(
+        join(repoRoot, "design-system-packs", packId),
+      );
+      const withPlaceholder = normalizePixsoDesignV2({
+        artifactId: `pixso_${packId}_text_input`,
+        rootNodeId: "10:1",
+        rawDsl: pixsoTextInput(componentKey, "Введите название"),
+      });
+      const uiManifest = buildUiManifestV2({
+        ir: withPlaceholder,
+        exactMappings: [...pack.exactPixsoMappings],
+      });
+      const plan = resolveUiManifestV2({
+        manifest: uiManifest,
+        designIr: withPlaceholder,
+        pack,
+      });
+      const generated = generateReactBundle({
+        sourceRunId: `run_${packId}_text_input`,
+        designIr: withPlaceholder,
+        uiManifest,
+        resolutionPlan: plan,
+        pack,
+      });
+
+      expect(uiManifest.root).toMatchObject({
+        role: "textInput",
+        content: { label: "Введите название" },
+        sourceNodeIds: ["10:1", "10:2"],
+        evidence: expect.arrayContaining([
+          { kind: "direct-text-source-node", value: "10:2" },
+          {
+            kind: "direct-text-selection-rule",
+            value: "single-visible-direct-text",
+          },
+        ]),
+      });
+      const tsx = source(generated, ".tsx");
+      expect(tsx).toContain(`<${exportName}`);
+      expect(tsx).toContain(`${textProp}="Введите название"`);
+      expect(tsx).toContain('value=""');
+      expect(generated.report.renderOnlyProps).toEqual([
+        {
+          manifestNodeId: "ui_textInput_10-1",
+          componentId:
+            packId === "sber-space-ui" ? "base.Field" : "mui.TextField",
+          propNames: ["value"],
+        },
+      ]);
+      expect(tsx).not.toMatch(
+        /\b(useState|useEffect|options|fetch|axios|react-hook-form)\b/,
+      );
+
+      const withoutPlaceholder = normalizePixsoDesignV2({
+        artifactId: `pixso_${packId}_empty_text_input`,
+        rootNodeId: "10:1",
+        rawDsl: pixsoTextInput(componentKey),
+      });
+      const emptyManifest = buildUiManifestV2({
+        ir: withoutPlaceholder,
+        exactMappings: [...pack.exactPixsoMappings],
+      });
+      const emptyPlan = resolveUiManifestV2({
+        manifest: emptyManifest,
+        designIr: withoutPlaceholder,
+        pack,
+      });
+      const emptyGenerated = generateReactBundle({
+        sourceRunId: `run_${packId}_empty_text_input`,
+        designIr: withoutPlaceholder,
+        uiManifest: emptyManifest,
+        resolutionPlan: emptyPlan,
+        pack,
+      });
+      const emptyTsx = source(emptyGenerated, ".tsx");
+      expect(emptyManifest.root.content).toBeUndefined();
+      expect(emptyTsx).toContain('value=""');
+      expect(emptyTsx).not.toContain(`${textProp}=`);
+    },
+  );
+
   it("generates the real 4:314 Sber modal with disclosed render-only gaps", async () => {
     const rawDsl = JSON.parse(
       await readFile(
@@ -224,6 +311,47 @@ describe("reviewed React generation acceptance", () => {
     await expectAcceptedBundle(join(realRoot, "generated"), generated);
   });
 });
+
+function pixsoTextInput(componentKey: string, placeholder?: string): unknown {
+  return {
+    dsl: {
+      dslVersion: "2.1.15",
+      converterVersion: "2.2.13",
+      pixTreeDslNodes: [
+        {
+          guid: "10:1",
+          type: "INSTANCE",
+          name: "Text input",
+          visible: true,
+          left: 0,
+          top: 0,
+          width: 320,
+          height: 40,
+          componentKey,
+          childNode: placeholder
+            ? [
+                {
+                  guid: "10:2",
+                  type: "TEXT",
+                  name: "Placeholder",
+                  visible: true,
+                  left: 12,
+                  top: 10,
+                  width: 200,
+                  height: 20,
+                  nodeText: placeholder,
+                },
+              ]
+            : [],
+        },
+      ],
+      pixComponentTreeDslNodes: [],
+      localStyleMap: {},
+      variableMap: {},
+      variableSetMap: {},
+    },
+  };
+}
 
 async function readContract<T>(
   path: string,

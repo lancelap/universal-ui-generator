@@ -37,7 +37,9 @@ export function buildUiManifestV2(input: {
       exactRecognition &&
       !node.text?.value &&
       (exactRecognition.kind === "content" ||
-        exactRecognition.kind === "action")
+        exactRecognition.kind === "action" ||
+        (exactRecognition.kind === "control" &&
+          exactRecognition.role === "textInput"))
         ? onlyVisibleDirectText(node.children, input.ir, exactRecognition.role)
         : undefined;
     const baseId = `ui_${role}_${sanitize(node.id)}`;
@@ -110,14 +112,25 @@ export function buildUiManifestV2(input: {
             ]
           : []),
       ],
-      ...(node.text?.value || directTextProjection
+      ...(node.text?.value
         ? {
             content: {
-              text: node.text?.value ?? directTextProjection!.text,
-              label: node.text?.value ?? directTextProjection!.text,
+              text: node.text.value,
+              label: node.text.value,
             },
           }
-        : {}),
+        : directTextProjection
+          ? {
+              content:
+                exactRecognition?.kind === "control" &&
+                exactRecognition.role === "textInput"
+                  ? { label: directTextProjection.text }
+                  : {
+                      text: directTextProjection.text,
+                      label: directTextProjection.text,
+                    },
+            }
+          : {}),
       children: exactRecognition
         ? []
         : node.children.flatMap((childId) =>

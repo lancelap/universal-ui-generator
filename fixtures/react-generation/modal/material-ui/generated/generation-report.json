@@ -28,13 +28,21 @@
       "sha256": "f873fab384d81779f5cb5161ea07420442731b6745b520fdcb3b381e01b479aa"
     },
     {
-      "byteLength": 1250,
+      "byteLength": 1259,
       "kind": "tsx",
       "path": "GeneratedModal.tsx",
-      "sha256": "edb346b3b940da0c62ea4139a63a2240bc27c8ad8fdab7a4d4c34a04eff18fe8"
+      "sha256": "29062c8c1a1d31edeaec8ef8df4fa43edee3a12f0a5ce1650fe77ef6bc054eca"
     }
   ],
-  "renderOnlyProps": [],
+  "renderOnlyProps": [
+    {
+      "componentId": "mui.TextField",
+      "manifestNodeId": "ui_text_input",
+      "propNames": [
+        "value"
+      ]
+    }
+  ],
   "schema": "react-generation-report/v2",
   "sourceRunId": "run_acceptance_neutral_modal",
   "statistics": {
@@ -49,7 +57,7 @@
     "generatedProps": 2,
     "imports": 8,
     "manifestNodes": 8,
-    "sourceByteLength": 1483
+    "sourceByteLength": 1492
   },
   "status": "generated",
   "validation": {

@@ -23,8 +23,18 @@
     },
     {
       "componentId": "base.Field",
-      "staticProps": [],
-      "content": { "source": "content.value", "target": "value" },
+      "staticProps": [
+        {
+          "target": "value",
+          "value": { "kind": "literal", "value": "" },
+          "reason": "render-only"
+        }
+      ],
+      "content": {
+        "source": "content.label",
+        "target": "placeholder",
+        "required": false
+      },
       "stateProps": [
         {
           "source": "state.disabled",
