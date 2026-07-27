@@ -10,6 +10,9 @@ importers:
       "@types/node":
         specifier: ^24.13.3
         version: 24.13.3
+      esbuild:
+        specifier: 0.28.1
+        version: 0.28.1
       prettier:
         specifier: ^3.9.6
         version: 3.9.6
@@ -52,6 +55,24 @@ importers:
       commander:
         specifier: ^14.0.3
         version: 14.0.3
+
+  extensions/qwen-cli:
+    dependencies:
+      "@modelcontextprotocol/server":
+        specifier: 2.0.0-beta.5
+        version: 2.0.0-beta.5
+      "@uig/cli":
+        specifier: workspace:*
+        version: link:../../apps/cli
+      "@uig/contracts":
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      "@uig/provider-pixso":
+        specifier: workspace:*
+        version: link:../../packages/provider-pixso
+      zod:
+        specifier: 4.2.0
+        version: 4.2.0
 
   packages/component-catalog:
     dependencies:
@@ -380,6 +401,13 @@ packages:
     resolution:
       {
         integrity: sha512-HKbY9XTbsDy1Y6r2I55TGE3JEapM0vg96e1MUmBIF9LGjos5gjhcIrTz1yvBPLg2aFKHjwhUAQfRdrCEnPxNew==,
+      }
+    engines: { node: ">=20" }
+
+  "@modelcontextprotocol/server@2.0.0-beta.5":
+    resolution:
+      {
+        integrity: sha512-i1E5l75rQKsgY/AKAIspgMBH1vEL7dqiK7tHr0L+raYcb0SWOziqNGJXGIG6NY4AlXDWIKGJQGB7Nqfs3oUi5g==,
       }
     engines: { node: ">=20" }
 
@@ -1110,10 +1138,10 @@ packages:
     engines: { node: ">=8" }
     hasBin: true
 
-  zod@4.4.3:
+  zod@4.2.0:
     resolution:
       {
-        integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==,
+        integrity: sha512-Bd5fw9wlIhtqCCxotZgdTOMwGm1a0u75wARVEY9HMs1X17trvA/lMi4+MGK5EUfYkXVTbX8UDiDKW4OgzHVUZw==,
       }
 
 snapshots:
@@ -1205,11 +1233,16 @@ snapshots:
       eventsource-parser: 3.1.0
       jose: 6.2.4
       pkce-challenge: 5.0.1
-      zod: 4.4.3
+      zod: 4.2.0
 
   "@modelcontextprotocol/core@2.0.0-beta.5":
     dependencies:
-      zod: 4.4.3
+      zod: 4.2.0
+
+  "@modelcontextprotocol/server@2.0.0-beta.5":
+    dependencies:
+      "@modelcontextprotocol/core": 2.0.0-beta.5
+      zod: 4.2.0
 
   "@rollup/rollup-android-arm-eabi@4.62.2":
     optional: true
@@ -1615,4 +1648,4 @@ snapshots:
       siginfo: 2.0.0
       stackback: 0.0.2
 
-  zod@4.4.3: {}
+  zod@4.2.0: {}

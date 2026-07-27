@@ -1,0 +1,13 @@
+{
+  "name": "@uig/qwen-cli-extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.0.0-beta.5",
+    "@uig/cli": "workspace:*",
+    "@uig/contracts": "workspace:*",
+    "@uig/provider-pixso": "workspace:*",
+    "zod": "4.2.0"
+  }
+}
