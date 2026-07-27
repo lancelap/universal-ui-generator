@@ -12,7 +12,8 @@ import {
 } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { createRequire } from "node:module";
+import { fileURLToPath, pathToFileURL } from "node:url";
 
 import { loadDesignSystemPackV2 } from "@uig/component-catalog";
 import { resolveUiManifestV2 } from "@uig/component-resolver";
@@ -33,6 +34,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { generateFromRun } from "./generate-from-run.js";
 import { writeGeneratedBundleAtomically } from "./write-generated-bundle.js";
 
+const require = createRequire(import.meta.url);
 const materialUiPack = fileURLToPath(
   new URL("../../../design-system-packs/material-ui", import.meta.url),
 );
@@ -79,6 +81,46 @@ describe("generateFromRun", () => {
       schema: "react-generation-report/v2",
       sourceRunId: fixture.run.runId,
     });
+  });
+
+  it("uses a caller-supplied generation worker entrypoint", async () => {
+    const fixture = await runFixture(roots);
+    const proxyPath = join(fixture.workspace, "worker-proxy.mjs");
+    const markerPath = join(fixture.workspace, "worker-proxy.used");
+    await writeFile(
+      proxyPath,
+      [
+        'import { writeFile } from "node:fs/promises";',
+        `import { runGenerateWorker } from ${JSON.stringify(
+          pathToFileURL(
+            join(import.meta.dirname, "generate-from-run-worker.ts"),
+          ).href,
+        )};`,
+        `await writeFile(${JSON.stringify(markerPath)}, "used\\n");`,
+        "await runGenerateWorker();",
+      ].join("\n"),
+    );
+
+    const result = await generateFromRun({
+      runId: fixture.run.runId,
+      workspaceDir: fixture.workspace,
+      workerEntrypoint: {
+        modulePath: proxyPath,
+        args: [],
+        execArgv: ["--import", require.resolve("tsx")],
+      },
+    });
+
+    expect(result.status).toBe("generated");
+    expect(await readFile(markerPath, "utf8")).toBe("used\n");
+    expect(
+      JSON.parse(
+        await readFile(
+          join(fixture.runDir, "generated", "generation-report.json"),
+          "utf8",
+        ),
+      ).sourceRunId,
+    ).toBe(fixture.run.runId);
   });
 
   it("rejects run traversal before reading or writing outside the chosen run", async () => {

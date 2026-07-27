@@ -15,10 +15,17 @@ import type {
 const runIdPattern = /^run_[A-Za-z0-9_-]+$/;
 const require = createRequire(import.meta.url);
 
+export interface GenerationWorkerEntrypoint {
+  modulePath: string;
+  args: string[];
+  execArgv: string[];
+}
+
 export async function generateFromRun(input: {
   runId: string;
   workspaceDir: string;
   explicitPackPath?: string;
+  workerEntrypoint?: GenerationWorkerEntrypoint;
   /** @internal Runs after the pinned worker is ready and before publication. */
   testHooks?: {
     beforeInstall?: () => Promise<void>;
@@ -50,6 +57,7 @@ export async function generateFromRun(input: {
       ...(input.testHooks?.beforeInstall
         ? { beforePublish: input.testHooks.beforeInstall }
         : {}),
+      workerEntrypoint: input.workerEntrypoint ?? defaultWorkerEntrypoint(),
     });
     return {
       outputPath: relative(input.workspaceDir, join(runDir, "generated"))
@@ -103,17 +111,17 @@ async function runPinnedWorker(input: {
   expectedIdentity: PinnedRunIdentity;
   explicitPackPath?: string;
   beforePublish?: () => Promise<void>;
+  workerEntrypoint: GenerationWorkerEntrypoint;
 }): Promise<Extract<GenerateWorkerOutbound, { type: "result" }>> {
-  const sourceExtension = extname(fileURLToPath(import.meta.url));
-  const workerPath = fileURLToPath(
-    new URL(`./generate-from-run-worker${sourceExtension}`, import.meta.url),
+  const worker = fork(
+    input.workerEntrypoint.modulePath,
+    input.workerEntrypoint.args,
+    {
+      cwd: input.canonicalRunDir,
+      execArgv: input.workerEntrypoint.execArgv,
+      stdio: ["ignore", "ignore", "ignore", "ipc"],
+    },
   );
-  const worker = fork(workerPath, [], {
-    cwd: input.canonicalRunDir,
-    execArgv:
-      sourceExtension === ".ts" ? ["--import", require.resolve("tsx")] : [],
-    stdio: ["ignore", "ignore", "ignore", "ipc"],
-  });
   const initialization: GenerateWorkerInbound = {
     type: "initialize",
     runId: input.runId,
@@ -130,6 +138,21 @@ async function runPinnedWorker(input: {
     worker.kill();
     throw error;
   }
+}
+
+function defaultWorkerEntrypoint(): GenerationWorkerEntrypoint {
+  const sourceExtension = extname(fileURLToPath(import.meta.url));
+  return {
+    modulePath: fileURLToPath(
+      new URL(
+        `./generate-from-run-worker-entry${sourceExtension}`,
+        import.meta.url,
+      ),
+    ),
+    args: [],
+    execArgv:
+      sourceExtension === ".ts" ? ["--import", require.resolve("tsx")] : [],
+  };
 }
 
 function awaitWorkerResult(

@@ -23,9 +23,7 @@ import type {
 import { resolveDesignSystemPackPath } from "./resolve-design-system-pack.js";
 import { writeGeneratedBundleAtomically } from "./write-generated-bundle.js";
 
-void runWorker();
-
-async function runWorker(): Promise<void> {
+export async function runGenerateWorker(): Promise<void> {
   let directoryHandle: FileHandle | undefined;
   try {
     const initialization = await nextMessage("initialize");

@@ -6,6 +6,11 @@
   "bin": {
     "uig": "./src/main.ts"
   },
+  "exports": {
+    "./plan-from-url": "./src/plan-from-url.ts",
+    "./generate-from-run": "./src/generate-from-run.ts",
+    "./generate-from-run-worker": "./src/generate-from-run-worker.ts"
+  },
   "dependencies": {
     "@uig/component-catalog": "workspace:*",
     "@uig/component-resolver": "workspace:*",
