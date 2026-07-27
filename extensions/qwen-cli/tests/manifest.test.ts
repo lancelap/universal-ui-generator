@@ -101,6 +101,8 @@ describe("Qwen extension manifest and commands", () => {
       "/uig:generate",
       "/uig:pixso-to-react",
       "qwen extensions link",
+      "export PIXSO_ACCESS_TOKEN",
+      "Qwen Code 0.21.0 setting fallback",
       ".uig",
       "business logic",
     ]) {

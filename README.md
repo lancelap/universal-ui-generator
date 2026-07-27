@@ -176,10 +176,10 @@ qwen extensions install lancelap/universal-ui-generator
 qwen extensions settings set universal-ui-generator "Pixso access token"
 ```
 
-The second command prompts for a sensitive value. Qwen supplies it to the
-extension MCP process as `PIXSO_ACCESS_TOKEN`; it is not a tool argument or
-part of a generated artifact. A workspace-specific setting can be configured
-with:
+The second command prompts for a sensitive value. The manifest declares that
+value for the extension MCP process as `PIXSO_ACCESS_TOKEN`; it is not a tool
+argument or part of a generated artifact. A workspace-specific setting can be
+configured with:
 
 ```bash
 qwen extensions settings set \
@@ -289,6 +289,12 @@ pnpm test:qwen-extension
 
 - `UIG_PROVIDER_CONFIG_MISSING`: configure the sensitive Pixso setting; do
   not put the token in the manifest or command text.
+- Qwen Code 0.21.0 setting fallback: if
+  `qwen extensions settings list universal-ui-generator` reports a stored
+  value but the MCP process still returns `UIG_PROVIDER_CONFIG_MISSING`, export
+  `PIXSO_ACCESS_TOKEN` in the shell that starts `qwen`. Keep the value only in
+  the local environment; never add it to the manifest, command arguments,
+  copied logs, or repository files.
 - Node startup failure: verify `node --version` is 22 or newer and the
   extension is enabled.
 - Blocked resolution: inspect the returned diagnostics artifact under
