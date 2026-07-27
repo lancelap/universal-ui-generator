@@ -19,3 +19,5 @@ Task 7: resumed after environment-limit interruption; takeover starts from commi
 Task 7: implementation committed (7d9a5d9); review round 1/5 addressed 5 findings (7187841).
 Task 7: fix round 2/5 (4 addressed, 0 open — complete root binding reservation, exact declaration collisions, atomic no-replace symlink publication, kernel-pinned cwd worker; commit debe96a).
 Task 7: complete (commits 34b6411..debe96a, review clean after fix round 2)
+Task 8: fix round 1/5 (6 addressed, 0 open — unambiguous text provenance, standalone Sber Field, complete candidate/provenance evidence; commit e2a5c06).
+Task 8: complete (commits 8ffac22..e2a5c06, review clean after fix round 1).
