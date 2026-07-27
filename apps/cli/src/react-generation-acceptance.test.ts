@@ -20,7 +20,10 @@ import { generateReactBundle } from "@uig/generator-react";
 import { buildUiManifestV2 } from "@uig/semantic-planner";
 import { describe, expect, it } from "vitest";
 
-import { generateReactAcceptanceCandidates } from "../../../scripts/generate-react-acceptance-candidates.js";
+import {
+  collectExternalInterfacePropNames,
+  generateReactAcceptanceCandidates,
+} from "../../../scripts/generate-react-acceptance-candidates.js";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 const neutralRoot = join(repoRoot, "fixtures", "react-generation", "modal");
@@ -40,6 +43,18 @@ describe("reviewed React generation acceptance", () => {
         destination: join(repoRoot, "fixtures", "react-generation"),
       }),
     ).rejects.toThrow("outside fixtures");
+  });
+
+  it("structurally reports required and optional external interface props", () => {
+    expect(
+      collectExternalInterfacePropNames(`
+        export interface GeneratedExampleProps {
+          title: string;
+          disabled?: boolean;
+          onSubmit?: () => void;
+        }
+      `),
+    ).toEqual(["disabled", "onSubmit", "title"]);
   });
 
   it("generates one neutral modal deterministically through both packs", async () => {
@@ -89,7 +104,7 @@ describe("reviewed React generation acceptance", () => {
           join(neutralRoot, packId, "generated"),
           first,
         );
-        return { packId, bundle: first, tsx: source(first, ".tsx") };
+        return { packId, pack, bundle: first, tsx: source(first, ".tsx") };
       }),
     );
 
@@ -106,6 +121,23 @@ describe("reviewed React generation acceptance", () => {
       expect.stringContaining("@sber-space-ui/"),
     );
     expect(sber.tsx).not.toMatch(/\b(FieldBefore|FieldAfter)\b/);
+    expect(sber.tsx).not.toMatch(/\b(FormControl|FormLabel)\b/);
+    expect(sber.pack.componentsById.has("base.FormControl")).toBe(true);
+    expect(sber.pack.componentsById.has("base.FormLabel")).toBe(true);
+    expect(sber.tsx).toContain(
+      '<Field placeholder="Введите название" value=""/>',
+    );
+    const textInputResolution = (
+      await readContract<ResolutionPlanV2>(
+        join(neutralRoot, "sber-space-ui", "resolution-plan.json"),
+        ResolutionPlanV2Schema,
+      )
+    ).nodes.find((node) => node.manifestNodeId === "ui_text_input");
+    expect(
+      textInputResolution && "binding" in textInputResolution
+        ? [textInputResolution.binding.componentId]
+        : [],
+    ).toEqual(["base.Field"]);
     expect(sber.bundle.report.diagnostics).not.toContainEqual(
       expect.objectContaining({
         code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
@@ -165,7 +197,13 @@ describe("reviewed React generation acceptance", () => {
         propNames: ["mode", "onChange", "options", "value"],
       },
     ]);
-    expect(generated.report.diagnostics).toContainEqual(
+    expect(
+      generated.report.diagnostics.filter(
+        (diagnostic) =>
+          diagnostic.code === "GENERATION_RENDER_ONLY_CHILDREN_MISSING" &&
+          diagnostic.evidence?.manifestNodeId === "ui_actionGroup_4-317",
+      ),
+    ).toEqual([
       expect.objectContaining({
         code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
         blocking: false,
@@ -174,7 +212,7 @@ describe("reviewed React generation acceptance", () => {
           semanticRole: "actionGroup",
         },
       }),
-    );
+    ]);
 
     const tsx = source(generated, ".tsx");
     expect(tsx).toContain(

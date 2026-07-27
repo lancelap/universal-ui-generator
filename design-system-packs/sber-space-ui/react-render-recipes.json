@@ -208,28 +208,6 @@
         "kind": "canonical-library-doc",
         "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
       }
-    },
-    {
-      "compositionId": "sber-text-input",
-      "rootComponentId": "base.Field",
-      "slots": [
-        {
-          "name": "control",
-          "componentId": "base.FormControl",
-          "acceptsRemaining": true,
-          "cardinality": "zero-or-one"
-        },
-        {
-          "name": "label",
-          "componentId": "base.FormLabel",
-          "acceptsRoles": ["label"],
-          "cardinality": "zero-or-one"
-        }
-      ],
-      "provenance": {
-        "kind": "canonical-library-doc",
-        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
-      }
     }
   ]
 }

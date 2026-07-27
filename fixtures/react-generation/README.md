@@ -8,17 +8,22 @@ The neutral modal uses one unchanged v2 manifest for both packs. The real
 `4:314` Sber output is regenerated only from the lossless Pixso source recorded
 in `fixtures/pixso/README.md`.
 
-The Sber Field recipe's optional semantic children are grounded in:
+The Sber Field recipe's optional semantic children are grounded in the
+portable canonical resource identifier:
 
 ```text
-/Users/danilel/dev/gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Field/Field.md
+gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Field/Field.md
 ```
 
 That canonical document shows standalone self-closing `Field` usage; children
-are optional `FieldBefore`/`FieldAfter` adornments. The current imported
-catalog separately expands `FormControl` and `FormLabel` companions. Their
-empty neutral slots are retained as a visible, reviewed limitation and are not
-treated as completed form integration.
+are optional `FieldBefore`/`FieldAfter` adornments. The canonical
+`gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md`
+instead shows `Field` and a content-bearing `FormLabel` nested inside a
+`FormControl`. Therefore `FormControl` and `FormLabel` remain available
+catalog components but are not unconditional `Field` companions. A future
+conditional form composition must be rooted at `FormControl` and requires
+real semantic label, description, or validation content; standalone text
+inputs stay self-closing `Field` elements.
 
 <!-- react-generation-provenance:start -->
 
@@ -53,18 +58,18 @@ treated as completed form integration.
     },
     {
       "path": "modal/sber-space-ui/generated/GeneratedModal.tsx",
-      "byteLength": 1432,
-      "sha256": "3d879b95340cd707815c31126e084f2329d3fa922f68903f4926f547f3ef082c"
+      "byteLength": 1327,
+      "sha256": "aaa2ed243dab7009f7ecf49e4b66c45607de32e7f28f6bd75ac3cdad4e215a0d"
     },
     {
       "path": "modal/sber-space-ui/generated/generation-report.json",
-      "byteLength": 1046,
-      "sha256": "a3b38805ddd6c93c134b82e9e3994c3c6dd349669c469c08922e3244347136a1"
+      "byteLength": 1045,
+      "sha256": "2eb6d257d73aa6d62397b839037e76ed6d847b07bc887021c92b20a22ed48e1e"
     },
     {
       "path": "modal/sber-space-ui/resolution-plan.json",
-      "byteLength": 6158,
-      "sha256": "94e6fe0669c90c81cbd8ab30e03619b7791140fee5e9898f848b46b9fa9dd7f9"
+      "byteLength": 5761,
+      "sha256": "d89af2233b8936e36b2a8f91dd2c9687fba9bc5ee550d46b56dfb044835f664d"
     },
     {
       "path": "modal/source.design-ir.json",

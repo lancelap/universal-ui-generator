@@ -15,7 +15,7 @@
     "typecheck": "tsc --project tsconfig.base.json --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "verify:fixtures": "node scripts/verify-fixture-provenance.mjs",
+    "verify:fixtures": "node --import tsx scripts/verify-fixture-provenance.ts",
     "verify": "pnpm format:check && pnpm typecheck && pnpm verify:fixtures && pnpm test"
   },
   "devDependencies": {

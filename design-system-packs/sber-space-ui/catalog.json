@@ -29,7 +29,7 @@
       "formAdapters": ["controlled"],
       "priority": 100,
       "verified": true,
-      "requiredComponentIds": ["base.FormControl", "base.FormLabel"],
+      "requiredComponentIds": [],
       "optionalComponentIds": [],
       "defaultProps": {},
       "provenance": {

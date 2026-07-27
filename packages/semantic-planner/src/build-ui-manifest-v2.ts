@@ -33,11 +33,12 @@ export function buildUiManifestV2(input: {
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;
     const role = accepted ? recognized.role : "unresolved";
-    const exactText =
+    const directTextProjection =
       exactRecognition &&
+      !node.text?.value &&
       (exactRecognition.kind === "content" ||
         exactRecognition.kind === "action")
-        ? firstVisibleDirectText(node.children, input.ir)
+        ? onlyVisibleDirectText(node.children, input.ir, exactRecognition.role)
         : undefined;
     const baseId = `ui_${role}_${sanitize(node.id)}`;
     const collision = (ids.get(baseId) ?? 0) + 1;
@@ -81,17 +82,39 @@ export function buildUiManifestV2(input: {
       id: collision === 1 ? baseId : `${baseId}_${collision}`,
       kind: accepted ? recognized.kind : "unresolved",
       role,
-      sourceNodeIds: accepted ? recognized.sourceNodeIds : [node.id],
+      sourceNodeIds: accepted
+        ? [
+            ...recognized.sourceNodeIds,
+            ...(directTextProjection &&
+            !recognized.sourceNodeIds.includes(directTextProjection.nodeId)
+              ? [directTextProjection.nodeId]
+              : []),
+          ]
+        : [node.id],
       layoutSourceNodeId: node.id,
       confidence: accepted
         ? recognized.confidence
         : (recognized?.confidence ?? 0),
-      evidence: recognized?.evidence ?? [],
-      ...(node.text?.value || exactText
+      evidence: [
+        ...(recognized?.evidence ?? []),
+        ...(directTextProjection
+          ? [
+              {
+                kind: "direct-text-source-node",
+                value: directTextProjection.nodeId,
+              },
+              {
+                kind: "direct-text-selection-rule",
+                value: directTextProjection.rule,
+              },
+            ]
+          : []),
+      ],
+      ...(node.text?.value || directTextProjection
         ? {
             content: {
-              text: node.text?.value ?? exactText!,
-              label: node.text?.value ?? exactText!,
+              text: node.text?.value ?? directTextProjection!.text,
+              label: node.text?.value ?? directTextProjection!.text,
             },
           }
         : {}),
@@ -119,15 +142,61 @@ function sanitize(value: string): string {
   return value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
-function firstVisibleDirectText(
+function onlyVisibleDirectText(
   childIds: string[],
   ir: DesignIRV2,
-): string | undefined {
+  role: string,
+):
+  | {
+      nodeId: string;
+      text: string;
+      rule:
+        | "single-visible-direct-text"
+        | "unique-leading-typography-dominant-direct-text";
+    }
+  | undefined {
+  const visible: { nodeId: string; text: string; y: number }[] = [];
   for (const childId of childIds) {
     const child = ir.nodes[childId];
     if (child?.visible && child.text?.value) {
-      return child.text.value;
+      visible.push({
+        nodeId: childId,
+        text: child.text.value,
+        y: child.geometry.y,
+      });
     }
   }
-  return undefined;
+  if (visible.length === 1) {
+    return {
+      nodeId: visible[0]!.nodeId,
+      text: visible[0]!.text,
+      rule: "single-visible-direct-text",
+    };
+  }
+  if (role !== "heading" || visible.length === 0) {
+    return undefined;
+  }
+
+  const leading = visible.filter(
+    (candidate) => candidate.y === Math.min(...visible.map((entry) => entry.y)),
+  );
+  if (leading.length !== 1) {
+    return undefined;
+  }
+  const candidate = leading[0]!;
+  const candidateHeight = ir.nodes[candidate.nodeId]!.geometry.height;
+  const otherHeights = visible
+    .filter((entry) => entry.nodeId !== candidate.nodeId)
+    .map((entry) => ir.nodes[entry.nodeId]!.geometry.height);
+  if (
+    otherHeights.length === 0 ||
+    !otherHeights.every((height) => candidateHeight > height)
+  ) {
+    return undefined;
+  }
+  return {
+    nodeId: candidate.nodeId,
+    text: candidate.text,
+    rule: "unique-leading-typography-dominant-direct-text",
+  };
 }

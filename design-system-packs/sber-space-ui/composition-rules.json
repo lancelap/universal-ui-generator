@@ -10,12 +10,6 @@
         "body": "base.ModalBody",
         "actions": "base.ModalFooter"
       }
-    },
-    {
-      "id": "sber-text-input",
-      "semanticRole": "textInput",
-      "rootComponentId": "base.Field",
-      "slots": { "control": "base.FormControl", "label": "base.FormLabel" }
     }
   ]
 }

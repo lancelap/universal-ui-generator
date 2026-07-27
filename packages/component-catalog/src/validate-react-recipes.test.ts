@@ -283,28 +283,6 @@ describe("loadDesignSystemPackV2", () => {
             source: "test fixture declaration",
           },
         },
-        {
-          compositionId: "sber-text-input",
-          rootComponentId: "base.Field",
-          slots: [
-            {
-              name: "control",
-              componentId: "base.FormControl",
-              acceptsRemaining: true,
-              cardinality: "zero-or-one",
-            },
-            {
-              name: "label",
-              componentId: "base.FormLabel",
-              acceptsRoles: ["label"],
-              cardinality: "zero-or-one",
-            },
-          ],
-          provenance: {
-            kind: "verified-public-api",
-            source: "test fixture declaration",
-          },
-        },
       ],
     });
     await writeJson(join(packDirectory, "react-style-policy.json"), {

@@ -9,6 +9,8 @@ import { tmpdir } from "node:os";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import ts from "typescript";
+
 import { loadDesignSystemPackV2 } from "../packages/component-catalog/src/index.js";
 import { resolveUiManifestV2 } from "../packages/component-resolver/src/index.js";
 import {
@@ -203,13 +205,7 @@ function summarize(
           .filter((value) => !value.startsWith(".")),
       ),
     ].sort(),
-    externalPropNames: [
-      ...new Set(
-        [...tsx.matchAll(/^\s+(on[A-Za-z0-9]+)\?:/gm)].map(
-          (match) => match[1]!,
-        ),
-      ),
-    ].sort(),
+    externalPropNames: collectExternalInterfacePropNames(tsx),
     renderOnlyPropNames: [
       ...new Set(
         bundle.report.renderOnlyProps.flatMap((entry) => entry.propNames),
@@ -229,6 +225,47 @@ function summarize(
     ),
     candidateDirectory,
   };
+}
+
+export function collectExternalInterfacePropNames(tsx: string): string[] {
+  const source = ts.createSourceFile(
+    "acceptance-candidate.tsx",
+    tsx,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+  const names = new Set<string>();
+  for (const statement of source.statements) {
+    if (
+      !ts.isInterfaceDeclaration(statement) ||
+      !statement.modifiers?.some(
+        (modifier) => modifier.kind === ts.SyntaxKind.ExportKeyword,
+      )
+    ) {
+      continue;
+    }
+    for (const member of statement.members) {
+      if (ts.isPropertySignature(member) && member.name) {
+        const name = propertyName(member.name);
+        if (name) {
+          names.add(name);
+        }
+      }
+    }
+  }
+  return [...names].sort();
+}
+
+function propertyName(name: ts.PropertyName): string | undefined {
+  if (
+    ts.isIdentifier(name) ||
+    ts.isStringLiteral(name) ||
+    ts.isNumericLiteral(name)
+  ) {
+    return name.text;
+  }
+  return undefined;
 }
 
 async function readContract<T>(

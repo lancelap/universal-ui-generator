@@ -81,13 +81,16 @@ describe("buildUiManifestV2", () => {
     expect(manifest.root.interactions).toBeUndefined();
   });
 
-  it("projects the first visible direct text child from an exact content boundary", () => {
+  it("projects one visible direct text child with provenance from an exact content boundary", () => {
     const design = structuredClone(designFixture);
     design.nodes["4:314"]!.component = { key: "ModalHeader" };
     design.nodes["4:314"]!.children = ["4:319", "4:320", "4:321"];
     design.nodes["4:319"] = textNode("4:319", "Hidden", false);
     design.nodes["4:320"] = textNode("4:320", "Modal title", true);
-    design.nodes["4:321"] = textNode("4:321", "Supporting copy", true);
+    design.nodes["4:321"] = {
+      ...textNode("4:321", "Supporting copy", true),
+      geometry: { x: 0, y: 28, width: 100, height: 16 },
+    };
 
     const manifest = buildUiManifestV2({
       ir: design,
@@ -103,20 +106,58 @@ describe("buildUiManifestV2", () => {
     expect(manifest.root).toMatchObject({
       role: "heading",
       content: { text: "Modal title", label: "Modal title" },
+      sourceNodeIds: ["4:314", "4:320"],
+      evidence: expect.arrayContaining([
+        { kind: "direct-text-source-node", value: "4:320" },
+        {
+          kind: "direct-text-selection-rule",
+          value: "unique-leading-typography-dominant-direct-text",
+        },
+      ]),
       children: [],
     });
   });
 
-  it("does not invent content for an exact content boundary without direct text", () => {
+  it("projects a single visible direct text child with the single-child rule", () => {
     const design = structuredClone(designFixture);
     design.nodes["4:314"]!.component = { key: "ModalHeader" };
     design.nodes["4:314"]!.children = ["4:319"];
+    design.nodes["4:319"] = textNode("4:319", "Modal title", true);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ModalHeader",
+          kind: "content",
+          role: "heading",
+        },
+      ],
+    });
+
+    expect(manifest.root).toMatchObject({
+      content: { text: "Modal title", label: "Modal title" },
+      sourceNodeIds: ["4:314", "4:319"],
+      evidence: expect.arrayContaining([
+        {
+          kind: "direct-text-selection-rule",
+          value: "single-visible-direct-text",
+        },
+      ]),
+    });
+  });
+
+  it("does not project a smaller leading eyebrow over a later dominant title", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ModalHeader" };
+    design.nodes["4:314"]!.children = ["4:319", "4:320"];
     design.nodes["4:319"] = {
-      ...structuredClone(design.nodes["4:316"]!),
-      id: "4:319",
-      name: "Nested container",
-      children: [],
-      source: { provider: "pixso", nodeId: "4:319" },
+      ...textNode("4:319", "Eyebrow", true),
+      geometry: { x: 0, y: 0, width: 100, height: 16 },
+    };
+    design.nodes["4:320"] = {
+      ...textNode("4:320", "Modal title", true),
+      geometry: { x: 0, y: 20, width: 100, height: 24 },
     };
 
     const manifest = buildUiManifestV2({
@@ -131,6 +172,60 @@ describe("buildUiManifestV2", () => {
     });
 
     expect(manifest.root.content).toBeUndefined();
+    expect(manifest.root.sourceNodeIds).toEqual(["4:314"]);
+  });
+
+  it("does not silently choose between multiple visible direct text children", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ModalHeader" };
+    design.nodes["4:314"]!.children = ["4:319", "4:320"];
+    design.nodes["4:319"] = textNode("4:319", "Modal title", true);
+    design.nodes["4:320"] = textNode("4:320", "Supporting copy", true);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ModalHeader",
+          kind: "content",
+          role: "heading",
+        },
+      ],
+    });
+
+    expect(manifest.root.content).toBeUndefined();
+    expect(manifest.root.sourceNodeIds).toEqual(["4:314"]);
+    expect(manifest.root.evidence).not.toContainEqual(
+      expect.objectContaining({ kind: "direct-text-source-node" }),
+    );
+  });
+
+  it("does not invent content for an exact content boundary without one visible direct text child", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ModalHeader" };
+    design.nodes["4:314"]!.children = ["4:319", "4:320"];
+    design.nodes["4:319"] = {
+      ...structuredClone(design.nodes["4:316"]!),
+      id: "4:319",
+      name: "Nested container",
+      children: [],
+      source: { provider: "pixso", nodeId: "4:319" },
+    };
+    design.nodes["4:320"] = textNode("4:320", "Hidden", false);
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ModalHeader",
+          kind: "content",
+          role: "heading",
+        },
+      ],
+    });
+
+    expect(manifest.root.content).toBeUndefined();
+    expect(manifest.root.sourceNodeIds).toEqual(["4:314"]);
   });
 
   it("blocks different semantic roles that normalize to one interaction key", () => {

@@ -118,28 +118,14 @@
       "semanticRole": "heading"
     },
     {
-      "bindings": [
-        {
-          "componentId": "base.Field",
-          "export": "Field",
-          "exportKind": "named",
-          "package": "@sber-space-ui/field"
-        },
-        {
-          "componentId": "base.FormControl",
-          "export": "FormControl",
-          "exportKind": "named",
-          "package": "@sber-space-ui/form-control"
-        },
-        {
-          "componentId": "base.FormLabel",
-          "export": "FormLabel",
-          "exportKind": "named",
-          "package": "@sber-space-ui/form-control"
-        }
-      ],
+      "binding": {
+        "componentId": "base.Field",
+        "export": "Field",
+        "exportKind": "named",
+        "package": "@sber-space-ui/field"
+      },
       "confidence": 1,
-      "decision": "compose",
+      "decision": "reuse",
       "diagnosticCodes": [],
       "evidence": [
         {
@@ -243,15 +229,15 @@
   },
   "summary": {
     "blocked": 0,
-    "compose": 2,
+    "compose": 1,
     "fallback": 0,
-    "reuse": 6
+    "reuse": 7
   },
   "target": {
     "designSystem": "sber-space-ui",
     "designSystemVersion": "2.0.0",
     "framework": "react",
     "language": "typescript",
-    "packSha256": "17d47b405f794c857c009cba899a834a40f76846fd96da37933d0b3d587c9e64"
+    "packSha256": "1915793b0d2b54b97198117ed35d45843cc189ecb4ae80bdedf8e2c6c7cf8ed3"
   }
 }
