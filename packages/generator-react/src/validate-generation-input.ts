@@ -34,7 +34,11 @@ export function validateGenerationInput(
 
   assertSourceProofs(input);
   assertPackProof(input);
-  assertResolutionAuthorization(input);
+  const canonicalPlan = assertResolutionAuthorization(input);
+  const effectiveDiagnostics = mergeDiagnostics(
+    canonicalPlan.diagnostics,
+    input.resolutionPlan.diagnostics,
+  );
 
   const manifestNodes = flatten(input.uiManifest.root);
   const resolutionsByManifestNodeId = indexResolutions(input);
@@ -55,19 +59,21 @@ export function validateGenerationInput(
   if (
     input.resolutionPlan.summary.blocked > 0 ||
     input.resolutionPlan.nodes.some((node) => node.decision === "blocked") ||
-    input.resolutionPlan.diagnostics.some((diagnostic) => diagnostic.blocking)
+    effectiveDiagnostics.some((diagnostic) => diagnostic.blocking)
   ) {
     return {
       ...common,
       status: "blocked",
-      diagnostics: blockedDiagnostics(input),
+      diagnostics: blockedDiagnostics(input, effectiveDiagnostics),
     };
   }
 
   return { ...common, status: "ready" };
 }
 
-function assertResolutionAuthorization(input: ReactGenerationInput): void {
+function assertResolutionAuthorization(
+  input: ReactGenerationInput,
+): ReturnType<typeof resolveUiManifestV2> {
   let canonical: ReturnType<typeof resolveUiManifestV2>;
   try {
     canonical = resolveUiManifestV2({
@@ -95,6 +101,7 @@ function assertResolutionAuthorization(input: ReactGenerationInput): void {
       "Resolution decisions are not authorized by the loaded design-system pack",
     );
   }
+  return canonical;
 }
 
 function assertSourceProofs(input: ReactGenerationInput): void {
@@ -160,9 +167,34 @@ function assertExactResolutionJoin(
   }
 }
 
-function blockedDiagnostics(input: ReactGenerationInput): Diagnostic[] {
+function mergeDiagnostics(
+  canonical: Diagnostic[],
+  stored: Diagnostic[],
+): Diagnostic[] {
+  const diagnosticsByIdentity = new Map<string, Diagnostic>();
+  for (const diagnostic of [...canonical, ...stored]) {
+    const identity = stableStringify({
+      severity: diagnostic.severity,
+      blocking: diagnostic.blocking,
+      stage: diagnostic.stage,
+      code: diagnostic.code,
+      source: diagnostic.source ?? null,
+    });
+    if (!diagnosticsByIdentity.has(identity)) {
+      diagnosticsByIdentity.set(identity, diagnostic);
+    }
+  }
+  return [...diagnosticsByIdentity.entries()]
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([, diagnostic]) => diagnostic);
+}
+
+function blockedDiagnostics(
+  input: ReactGenerationInput,
+  effectiveDiagnostics: Diagnostic[],
+): Diagnostic[] {
   return [
-    ...input.resolutionPlan.diagnostics,
+    ...effectiveDiagnostics,
     {
       severity: "error",
       blocking: true,

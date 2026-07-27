@@ -259,15 +259,7 @@ describe("validateGenerationInput", () => {
 
   it("preserves a stored blocking diagnostic without treating it as authority", () => {
     const input = validInput(pack);
-    const diagnostic: Diagnostic = {
-      severity: "error",
-      blocking: true,
-      stage: "component-resolution",
-      code: "COMPONENT_UNRESOLVED",
-      message: "The component cannot be resolved",
-      source: { manifestNodeId: "ui_action" },
-      evidence: {},
-    };
+    const diagnostic = blockingDiagnostic("STORED_ADDITIONAL_BLOCKER");
     input.resolutionPlan.diagnostics.push(diagnostic);
 
     const result = validateGenerationInput(input);
@@ -276,6 +268,7 @@ describe("validateGenerationInput", () => {
     if (result.status === "blocked") {
       expect(result.diagnostics).toEqual(
         expect.arrayContaining([
+          diagnostic,
           expect.objectContaining({
             code: "GENERATION_INPUT_BLOCKED",
             blocking: true,
@@ -283,6 +276,73 @@ describe("validateGenerationInput", () => {
         ]),
       );
     }
+  });
+
+  it("cannot be unblocked by deleting a canonical blocking diagnostic", () => {
+    const input = withCanonicalManifestBlocker(validInput(pack));
+    expect(input.resolutionPlan.summary.blocked).toBe(0);
+    expect(
+      input.resolutionPlan.nodes.every((node) => node.decision !== "blocked"),
+    ).toBe(true);
+    input.resolutionPlan.diagnostics = [];
+
+    const result = validateGenerationInput(input);
+
+    expect(result.status).toBe("blocked");
+    if (result.status === "blocked") {
+      expect(result.diagnostics).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            code: "CANONICAL_MANIFEST_BLOCKER",
+            blocking: true,
+          }),
+          expect.objectContaining({
+            code: "GENERATION_INPUT_BLOCKED",
+            blocking: true,
+          }),
+        ]),
+      );
+    }
+  });
+
+  it("deduplicates canonical and stored diagnostics deterministically", () => {
+    const input = withCanonicalManifestBlocker(validInput(pack));
+
+    const first = validateGenerationInput(input);
+    const second = validateGenerationInput(input);
+
+    expect(first).toEqual(second);
+    expect(first.status).toBe("blocked");
+    if (first.status === "blocked") {
+      expect(
+        first.diagnostics.filter(
+          (diagnostic) => diagnostic.code === "CANONICAL_MANIFEST_BLOCKER",
+        ),
+      ).toHaveLength(1);
+    }
+  });
+
+  it("does not authorize against mutable non-blocking diagnostic prose", () => {
+    const input = validInput(pack);
+    input.uiManifest.diagnostics.push({
+      severity: "warning",
+      blocking: false,
+      stage: "semantic-planning",
+      code: "SEMANTIC_REVIEW_NOTE",
+      message: "Canonical prose",
+      source: { manifestNodeId: "ui_action" },
+      evidence: { confidence: 0.9 },
+    });
+    input.resolutionPlan = structuredClone(
+      resolveUiManifestV2({
+        manifest: input.uiManifest,
+        designIr: input.designIr,
+        pack: input.pack,
+      }),
+    );
+    input.resolutionPlan.diagnostics[0]!.message = "Stored prose changed";
+
+    expect(validateGenerationInput(input).status).toBe("ready");
   });
 });
 
@@ -375,6 +435,32 @@ function composedInput(pack: LoadedDesignSystemPackV2): ReactGenerationInput {
     pack,
   });
   return input;
+}
+
+function withCanonicalManifestBlocker(
+  input: ReactGenerationInput,
+): ReactGenerationInput {
+  input.uiManifest.diagnostics.push(
+    blockingDiagnostic("CANONICAL_MANIFEST_BLOCKER"),
+  );
+  input.resolutionPlan = resolveUiManifestV2({
+    manifest: input.uiManifest,
+    designIr: input.designIr,
+    pack: input.pack,
+  });
+  return input;
+}
+
+function blockingDiagnostic(code: string): Diagnostic {
+  return {
+    severity: "error",
+    blocking: true,
+    stage: "semantic-planning",
+    code,
+    message: `Blocking diagnostic ${code}`,
+    source: { manifestNodeId: "ui_action" },
+    evidence: {},
+  };
 }
 
 function refreshManifestHash(input: ReactGenerationInput): void {

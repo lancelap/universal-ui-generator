@@ -132,6 +132,49 @@ describe("generateReactBundle", () => {
     });
   });
 
+  it("keeps output report-only when the stored plan deletes a canonical blocker", () => {
+    const blocked = structuredClone(input) as ReactGenerationInput;
+    blocked.uiManifest.diagnostics.push({
+      severity: "error",
+      blocking: true,
+      stage: "semantic-planning",
+      code: "CANONICAL_MANIFEST_BLOCKER",
+      message: "The exact UI manifest blocks generation",
+      source: { manifestNodeId: blocked.uiManifest.root.id },
+      evidence: {},
+    });
+    blocked.resolutionPlan = resolveUiManifestV2({
+      manifest: blocked.uiManifest,
+      designIr: blocked.designIr,
+      pack: blocked.pack,
+    });
+    expect(blocked.resolutionPlan.summary.blocked).toBe(0);
+    expect(
+      blocked.resolutionPlan.nodes.every(
+        (resolution) => resolution.decision !== "blocked",
+      ),
+    ).toBe(true);
+    blocked.resolutionPlan.diagnostics = [];
+
+    const result = generateReactBundle(blocked);
+
+    expect(result).toMatchObject({
+      status: "blocked",
+      files: [],
+      report: {
+        status: "blocked",
+        files: [],
+        validation: { syntax: "not-run", targetTypecheck: "not-run" },
+        diagnostics: expect.arrayContaining([
+          expect.objectContaining({
+            code: "CANONICAL_MANIFEST_BLOCKER",
+            blocking: true,
+          }),
+        ]),
+      },
+    });
+  });
+
   it("emits linked fallback TSX and CSS-module artifacts", () => {
     const result = generateReactBundle(fallbackInput);
     const rootTsx = new TextDecoder().decode(
