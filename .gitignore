@@ -1,6 +1,10 @@
 .worktrees/
 node_modules/
 dist/
+!/dist/
+/dist/*
+!/dist/qwen-adapter.mjs
+!/dist/qwen-adapter.provenance.json
 coverage/
 .uig/
 .env

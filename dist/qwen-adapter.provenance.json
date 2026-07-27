@@ -1,0 +1,11 @@
+{
+  "artifact": "dist/qwen-adapter.mjs",
+  "buildCommand": "pnpm build:qwen-extension",
+  "bundler": "esbuild@0.28.1",
+  "lockfile": "pnpm-lock.yaml",
+  "lockfileSha256": "eba1c6388373a08810dcce5160febcec4733f8578c369afba387425e9d86d759",
+  "node": ">=22",
+  "schema": "uig-qwen-adapter-provenance/v1",
+  "sha256": "789c1a49c1017508ae70c2f7064894e56322aabc76945238f64353703a8b9e70",
+  "sourceEntry": "extensions/qwen-cli/src/server.ts"
+}
