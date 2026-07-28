@@ -244742,12 +244742,29 @@ var UiManifestSchema = closedObject({
   root: UiNodeSchema,
   diagnostics: Type.Array(DiagnosticSchema)
 });
-var PixsoSemanticMappingSchema = closedObject({
+var PixsoSemanticMappingV1Schema = closedObject({
   componentKey: Type.String({ minLength: 1 }),
   variant: Type.Optional(Type.String({ minLength: 1 })),
   kind: UiNodeKindSchema,
   role: Type.String({ minLength: 1 })
 });
+var ActionGroupProjectionSchema = closedObject({
+  kind: Type.Literal("action-group"),
+  candidate: Type.Literal("button-shape-with-visible-label"),
+  order: Type.Literal("visual"),
+  roles: Type.Array(Type.String({ minLength: 1 }), { minItems: 1 })
+});
+var PixsoSemanticMappingV2Schema = closedObject({
+  componentKey: Type.String({ minLength: 1 }),
+  variant: Type.Optional(Type.String({ minLength: 1 })),
+  kind: UiNodeKindSchema,
+  role: Type.String({ minLength: 1 }),
+  projection: Type.Optional(ActionGroupProjectionSchema)
+});
+var PixsoSemanticMappingSchema = Type.Union([
+  PixsoSemanticMappingV1Schema,
+  PixsoSemanticMappingV2Schema
+]);
 
 // packages/contracts/src/design-system-pack.ts
 var DesignSystemPackSchema = closedObject({
@@ -244811,10 +244828,15 @@ var SemanticPolicySchema = closedObject({
   schema: Type.Literal("semantic-policy/v1"),
   roles: Type.Record(Type.String({ minLength: 1 }), SemanticRolePolicySchema)
 });
-var PixsoMapSchema = closedObject({
+var PixsoMapV1Schema = closedObject({
   schema: Type.Literal("pixso-map/v1"),
-  mappings: Type.Array(PixsoSemanticMappingSchema)
+  mappings: Type.Array(PixsoSemanticMappingV1Schema)
 });
+var PixsoMapV2Schema = closedObject({
+  schema: Type.Literal("pixso-map/v2"),
+  mappings: Type.Array(PixsoSemanticMappingV2Schema)
+});
+var PixsoMapSchema = Type.Union([PixsoMapV1Schema, PixsoMapV2Schema]);
 var CompositionRuleSchema = closedObject({
   id: Type.String({ minLength: 1 }),
   semanticRole: Type.String({ minLength: 1 }),
@@ -244909,6 +244931,27 @@ var GenerationRunSchema = closedObject({
     resolutionPlan: Type.String({ minLength: 1 }),
     diagnostics: Type.String({ minLength: 1 })
   })
+});
+
+// packages/contracts/src/normalization-provenance.ts
+var NormalizationOriginKindSchema = Type.Union([
+  Type.Literal("instance-value"),
+  Type.Literal("instance-override"),
+  Type.Literal("component-default")
+]);
+var NormalizationValueOriginSchema = closedObject({
+  targetNodeId: Type.String({ minLength: 1 }),
+  targetPath: Type.String({ pattern: "^/" }),
+  kind: NormalizationOriginKindSchema,
+  sourceNodeId: Type.String({ minLength: 1 }),
+  componentKey: Type.Optional(Type.String({ minLength: 1 })),
+  componentDefinitionNodeId: Type.Optional(Type.String({ minLength: 1 })),
+  sourcePropertyPath: Type.Optional(Type.String({ minLength: 1 }))
+});
+var NormalizationProvenanceV1Schema = closedObject({
+  schema: Type.Literal("normalization-provenance/v1"),
+  sourceArtifactId: Type.String({ minLength: 1 }),
+  values: Type.Array(NormalizationValueOriginSchema)
 });
 
 // packages/contracts/src/resolution-plan.ts
@@ -249057,6 +249100,7 @@ async function loadCommonDocuments(root, manifest) {
   };
 }
 function validateCommonDocuments(documents) {
+  validatePixsoMap(documents.pixsoMap);
   const indexes = buildCatalogIndexes(
     documents.catalog.components,
     documents.semanticPolicy
@@ -249072,6 +249116,25 @@ function validateCommonDocuments(documents) {
     verification: documents.verification
   });
   return indexes;
+}
+function validatePixsoMap(pixsoMap) {
+  for (const mapping of pixsoMap.mappings) {
+    if (!("projection" in mapping) || mapping.projection === void 0) {
+      continue;
+    }
+    if (mapping.kind !== "group" || mapping.role !== "actionGroup") {
+      throw new DesignSystemPackError(
+        "DESIGN_SYSTEM_PACK_INVALID",
+        "Action-group projection requires a group/actionGroup mapping"
+      );
+    }
+    if (new Set(mapping.projection.roles).size !== mapping.projection.roles.length) {
+      throw new DesignSystemPackError(
+        "DESIGN_SYSTEM_PACK_INVALID",
+        "Action-group projection roles must be unique"
+      );
+    }
+  }
 }
 function isSchemaDocument(value) {
   return typeof value === "object" && value !== null && "schema" in value && typeof value.schema === "string";
@@ -264959,6 +265022,338 @@ function hex3(value) {
   return value.toString(16).padStart(2, "0").toUpperCase();
 }
 
+// packages/design-normalizer/src/materialize-pixso-instance.ts
+function materializePixsoRoot(_input) {
+  const definitions = buildDefinitionsByKey(_input.componentDefinitions);
+  assertNoInheritanceCycle(_input.root, definitions, []);
+  const origins = /* @__PURE__ */ new WeakMap();
+  return {
+    root: materializeNode(_input.root, definitions, origins),
+    origins
+  };
+}
+function buildDefinitionsByKey(values) {
+  const definitions = /* @__PURE__ */ new Map();
+  const visit2 = (value) => {
+    if (!isRecord(value)) {
+      return;
+    }
+    if (typeof value.componentKey === "string" && value.componentKey.length > 0 && value.type === "SYMBOL") {
+      const existing = definitions.get(value.componentKey) ?? [];
+      existing.push(value);
+      definitions.set(value.componentKey, existing);
+    }
+    if (Array.isArray(value.childNode)) {
+      value.childNode.forEach(visit2);
+    }
+  };
+  for (const value of values) {
+    visit2(value);
+  }
+  return definitions;
+}
+function assertNoInheritanceCycle(instance, definitions, activeKeys) {
+  if (typeof instance.componentKey !== "string" || instance.componentKey.length === 0) {
+    return;
+  }
+  const identity = `${instance.componentKey}\0${typeof instance.componentNormName === "string" ? instance.componentNormName : ""}`;
+  if (activeKeys.includes(identity)) {
+    throw new DesignNormalizationError(
+      "PIXSO_COMPONENT_INHERITANCE_CYCLE",
+      `Pixso component inheritance cycle: ${[...activeKeys, identity].join(
+        " -> "
+      )}`
+    );
+  }
+  const definition = resolveDefinition(instance, definitions);
+  if (!definition) {
+    return;
+  }
+  for (const nestedInstance of collectNestedComponentInstances(definition)) {
+    assertNoInheritanceCycle(nestedInstance, definitions, [
+      ...activeKeys,
+      identity
+    ]);
+  }
+}
+function collectNestedComponentInstances(root) {
+  const instances = [];
+  const visit2 = (value, isRoot) => {
+    if (!isRecord(value)) {
+      return;
+    }
+    if (!isRoot && typeof value.componentKey === "string" && value.componentKey.length > 0) {
+      instances.push(value);
+    }
+    if (Array.isArray(value.childNode)) {
+      value.childNode.forEach((child) => visit2(child, false));
+    }
+  };
+  visit2(root, true);
+  return instances.sort(
+    (left, right) => rawNodeId(left, "").localeCompare(rawNodeId(right, ""))
+  );
+}
+function resolveDefinition(instance, definitions) {
+  if (typeof instance.componentKey !== "string" || instance.componentKey.length === 0) {
+    return void 0;
+  }
+  const candidates = definitions.get(instance.componentKey) ?? [];
+  const variant = typeof instance.componentNormName === "string" ? instance.componentNormName : void 0;
+  const compatible = variant ? candidates.filter((candidate2) => candidate2.componentNormName === variant) : candidates;
+  if (compatible.length === 1) {
+    return compatible[0];
+  }
+  if (compatible.length === 0 && candidates.length === 1) {
+    return candidates[0];
+  }
+  if (compatible.length === 0 && candidates.length === 0) {
+    return void 0;
+  }
+  throw new DesignNormalizationError(
+    "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
+    `Pixso component key ${instance.componentKey} has multiple compatible definitions`
+  );
+}
+function materializeNode(source, definitions, origins) {
+  const output = cloneOwnFields(source, origins);
+  const componentKey = typeof source.componentKey === "string" && source.componentKey.length > 0 ? source.componentKey : void 0;
+  const definition = componentKey ? resolveDefinition(source, definitions) : void 0;
+  const defaults = definition ? collectDefinitionDefaults(definition) : /* @__PURE__ */ new Map();
+  let propertyForest = [];
+  if (Array.isArray(source.props)) {
+    const effectiveProperties = source.props.flatMap((property) => {
+      if (!isRecord(property)) {
+        return [];
+      }
+      const path = canonicalPropertyPath(property.pathString).path;
+      return [
+        mergeEffectiveRecord(property, defaults.get(path), {
+          origins,
+          ...componentKey ? { componentKey } : {},
+          ...definition ? { definition } : {}
+        })
+      ];
+    });
+    propertyForest = buildPropertyForest(effectiveProperties);
+  } else if (source.props !== void 0) {
+    output.props = structuredClone(source.props);
+  }
+  const materializedChildren = [];
+  if (Array.isArray(source.childNode)) {
+    for (const child of source.childNode) {
+      if (isRecord(child)) {
+        materializedChildren.push(materializeNode(child, definitions, origins));
+      }
+    }
+  }
+  if (Array.isArray(source.childNode) || Array.isArray(source.props) || propertyForest.length > 0) {
+    output.childNode = [...materializedChildren, ...propertyForest];
+  }
+  return output;
+}
+function cloneOwnFields(source, origins) {
+  const output = {};
+  const recordOrigins = /* @__PURE__ */ new Map();
+  const sourceNodeId = rawNodeId(source, "instance");
+  for (const [field, value] of Object.entries(source)) {
+    if (field === "childNode" || field === "props") {
+      continue;
+    }
+    output[field] = structuredClone(value);
+    recordOrigins.set(field, {
+      kind: "instance-value",
+      sourceNodeId,
+      ...typeof source.pathString === "string" ? { sourcePropertyPath: source.pathString } : {}
+    });
+  }
+  origins.set(output, recordOrigins);
+  return output;
+}
+function collectDefinitionDefaults(definition) {
+  const defaults = /* @__PURE__ */ new Map();
+  const visit2 = (node, prefix) => {
+    if (prefix.length > 0) {
+      defaults.set(prefix, {
+        record: node,
+        path: prefix,
+        sourceNodeId: rawNodeId(node, prefix)
+      });
+    }
+    if (Array.isArray(node.props)) {
+      for (const property of node.props) {
+        if (!isRecord(property) || typeof property.pathString !== "string") {
+          continue;
+        }
+        const ownerPath = node === definition ? "" : rawNodeId(node, prefix);
+        const path = qualifyPath(ownerPath, property.pathString);
+        defaults.set(path, {
+          record: property,
+          path,
+          sourceNodeId: rawNodeId(property, path)
+        });
+      }
+    }
+    if (Array.isArray(node.childNode)) {
+      for (const child of node.childNode) {
+        if (!isRecord(child)) {
+          continue;
+        }
+        const localPath = rawNodeId(child, "");
+        if (localPath.length > 0) {
+          visit2(child, qualifyPath(prefix, localPath));
+        }
+      }
+    }
+  };
+  if (Array.isArray(definition.props)) {
+    visit2(definition, "");
+  }
+  if (Array.isArray(definition.childNode)) {
+    for (const child of definition.childNode) {
+      if (isRecord(child)) {
+        const path = rawNodeId(child, "");
+        if (path.length > 0) {
+          visit2(child, path);
+        }
+      }
+    }
+  }
+  return defaults;
+}
+function mergeEffectiveRecord(instance, fallback, context) {
+  const output = {};
+  const recordOrigins = /* @__PURE__ */ new Map();
+  const fields = /* @__PURE__ */ new Set([
+    ...Object.keys(fallback?.record ?? {}),
+    ...Object.keys(instance)
+  ]);
+  const instanceNodeId = rawNodeId(
+    instance,
+    typeof instance.pathString === "string" ? instance.pathString : "instance"
+  );
+  const definitionNodeId = context.definition ? rawNodeId(context.definition, "definition") : void 0;
+  for (const field of [...fields].sort()) {
+    const hasInstance = Object.prototype.hasOwnProperty.call(instance, field);
+    const hasFallback = Object.prototype.hasOwnProperty.call(
+      fallback?.record ?? {},
+      field
+    );
+    if (!hasInstance && (field === "childNode" || field === "props" || field === "guid")) {
+      continue;
+    }
+    if (!hasInstance && !hasFallback) {
+      continue;
+    }
+    output[field] = hasInstance ? hasFallback ? mergeValue(fallback.record[field], instance[field]) : structuredClone(instance[field]) : structuredClone(fallback.record[field]);
+    const fromInstance = hasInstance;
+    recordOrigins.set(field, {
+      kind: fromInstance ? hasFallback ? "instance-override" : "instance-value" : "component-default",
+      sourceNodeId: fromInstance ? instanceNodeId : fallback.sourceNodeId,
+      ...context.componentKey ? { componentKey: context.componentKey } : {},
+      ...definitionNodeId ? { componentDefinitionNodeId: definitionNodeId } : {},
+      ...typeof instance.pathString === "string" ? { sourcePropertyPath: instance.pathString } : fallback ? { sourcePropertyPath: fallback.path } : {}
+    });
+  }
+  context.origins.set(output, recordOrigins);
+  return output;
+}
+function mergeValue(fallback, override) {
+  if (isRecord(fallback) && isRecord(override)) {
+    const output = {};
+    const keys = /* @__PURE__ */ new Set([...Object.keys(fallback), ...Object.keys(override)]);
+    for (const key of [...keys].sort()) {
+      output[key] = Object.prototype.hasOwnProperty.call(override, key) ? Object.prototype.hasOwnProperty.call(fallback, key) ? mergeValue(fallback[key], override[key]) : structuredClone(override[key]) : structuredClone(fallback[key]);
+    }
+    return output;
+  }
+  return structuredClone(override);
+}
+function canonicalPropertyPath(value) {
+  if (typeof value !== "string") {
+    throw new DesignNormalizationError(
+      "PIXSO_PROPERTY_PATH_INVALID",
+      "Pixso property path must be a string"
+    );
+  }
+  const segments = value.split("/");
+  if (segments.length === 0 || segments.some(
+    (segment) => segment === "" || segment === "." || segment === ".."
+  )) {
+    throw new DesignNormalizationError(
+      "PIXSO_PROPERTY_PATH_INVALID",
+      `Pixso property path is invalid: ${JSON.stringify(value)}`
+    );
+  }
+  return { path: segments.join("/"), segments };
+}
+function buildPropertyForest(properties) {
+  const byPath = /* @__PURE__ */ new Map();
+  for (const property of properties) {
+    const { path } = canonicalPropertyPath(property.pathString);
+    if (byPath.has(path)) {
+      throw new DesignNormalizationError(
+        "PIXSO_PROPERTY_IDENTITY_CONFLICT",
+        `Pixso property path ${path} has multiple records`
+      );
+    }
+    byPath.set(path, property);
+  }
+  const roots = [];
+  for (const [path, property] of [...byPath.entries()].sort(
+    ([left], [right]) => left.localeCompare(right)
+  )) {
+    const segments = path.split("/");
+    let parent;
+    for (let length = segments.length - 1; length > 0; length -= 1) {
+      parent = byPath.get(segments.slice(0, length).join("/"));
+      if (parent) {
+        break;
+      }
+    }
+    if (!parent) {
+      roots.push(property);
+      continue;
+    }
+    const existingChildren = Array.isArray(parent.childNode) ? parent.childNode.filter(isRecord) : [];
+    parent.childNode = [...existingChildren, property].sort(
+      compareVisualThenPath
+    );
+  }
+  return roots.sort(compareVisualThenPath);
+}
+function compareVisualThenPath(left, right) {
+  const vertical = sortableNumber(left.top) - sortableNumber(right.top);
+  if (vertical !== 0) {
+    return vertical;
+  }
+  const horizontal = sortableNumber(left.left) - sortableNumber(right.left);
+  if (horizontal !== 0) {
+    return horizontal;
+  }
+  const leftPath = typeof left.pathString === "string" ? left.pathString : rawNodeId(left, "");
+  const rightPath = typeof right.pathString === "string" ? right.pathString : rawNodeId(right, "");
+  return leftPath.localeCompare(rightPath);
+}
+function sortableNumber(value) {
+  return typeof value === "number" && Number.isFinite(value) ? value : Number.POSITIVE_INFINITY;
+}
+function qualifyPath(prefix, path) {
+  if (prefix.length === 0 || path === prefix || path.startsWith(`${prefix}/`)) {
+    return path;
+  }
+  return `${prefix}/${path}`;
+}
+function rawNodeId(node, fallback) {
+  for (const field of ["guid", "componentId", "pathString"]) {
+    const value = node[field];
+    if (typeof value === "string" && value.length > 0) {
+      return value;
+    }
+  }
+  return fallback;
+}
+
 // packages/design-normalizer/src/normalize-effect.ts
 function normalizeEffects(value) {
   if (!Array.isArray(value)) {
@@ -265220,10 +265615,12 @@ function normalizePixsoNode(node, childIds, context) {
 function normalizePixsoNodeV2(node, childIds, context) {
   const normalized = normalizePixsoNode(node, childIds, context);
   const position = normalizePosition(node);
-  return {
+  const result = {
     ...normalized,
     ...position ? { position } : {}
   };
+  recordKnownOrigins(result, node, context);
+  return result;
 }
 function nonNegative(value, field) {
   const number4 = finiteNumber(value, field);
@@ -265254,17 +265651,95 @@ function normalizeComponent(node) {
     ...isRecord(node.props) ? { properties: node.props } : {}
   };
 }
+var normalizedTargetsByRawField = {
+  visible: ["/visible"],
+  left: ["/geometry/x", "/position/inset/left"],
+  top: ["/geometry/y", "/position/inset/top"],
+  width: ["/geometry/width"],
+  height: ["/geometry/height"],
+  nodeText: ["/text/value"],
+  fontSize: ["/text/fontSize"],
+  cornerRadius: [
+    "/appearance/radii/topLeft",
+    "/appearance/radii/topRight",
+    "/appearance/radii/bottomRight",
+    "/appearance/radii/bottomLeft"
+  ],
+  fills: ["/appearance/fills"],
+  fillPaints: ["/appearance/fills"],
+  strokes: ["/appearance/borders"],
+  strokePaints: ["/appearance/borders"],
+  strokeWeight: ["/appearance/borders"],
+  effects: ["/appearance/shadows"],
+  opacity: ["/appearance/opacity"],
+  autoLayout: ["/layout"],
+  autoLayoutAbsolutePos: ["/position/mode"],
+  componentKey: ["/component/key"],
+  componentNormName: ["/component/variant"],
+  props: ["/component/properties"]
+};
+function recordKnownOrigins(normalized, rawNode, context) {
+  for (const [rawField, targets] of Object.entries(
+    normalizedTargetsByRawField
+  )) {
+    const origin = context.rawOrigins?.get(rawField);
+    if (!origin || !Object.prototype.hasOwnProperty.call(rawNode, rawField)) {
+      continue;
+    }
+    for (const targetPath of targets) {
+      if (hasJsonPointer(normalized, targetPath)) {
+        context.provenance?.push({
+          targetNodeId: normalized.id,
+          targetPath,
+          ...origin
+        });
+      }
+    }
+  }
+}
+function hasJsonPointer(value, pointer) {
+  let current = value;
+  for (const segment of pointer.slice(1).split("/")) {
+    if (!isRecord(current) || !Object.prototype.hasOwnProperty.call(current, segment)) {
+      return false;
+    }
+    current = current[segment];
+  }
+  return true;
+}
 
 // packages/design-normalizer/src/normalize-design.ts
-function normalizePixsoDesignV2(input) {
-  return normalizePixsoDesignVersion(input, "v2");
+function normalizePixsoDesignV2WithProvenance(input) {
+  const provenance = [];
+  const designIr = normalizePixsoDesignVersion(
+    input,
+    "v2",
+    provenance
+  );
+  provenance.sort(compareOrigins);
+  return {
+    designIr,
+    provenance: validateWithSchema(NormalizationProvenanceV1Schema, {
+      schema: "normalization-provenance/v1",
+      sourceArtifactId: input.artifactId,
+      values: provenance
+    })
+  };
 }
-function normalizePixsoDesignVersion(input, version2) {
+function normalizePixsoDesignVersion(input, version2, provenance) {
   const envelope = readPixsoEnvelope(input.rawDsl);
-  const root = selectRoot(envelope.dsl.pixTreeDslNodes, input.rootNodeId);
-  if (!isRecord(root)) {
+  const selectedRoot = selectRoot(
+    envelope.dsl.pixTreeDslNodes,
+    input.rootNodeId
+  );
+  if (!isRecord(selectedRoot)) {
     throw unsupported("Pixso root node must be an object");
   }
+  const materialized = version2 === "v2" ? materializePixsoRoot({
+    root: selectedRoot,
+    componentDefinitions: envelope.dsl.pixComponentTreeDslNodes
+  }) : void 0;
+  const root = materialized?.root ?? selectedRoot;
   const nodeIndex = buildNodeIndex([root]);
   addNodesToIndex(nodeIndex, envelope.dsl.pixTreeDslNodes, false);
   const diagnostics = [];
@@ -265289,10 +265764,13 @@ function normalizePixsoDesignVersion(input, version2) {
     const childIds = resolvedChildren.map(
       (child, index) => traverse(child, `${id}/${index}`)
     );
+    const rawOrigins = materialized?.origins.get(rawNode);
     const context = {
       artifactId: input.artifactId,
       diagnostics,
-      nodeId: id
+      nodeId: id,
+      ...rawOrigins ? { rawOrigins } : {},
+      ...provenance ? { provenance } : {}
     };
     nodes[id] = version2 === "v2" ? normalizePixsoNodeV2(rawNode, childIds, context) : normalizePixsoNode(rawNode, childIds, context);
     activeObjects.delete(rawNode);
@@ -265325,6 +265803,9 @@ function normalizePixsoDesignVersion(input, version2) {
       error46
     );
   }
+}
+function compareOrigins(left, right) {
+  return left.targetNodeId.localeCompare(right.targetNodeId) || left.targetPath.localeCompare(right.targetPath) || left.kind.localeCompare(right.kind) || left.sourceNodeId.localeCompare(right.sourceNodeId);
 }
 function isVisualPropertyOverride(value) {
   return isRecord(value) && [value.left, value.top, value.width, value.height].every(
@@ -265440,7 +265921,7 @@ function createExactComponentRecognizer(mappings) {
     byKey.set(mapping.componentKey, current);
   }
   return {
-    recognize(node) {
+    match(node) {
       if (!node.component) {
         return void 0;
       }
@@ -265452,21 +265933,24 @@ function createExactComponentRecognizer(mappings) {
         return void 0;
       }
       return {
-        kind: selected.kind,
-        role: selected.role,
-        confidence: 1,
-        evidence: [
-          { kind: "component-key", value: node.component.key, weight: 1 },
-          ...selected.variant ? [
-            {
-              kind: "component-variant",
-              value: selected.variant,
-              weight: 1
-            }
-          ] : [],
-          { kind: "source-node", value: node.id }
-        ],
-        sourceNodeIds: [node.id]
+        mapping: selected,
+        recognition: {
+          kind: selected.kind,
+          role: selected.role,
+          confidence: 1,
+          evidence: [
+            { kind: "component-key", value: node.component.key, weight: 1 },
+            ...selected.variant ? [
+              {
+                kind: "component-variant",
+                value: selected.variant,
+                weight: 1
+              }
+            ] : [],
+            { kind: "source-node", value: node.id }
+          ],
+          sourceNodeIds: [node.id]
+        }
       };
     }
   };
@@ -265773,24 +266257,160 @@ function normalizeInteractionKey(role) {
   ).join("");
 }
 
+// packages/semantic-planner/src/project-compound-boundary.ts
+function projectCompoundBoundary(_input) {
+  if (!("projection" in _input.mapping) || _input.mapping.projection === void 0) {
+    return { children: [], diagnostics: [] };
+  }
+  const rejectedCandidates = [];
+  const candidates = discoverCandidates(
+    _input.boundary,
+    _input.ir,
+    rejectedCandidates
+  );
+  const overlapping = overlappingCandidateIds(candidates);
+  const accepted = candidates.filter((candidate2) => !overlapping.has(candidate2.boundaryNodeId)).sort(compareCandidates);
+  for (const nodeId of [...overlapping].sort()) {
+    rejectedCandidates.push({ nodeId, reason: "overlap" });
+  }
+  const roles = _input.mapping.projection.roles;
+  const children = accepted.slice(0, roles.length).map((candidate2, index) => ({
+    kind: "action",
+    role: roles[index],
+    boundaryNodeId: candidate2.boundaryNodeId,
+    labelNodeId: candidate2.labelNodeId,
+    label: candidate2.label
+  }));
+  if (accepted.length === roles.length) {
+    return { children, diagnostics: [] };
+  }
+  return {
+    children,
+    diagnostics: [
+      {
+        severity: "error",
+        blocking: true,
+        stage: "semantic-planning",
+        code: "SEMANTIC_COMPOUND_PROJECTION_INCOMPLETE",
+        message: `Compound action group expected ${roles.length} actions but found ${accepted.length}`,
+        source: {
+          artifactId: _input.ir.sourceArtifactId,
+          nodeId: _input.boundary.id
+        },
+        evidence: {
+          expectedRoles: roles,
+          acceptedCandidateNodeIds: accepted.map(
+            (candidate2) => candidate2.boundaryNodeId
+          ),
+          rejectedCandidates: rejectedCandidates.sort(
+            (left, right) => left.nodeId.localeCompare(right.nodeId)
+          )
+        }
+      }
+    ]
+  };
+}
+function discoverCandidates(boundary, ir, rejected) {
+  const candidates = [];
+  const visit2 = (nodeId, parentNodeId) => {
+    const node = ir.nodes[nodeId];
+    if (!node?.visible) {
+      return;
+    }
+    const directLabels = node.children.flatMap((childId) => {
+      const child = ir.nodes[childId];
+      return child?.visible && child.text?.value.trim() ? [{ nodeId: child.id, label: child.text.value }] : [];
+    });
+    const buttonLike = node.geometry.height > 0 && node.geometry.width >= node.geometry.height * 1.5;
+    if (buttonLike && directLabels.length === 1) {
+      candidates.push({
+        parentNodeId,
+        boundaryNodeId: node.id,
+        labelNodeId: directLabels[0].nodeId,
+        label: directLabels[0].label,
+        geometry: node.geometry
+      });
+      return;
+    }
+    if (buttonLike && directLabels.length > 1) {
+      rejected.push({ nodeId: node.id, reason: "ambiguous-label" });
+    }
+    for (const childId of node.children) {
+      visit2(childId, node.id);
+    }
+  };
+  for (const childId of boundary.children) {
+    visit2(childId, boundary.id);
+  }
+  return candidates;
+}
+function overlappingCandidateIds(candidates) {
+  const overlapping = /* @__PURE__ */ new Set();
+  for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
+    const left = candidates[leftIndex];
+    for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
+      const right = candidates[rightIndex];
+      if (left.parentNodeId === right.parentNodeId && rectanglesOverlap(left.geometry, right.geometry)) {
+        overlapping.add(left.boundaryNodeId);
+        overlapping.add(right.boundaryNodeId);
+      }
+    }
+  }
+  return overlapping;
+}
+function rectanglesOverlap(left, right) {
+  return left.x < right.x + right.width && left.x + left.width > right.x && left.y < right.y + right.height && left.y + left.height > right.y;
+}
+function compareCandidates(left, right) {
+  return left.geometry.y - right.geometry.y || left.geometry.x - right.geometry.x || left.boundaryNodeId.localeCompare(right.boundaryNodeId);
+}
+
 // packages/semantic-planner/src/build-ui-manifest-v2.ts
 function buildUiManifestV2(input) {
   const exact = createExactComponentRecognizer(input.exactMappings);
   const diagnostics = [];
   const ids = /* @__PURE__ */ new Map();
+  const reserveUiId = (role, sourceNodeId) => {
+    const baseId = `ui_${role}_${sanitize(sourceNodeId)}`;
+    const collision = (ids.get(baseId) ?? 0) + 1;
+    ids.set(baseId, collision);
+    return collision === 1 ? baseId : `${baseId}_${collision}`;
+  };
+  const buildProjected = (projected, compoundBoundaryNodeId) => ({
+    id: reserveUiId(projected.role, projected.boundaryNodeId),
+    kind: "action",
+    role: projected.role,
+    sourceNodeIds: [projected.boundaryNodeId, projected.labelNodeId],
+    layoutSourceNodeId: projected.boundaryNodeId,
+    confidence: 1,
+    evidence: [
+      { kind: "compound-boundary", value: compoundBoundaryNodeId },
+      {
+        kind: "projected-label-source-node",
+        value: projected.labelNodeId
+      },
+      { kind: "pack-declared-role", value: projected.role }
+    ],
+    content: { text: projected.label, label: projected.label },
+    children: []
+  });
   const build3 = (nodeId) => {
     const node = input.ir.nodes[nodeId];
     if (!node) {
       throw new Error(`Design node does not exist: ${nodeId}`);
     }
-    const exactRecognition = exact.recognize(node);
+    const exactMatch = exact.match(node);
+    const exactRecognition = exactMatch?.recognition;
     const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted = recognized && recognized.confidence >= confidencePolicy.warning;
     const role = accepted ? recognized.role : "unresolved";
     const directTextProjection = exactRecognition && !node.text?.value && (exactRecognition.kind === "content" || exactRecognition.kind === "action" || exactRecognition.kind === "control" && exactRecognition.role === "textInput") ? onlyVisibleDirectText(node.children, input.ir, exactRecognition.role) : void 0;
-    const baseId = `ui_${role}_${sanitize(node.id)}`;
-    const collision = (ids.get(baseId) ?? 0) + 1;
-    ids.set(baseId, collision);
+    const compoundProjection = exactMatch ? projectCompoundBoundary({
+      boundary: node,
+      mapping: exactMatch.mapping,
+      ir: input.ir
+    }) : { children: [], diagnostics: [] };
+    diagnostics.push(...compoundProjection.diagnostics);
     if (!accepted) {
       diagnostics.push({
         severity: "error",
@@ -265825,7 +266445,7 @@ function buildUiManifestV2(input) {
       });
     }
     return {
-      id: collision === 1 ? baseId : `${baseId}_${collision}`,
+      id: reserveUiId(role, node.id),
       kind: accepted ? recognized.kind : "unresolved",
       role,
       sourceNodeIds: accepted ? [
@@ -265858,7 +266478,9 @@ function buildUiManifestV2(input) {
           label: directTextProjection.text
         }
       } : {},
-      children: exactRecognition ? [] : node.children.flatMap(
+      children: exactRecognition ? compoundProjection.children.map(
+        (projected) => buildProjected(projected, node.id)
+      ) : node.children.flatMap(
         (childId) => input.ir.nodes[childId] ? [build3(childId)] : []
       )
     };
@@ -265932,6 +266554,7 @@ function createRunLayout(input) {
       run: "run.json",
       snapshot: "snapshot.json",
       designIr: "design-ir.json",
+      normalizationProvenance: "normalization-provenance.json",
       designSummary: "design-summary.json",
       uiManifest: "ui-manifest.json",
       resolutionPlan: `resolution-plan.${input.packId}.json`,
@@ -265980,11 +266603,12 @@ async function planFromSnapshot(input) {
     rawDsl,
     retrievedAt: now
   });
-  const designIr = normalizePixsoDesignV2({
+  const normalized = normalizePixsoDesignV2WithProvenance({
     artifactId: input.artifactId,
     rootNodeId: snapshot.source.nodeId,
     rawDsl
   });
+  const designIr = normalized.designIr;
   const designSummary = buildDesignSummary({
     ir: { ...designIr, schema: "design-ir/v1" }
   });
@@ -266033,6 +266657,7 @@ async function planFromSnapshot(input) {
     artifacts: {
       [layout.files.snapshot]: snapshot,
       [layout.files.designIr]: designIr,
+      [layout.files.normalizationProvenance]: normalized.provenance,
       [layout.files.designSummary]: designSummary,
       [layout.files.uiManifest]: uiManifest,
       [layout.files.resolutionPlan]: resolutionPlan,
