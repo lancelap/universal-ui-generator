@@ -44,15 +44,43 @@ export const UiManifestSchema = closedObject({
   diagnostics: Type.Array(DiagnosticSchema),
 });
 
-export const PixsoSemanticMappingSchema = closedObject({
+export const PixsoSemanticMappingV1Schema = closedObject({
   componentKey: Type.String({ minLength: 1 }),
   variant: Type.Optional(Type.String({ minLength: 1 })),
   kind: UiNodeKindSchema,
   role: Type.String({ minLength: 1 }),
 });
 
+export const ActionGroupProjectionSchema = closedObject({
+  kind: Type.Literal("action-group"),
+  candidate: Type.Literal("button-shape-with-visible-label"),
+  order: Type.Literal("visual"),
+  roles: Type.Array(Type.String({ minLength: 1 }), { minItems: 1 }),
+});
+
+export const PixsoSemanticMappingV2Schema = closedObject({
+  componentKey: Type.String({ minLength: 1 }),
+  variant: Type.Optional(Type.String({ minLength: 1 })),
+  kind: UiNodeKindSchema,
+  role: Type.String({ minLength: 1 }),
+  projection: Type.Optional(ActionGroupProjectionSchema),
+});
+
+export const PixsoSemanticMappingSchema = Type.Union([
+  PixsoSemanticMappingV1Schema,
+  PixsoSemanticMappingV2Schema,
+]);
+
 export type UiNodeKind = Static<typeof UiNodeKindSchema>;
 export type SemanticEvidence = Static<typeof SemanticEvidenceSchema>;
 export type UiNode = Static<typeof UiNodeSchema>;
 export type UiManifest = Static<typeof UiManifestSchema>;
-export type PixsoSemanticMapping = Static<typeof PixsoSemanticMappingSchema>;
+export type ActionGroupProjection = Static<typeof ActionGroupProjectionSchema>;
+export type PixsoSemanticMappingV1 = Static<
+  typeof PixsoSemanticMappingV1Schema
+>;
+export type PixsoSemanticMappingV2 = Static<
+  typeof PixsoSemanticMappingV2Schema
+>;
+export type PixsoSemanticMapping =
+  PixsoSemanticMappingV1 | PixsoSemanticMappingV2;

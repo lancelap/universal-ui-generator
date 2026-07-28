@@ -6,6 +6,7 @@ import {
   DesignSummarySchema,
   DesignSystemPackSchema,
   GenerationRunSchema,
+  PixsoMapSchema,
   ResolutionPlanSchema,
   UiManifestSchema,
   validateWithSchema,
@@ -234,5 +235,48 @@ describe("public contracts", () => {
         ],
       }),
     ).toThrow(/binding/);
+  });
+
+  it("accepts v1 and v2 Pixso maps without widening v1", () => {
+    const v1Map = {
+      schema: "pixso-map/v1",
+      mappings: [
+        {
+          componentKey: "ActionGroup",
+          kind: "group",
+          role: "actionGroup",
+        },
+      ],
+    };
+    const projection = {
+      kind: "action-group",
+      candidate: "button-shape-with-visible-label",
+      order: "visual",
+      roles: ["secondaryAction", "primaryAction"],
+    };
+    const v2Map = {
+      schema: "pixso-map/v2",
+      mappings: [{ ...v1Map.mappings[0], projection }],
+    };
+
+    expect(validateWithSchema(PixsoMapSchema, v1Map)).toEqual(v1Map);
+    expect(validateWithSchema(PixsoMapSchema, v2Map)).toEqual(v2Map);
+    expect(() =>
+      validateWithSchema(PixsoMapSchema, {
+        ...v1Map,
+        mappings: [{ ...v1Map.mappings[0], projection }],
+      }),
+    ).toThrow(/projection/);
+    expect(() =>
+      validateWithSchema(PixsoMapSchema, {
+        ...v2Map,
+        mappings: [
+          {
+            ...v2Map.mappings[0],
+            projection: { ...projection, roles: [] },
+          },
+        ],
+      }),
+    ).toThrow(/roles/);
   });
 });

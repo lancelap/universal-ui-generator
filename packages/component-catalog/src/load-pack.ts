@@ -205,6 +205,7 @@ async function loadCommonDocuments(
 }
 
 function validateCommonDocuments(documents: CommonPackDocuments) {
+  validatePixsoMap(documents.pixsoMap);
   const indexes = buildCatalogIndexes(
     documents.catalog.components,
     documents.semanticPolicy,
@@ -220,6 +221,28 @@ function validateCommonDocuments(documents: CommonPackDocuments) {
     verification: documents.verification,
   });
   return indexes;
+}
+
+function validatePixsoMap(pixsoMap: PixsoMap): void {
+  for (const mapping of pixsoMap.mappings) {
+    if (!("projection" in mapping) || mapping.projection === undefined) {
+      continue;
+    }
+    if (mapping.kind !== "group" || mapping.role !== "actionGroup") {
+      throw new DesignSystemPackError(
+        "DESIGN_SYSTEM_PACK_INVALID",
+        "Action-group projection requires a group/actionGroup mapping",
+      );
+    }
+    if (
+      new Set(mapping.projection.roles).size !== mapping.projection.roles.length
+    ) {
+      throw new DesignSystemPackError(
+        "DESIGN_SYSTEM_PACK_INVALID",
+        "Action-group projection roles must be unique",
+      );
+    }
+  }
 }
 
 function isSchemaDocument(value: unknown): value is { schema: string } {

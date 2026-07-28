@@ -218,6 +218,69 @@ describe("loadDesignSystemPack", () => {
     expect(v2.components[0]?.staticProps).toHaveLength(1);
   });
 
+  it("loads and retains a v2 action-group projection", async () => {
+    const pack = await copyPack();
+    const pixsoMap = await readJson(join(pack, "pixso-map.json"));
+    const actionGroup = pixsoMap.mappings.find(
+      (mapping: any) => mapping.role === "actionGroup",
+    );
+    pixsoMap.schema = "pixso-map/v2";
+    actionGroup.projection = {
+      kind: "action-group",
+      candidate: "button-shape-with-visible-label",
+      order: "visual",
+      roles: ["secondaryAction", "primaryAction"],
+    };
+    await writeJson(join(pack, "pixso-map.json"), pixsoMap);
+
+    const loaded = await loadDesignSystemPackV2(pack);
+
+    expect(
+      loaded.exactPixsoMappings.find(
+        (mapping) => mapping.role === "actionGroup",
+      ),
+    ).toMatchObject({
+      projection: {
+        kind: "action-group",
+        roles: ["secondaryAction", "primaryAction"],
+      },
+    });
+  });
+
+  it.each([
+    ["non-group kind", { kind: "content" }],
+    ["non-action-group role", { role: "horizontalGroup" }],
+    [
+      "duplicate roles",
+      { projectionRoles: ["primaryAction", "primaryAction"] },
+    ],
+  ])("rejects v2 projection with %s", async (_case, change) => {
+    const update = change as {
+      kind?: string;
+      role?: string;
+      projectionRoles?: string[];
+    };
+    const pack = await copyPack();
+    const pixsoMap = await readJson(join(pack, "pixso-map.json"));
+    const actionGroup = pixsoMap.mappings.find(
+      (mapping: any) => mapping.role === "actionGroup",
+    );
+    pixsoMap.schema = "pixso-map/v2";
+    actionGroup.kind = update.kind ?? actionGroup.kind;
+    actionGroup.role = update.role ?? actionGroup.role;
+    actionGroup.projection = {
+      kind: "action-group",
+      candidate: "button-shape-with-visible-label",
+      order: "visual",
+      roles: update.projectionRoles ?? ["secondaryAction", "primaryAction"],
+    };
+    await writeJson(join(pack, "pixso-map.json"), pixsoMap);
+
+    await expect(loadDesignSystemPackV2(pack)).rejects.toMatchObject({
+      code: "DESIGN_SYSTEM_PACK_INVALID",
+    });
+  });
+
   async function copyPack(): Promise<string> {
     const root = await mkdtemp(join(tmpdir(), "uig-pack-"));
     temporaryRoots.push(root);

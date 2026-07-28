@@ -2,7 +2,10 @@ import type { Static } from "@sinclair/typebox";
 import { Type } from "@sinclair/typebox";
 
 import { closedObject } from "./schema-utils.js";
-import { PixsoSemanticMappingSchema } from "./ui-manifest.js";
+import {
+  PixsoSemanticMappingV1Schema,
+  PixsoSemanticMappingV2Schema,
+} from "./ui-manifest.js";
 
 export const DesignSystemPackSchema = closedObject({
   schema: Type.Literal("design-system-pack/v1"),
@@ -71,10 +74,17 @@ export const SemanticPolicySchema = closedObject({
   roles: Type.Record(Type.String({ minLength: 1 }), SemanticRolePolicySchema),
 });
 
-export const PixsoMapSchema = closedObject({
+export const PixsoMapV1Schema = closedObject({
   schema: Type.Literal("pixso-map/v1"),
-  mappings: Type.Array(PixsoSemanticMappingSchema),
+  mappings: Type.Array(PixsoSemanticMappingV1Schema),
 });
+
+export const PixsoMapV2Schema = closedObject({
+  schema: Type.Literal("pixso-map/v2"),
+  mappings: Type.Array(PixsoSemanticMappingV2Schema),
+});
+
+export const PixsoMapSchema = Type.Union([PixsoMapV1Schema, PixsoMapV2Schema]);
 
 export const CompositionRuleSchema = closedObject({
   id: Type.String({ minLength: 1 }),
@@ -127,7 +137,9 @@ export type ComponentCatalogEntry = Static<typeof ComponentCatalogEntrySchema>;
 export type ComponentCatalog = Static<typeof ComponentCatalogSchema>;
 export type SemanticRolePolicy = Static<typeof SemanticRolePolicySchema>;
 export type SemanticPolicy = Static<typeof SemanticPolicySchema>;
-export type PixsoMap = Static<typeof PixsoMapSchema>;
+export type PixsoMapV1 = Static<typeof PixsoMapV1Schema>;
+export type PixsoMapV2 = Static<typeof PixsoMapV2Schema>;
+export type PixsoMap = PixsoMapV1 | PixsoMapV2;
 export type CompositionRule = Static<typeof CompositionRuleSchema>;
 export type CompositionRules = Static<typeof CompositionRulesSchema>;
 export type DesignTokens = Static<typeof DesignTokensSchema>;
