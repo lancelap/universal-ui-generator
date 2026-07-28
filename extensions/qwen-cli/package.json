@@ -2,6 +2,7 @@
   "name": "@uig/qwen-cli-extension",
   "version": "0.1.0",
   "private": true,
+  "license": "UNLICENSED",
   "type": "module",
   "dependencies": {
     "@modelcontextprotocol/server": "2.0.0-beta.5",

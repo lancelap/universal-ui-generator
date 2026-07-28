@@ -318,3 +318,12 @@ pnpm test:qwen-extension
   setting out of copied logs.
 - No application source change: this slice intentionally writes only to
   `.uig`; application installation and business integration are separate.
+
+## License
+
+Copyright (c) 2026 lancelap. All rights reserved.
+
+This repository is publicly visible but is not open-source software. No
+permission is granted to use, copy, modify, publish, distribute, sublicense,
+or sell the software without prior written permission from the copyright
+holder, except as permitted by applicable law. See [LICENSE](LICENSE).

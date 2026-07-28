@@ -14,6 +14,26 @@ const extensionFiles = [
 ] as const;
 
 describe("Qwen extension manifest and commands", () => {
+  it("keeps the public Git installation proprietary", async () => {
+    const packageJson = JSON.parse(
+      await readFile(join(repoRoot, "package.json"), "utf8"),
+    );
+    const extensionPackageJson = JSON.parse(
+      await readFile(
+        join(repoRoot, "extensions/qwen-cli/package.json"),
+        "utf8",
+      ),
+    );
+    const license = await readFile(join(repoRoot, "LICENSE"), "utf8");
+
+    expect(packageJson.private).toBe(true);
+    expect(packageJson.license).toBe("UNLICENSED");
+    expect(extensionPackageJson.private).toBe(true);
+    expect(extensionPackageJson.license).toBe("UNLICENSED");
+    expect(license).toContain("Copyright (c) 2026 lancelap");
+    expect(license).toContain("All rights reserved.");
+  });
+
   it("matches the exact portable Qwen Code 0.21.0 contract", async () => {
     const manifest = JSON.parse(
       await readFile(join(repoRoot, "qwen-extension.json"), "utf8"),
