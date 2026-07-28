@@ -9,7 +9,7 @@ import {
   validateWithSchema,
 } from "@uig/contracts";
 import { buildDesignSummary, createArtifactStore } from "@uig/design-context";
-import { normalizePixsoDesignV2 } from "@uig/design-normalizer";
+import { normalizePixsoDesignV2WithProvenance } from "@uig/design-normalizer";
 import { buildUiManifestV2 } from "@uig/semantic-planner";
 
 import { createRunLayout } from "./run-layout.js";
@@ -47,11 +47,12 @@ export async function planFromSnapshot(
       rawDsl,
       retrievedAt: now,
     });
-  const designIr = normalizePixsoDesignV2({
+  const normalized = normalizePixsoDesignV2WithProvenance({
     artifactId: input.artifactId,
     rootNodeId: snapshot.source.nodeId,
     rawDsl,
   });
+  const designIr = normalized.designIr;
   const designSummary = buildDesignSummary({
     ir: { ...designIr, schema: "design-ir/v1" },
   });
@@ -105,6 +106,7 @@ export async function planFromSnapshot(
     artifacts: {
       [layout.files.snapshot]: snapshot,
       [layout.files.designIr]: designIr,
+      [layout.files.normalizationProvenance]: normalized.provenance,
       [layout.files.designSummary]: designSummary,
       [layout.files.uiManifest]: uiManifest,
       [layout.files.resolutionPlan]: resolutionPlan,

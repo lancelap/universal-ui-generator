@@ -10,6 +10,7 @@ import {
   DesignSnapshotSchema,
   DesignSummarySchema,
   GenerationRunSchema,
+  NormalizationProvenanceV1Schema,
   ResolutionPlanV2Schema,
   UiManifestV2Schema,
   validateWithSchema,
@@ -54,6 +55,7 @@ describe("planFromUrl", () => {
       run: "run.json",
       snapshot: "snapshot.json",
       designIr: "design-ir.json",
+      normalizationProvenance: "normalization-provenance.json",
       designSummary: "design-summary.json",
       uiManifest: "ui-manifest.json",
       resolutionPlan: "resolution-plan.sber-space-ui.json",
@@ -71,6 +73,10 @@ describe("planFromUrl", () => {
     validateWithSchema(GenerationRunSchema, JSON.parse(contents.run!));
     validateWithSchema(DesignSnapshotSchema, JSON.parse(contents.snapshot!));
     validateWithSchema(DesignIRV2Schema, JSON.parse(contents.designIr!));
+    validateWithSchema(
+      NormalizationProvenanceV1Schema,
+      JSON.parse(contents.normalizationProvenance!),
+    );
     validateWithSchema(
       DesignSummarySchema,
       JSON.parse(contents.designSummary!),

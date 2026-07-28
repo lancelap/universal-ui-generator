@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import {
   normalizePixsoDesign,
   normalizePixsoDesignV2,
+  normalizePixsoDesignV2WithProvenance,
 } from "./normalize-design.js";
 
 const artifactId = "pixso_doc_4_314_0123456789ab";
@@ -311,4 +312,150 @@ describe("normalizePixsoDesignV2 positioning", () => {
     expect(result.nodes["4:315/0/0"]?.position).toBeUndefined();
     expect(result.nodes["4:316"]?.position).toBeUndefined();
   });
+
+  it("materializes inherited text and records default and override provenance", () => {
+    const rawDsl = definitionBackedActionGroup();
+    const input = {
+      artifactId,
+      rootNodeId: "actions",
+      rawDsl,
+    };
+
+    const result = normalizePixsoDesignV2WithProvenance(input);
+    const secondary = Object.values(result.designIr.nodes).find(
+      (node) => node.text?.value === "Cancel default",
+    )!;
+    const primary = Object.values(result.designIr.nodes).find(
+      (node) => node.text?.value === "Confirm override",
+    )!;
+
+    expect(result.provenance.values).toContainEqual(
+      expect.objectContaining({
+        targetNodeId: secondary.id,
+        targetPath: "/text/value",
+        kind: "component-default",
+        sourceNodeId: "secondary-label",
+      }),
+    );
+    expect(result.provenance.values).toContainEqual(
+      expect.objectContaining({
+        targetNodeId: primary.id,
+        targetPath: "/text/value",
+        kind: "instance-override",
+        sourceNodeId: "primary-label",
+      }),
+    );
+    expect(normalizePixsoDesignV2(input)).toEqual(result.designIr);
+  });
 });
+
+function definitionBackedActionGroup(): unknown {
+  return {
+    dsl: {
+      dslVersion: "2.1.15",
+      converterVersion: "2.2.13",
+      pixTreeDslNodes: [
+        {
+          guid: "actions",
+          componentKey: "ActionGroup",
+          type: "INSTANCE",
+          name: "Actions",
+          visible: true,
+          left: 0,
+          top: 0,
+          width: 560,
+          height: 40,
+          props: [
+            {
+              componentId: "secondary",
+              pathString: "secondary",
+              type: "SYMBOL",
+              visible: true,
+              left: 207,
+              top: 0,
+              width: 114,
+              height: 40,
+            },
+            {
+              componentId: "secondary-label",
+              pathString: "secondary/secondary-label",
+              type: "TEXT",
+              visible: true,
+              left: 16,
+              top: 12,
+              width: 80,
+              height: 16,
+            },
+            {
+              componentId: "primary",
+              pathString: "primary",
+              type: "SYMBOL",
+              visible: true,
+              left: 329,
+              top: 0,
+              width: 231,
+              height: 40,
+            },
+            {
+              componentId: "primary-label",
+              pathString: "primary/primary-label",
+              type: "TEXT",
+              nodeText: "Confirm override",
+              visible: true,
+              left: 16,
+              top: 12,
+              width: 120,
+              height: 16,
+            },
+          ],
+        },
+      ],
+      pixComponentTreeDslNodes: [
+        {
+          guid: "definition",
+          componentKey: "ActionGroup",
+          type: "SYMBOL",
+          childNode: [
+            {
+              guid: "secondary",
+              type: "INSTANCE",
+              props: [
+                {
+                  componentId: "secondary-label",
+                  pathString: "secondary-label",
+                  type: "TEXT",
+                  nodeText: "Cancel default",
+                  visible: true,
+                  left: 16,
+                  top: 12,
+                  width: 80,
+                  height: 16,
+                },
+              ],
+            },
+            {
+              guid: "primary",
+              type: "INSTANCE",
+              props: [
+                {
+                  componentId: "primary-label",
+                  pathString: "primary-label",
+                  type: "TEXT",
+                  nodeText: "Save default",
+                  visible: true,
+                  left: 16,
+                  top: 12,
+                  width: 80,
+                  height: 16,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      localStyleMap: {},
+      variableMap: {},
+      variableSetMap: {},
+    },
+  };
+}

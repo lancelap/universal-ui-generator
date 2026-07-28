@@ -24,13 +24,7 @@ export function materializePixsoRoot(_input: {
   componentDefinitions: unknown[];
 }): PixsoMaterializationResult {
   const definitions = buildDefinitionsByKey(_input.componentDefinitions);
-  const rootKey =
-    typeof _input.root.componentKey === "string"
-      ? _input.root.componentKey
-      : undefined;
-  if (rootKey) {
-    assertNoInheritanceCycle(rootKey, definitions, []);
-  }
+  assertNoInheritanceCycle(_input.root, definitions, []);
   const origins = new WeakMap<object, Map<string, RawMaterializationOrigin>>();
   return {
     root: materializeNode(_input.root, definitions, origins),
@@ -46,8 +40,8 @@ interface DefinitionDefault {
 
 function buildDefinitionsByKey(
   values: unknown[],
-): ReadonlyMap<string, PixsoRecord> {
-  const definitions = new Map<string, PixsoRecord>();
+): ReadonlyMap<string, readonly PixsoRecord[]> {
+  const definitions = new Map<string, PixsoRecord[]>();
   for (const value of values) {
     if (!isRecord(value)) {
       continue;
@@ -56,44 +50,52 @@ function buildDefinitionsByKey(
       typeof value.componentKey === "string" &&
       value.componentKey.length > 0
     ) {
-      const existing = definitions.get(value.componentKey);
-      if (existing && existing !== value) {
-        throw new DesignNormalizationError(
-          "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
-          `Pixso component key ${value.componentKey} has multiple definitions`,
-        );
-      }
-      definitions.set(value.componentKey, value);
+      const existing = definitions.get(value.componentKey) ?? [];
+      existing.push(value);
+      definitions.set(value.componentKey, existing);
     }
   }
   return definitions;
 }
 
 function assertNoInheritanceCycle(
-  componentKey: string,
-  definitions: ReadonlyMap<string, PixsoRecord>,
+  instance: PixsoRecord,
+  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
   activeKeys: readonly string[],
 ): void {
-  if (activeKeys.includes(componentKey)) {
+  if (
+    typeof instance.componentKey !== "string" ||
+    instance.componentKey.length === 0
+  ) {
+    return;
+  }
+  const identity = `${instance.componentKey}\u0000${
+    typeof instance.componentNormName === "string"
+      ? instance.componentNormName
+      : ""
+  }`;
+  if (activeKeys.includes(identity)) {
     throw new DesignNormalizationError(
       "PIXSO_COMPONENT_INHERITANCE_CYCLE",
-      `Pixso component inheritance cycle: ${[...activeKeys, componentKey].join(" -> ")}`,
+      `Pixso component inheritance cycle: ${[...activeKeys, identity].join(
+        " -> ",
+      )}`,
     );
   }
-  const definition = definitions.get(componentKey);
+  const definition = resolveDefinition(instance, definitions);
   if (!definition) {
     return;
   }
-  for (const nestedKey of collectNestedComponentKeys(definition)) {
-    assertNoInheritanceCycle(nestedKey, definitions, [
+  for (const nestedInstance of collectNestedComponentInstances(definition)) {
+    assertNoInheritanceCycle(nestedInstance, definitions, [
       ...activeKeys,
-      componentKey,
+      identity,
     ]);
   }
 }
 
-function collectNestedComponentKeys(root: PixsoRecord): string[] {
-  const keys = new Set<string>();
+function collectNestedComponentInstances(root: PixsoRecord): PixsoRecord[] {
+  const instances: PixsoRecord[] = [];
   const visit = (value: unknown, isRoot: boolean): void => {
     if (!isRecord(value)) {
       return;
@@ -103,19 +105,54 @@ function collectNestedComponentKeys(root: PixsoRecord): string[] {
       typeof value.componentKey === "string" &&
       value.componentKey.length > 0
     ) {
-      keys.add(value.componentKey);
+      instances.push(value);
     }
     if (Array.isArray(value.childNode)) {
       value.childNode.forEach((child) => visit(child, false));
     }
   };
   visit(root, true);
-  return [...keys].sort();
+  return instances.sort((left, right) =>
+    rawNodeId(left, "").localeCompare(rawNodeId(right, "")),
+  );
+}
+
+function resolveDefinition(
+  instance: PixsoRecord,
+  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
+): PixsoRecord | undefined {
+  if (
+    typeof instance.componentKey !== "string" ||
+    instance.componentKey.length === 0
+  ) {
+    return undefined;
+  }
+  const candidates = definitions.get(instance.componentKey) ?? [];
+  const variant =
+    typeof instance.componentNormName === "string"
+      ? instance.componentNormName
+      : undefined;
+  const compatible = variant
+    ? candidates.filter((candidate) => candidate.componentNormName === variant)
+    : candidates;
+  if (compatible.length === 1) {
+    return compatible[0];
+  }
+  if (compatible.length === 0 && candidates.length === 1) {
+    return candidates[0];
+  }
+  if (compatible.length === 0 && candidates.length === 0) {
+    return undefined;
+  }
+  throw new DesignNormalizationError(
+    "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
+    `Pixso component key ${instance.componentKey} has multiple compatible definitions`,
+  );
 }
 
 function materializeNode(
   source: PixsoRecord,
-  definitions: ReadonlyMap<string, PixsoRecord>,
+  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
   origins: WeakMap<object, Map<string, RawMaterializationOrigin>>,
 ): PixsoRecord {
   const output = cloneOwnFields(source, origins);
@@ -123,7 +160,9 @@ function materializeNode(
     typeof source.componentKey === "string" && source.componentKey.length > 0
       ? source.componentKey
       : undefined;
-  const definition = componentKey ? definitions.get(componentKey) : undefined;
+  const definition = componentKey
+    ? resolveDefinition(source, definitions)
+    : undefined;
   const defaults = definition
     ? collectDefinitionDefaults(definition)
     : new Map<string, DefinitionDefault>();
@@ -161,9 +200,7 @@ function materializeNode(
     Array.isArray(source.props) ||
     propertyForest.length > 0
   ) {
-    output.childNode = [...materializedChildren, ...propertyForest].sort(
-      compareVisualThenPath,
-    );
+    output.childNode = [...materializedChildren, ...propertyForest];
   }
   return output;
 }

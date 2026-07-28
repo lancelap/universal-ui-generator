@@ -10,6 +10,7 @@ import {
   DesignIRSchema,
   DesignSnapshotSchema,
   GenerationRunSchema,
+  NormalizationProvenanceV1Schema,
   ResolutionPlanSchema,
   UiManifestSchema,
   stableStringify,
@@ -56,19 +57,33 @@ describe("generation-ready planning artifacts", () => {
       now: () => new Date("2026-07-26T10:30:00.000Z"),
     });
     const runDir = join(workspaceDir, ".uig", "runs", run.runId);
-    const [snapshot, runIndex, designIr, uiManifest, resolutionPlan] =
-      await Promise.all([
-        readJson(join(runDir, "snapshot.json")),
-        readJson(join(runDir, "run.json")),
-        readJson(join(runDir, "design-ir.json")),
-        readJson(join(runDir, "ui-manifest.json")),
-        readJson(join(runDir, "resolution-plan.material-ui.json")),
-      ]);
+    const [
+      snapshot,
+      runIndex,
+      designIr,
+      normalizationProvenance,
+      uiManifest,
+      resolutionPlan,
+    ] = await Promise.all([
+      readJson(join(runDir, "snapshot.json")),
+      readJson(join(runDir, "run.json")),
+      readJson(join(runDir, "design-ir.json")),
+      readJson(join(runDir, "normalization-provenance.json")),
+      readJson(join(runDir, "ui-manifest.json")),
+      readJson(join(runDir, "resolution-plan.material-ui.json")),
+    ]);
 
     expect(snapshot.schema).toBe("design-snapshot/v1");
     expect(runIndex.schema).toBe("generation-run/v1");
     validateWithSchema(DesignSnapshotSchema, snapshot);
     validateWithSchema(GenerationRunSchema, runIndex);
+    expect(
+      validateWithSchema(
+        NormalizationProvenanceV1Schema,
+        normalizationProvenance,
+      ).sourceArtifactId,
+    ).toBe(stored.artifactId);
+    expect(runIndex.artifacts.normalizationProvenance).toBeUndefined();
     expect(designIr.schema).toBe("design-ir/v2");
     expect(uiManifest.schema).toBe("ui-manifest/v2");
     expect(resolutionPlan.schema).toBe("resolution-plan/v2");

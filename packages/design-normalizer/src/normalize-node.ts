@@ -3,8 +3,10 @@ import type {
   DesignNode,
   DesignNodeV2,
   Diagnostic,
+  NormalizationValueOrigin,
 } from "@uig/contracts";
 
+import type { RawMaterializationOrigin } from "./materialize-pixso-instance.js";
 import { normalizeEffects } from "./normalize-effect.js";
 import { normalizeLayout } from "./normalize-layout.js";
 import { normalizeBorders, normalizeFills } from "./normalize-paint.js";
@@ -20,6 +22,8 @@ export interface NormalizeNodeContext {
   artifactId: string;
   diagnostics: Diagnostic[];
   nodeId?: string;
+  rawOrigins?: ReadonlyMap<string, RawMaterializationOrigin>;
+  provenance?: NormalizationValueOrigin[];
 }
 
 type TextContent = NonNullable<DesignNode["text"]>;
@@ -108,10 +112,12 @@ export function normalizePixsoNodeV2(
 ): DesignNodeV2 {
   const normalized = normalizePixsoNode(node, childIds, context);
   const position = normalizePosition(node);
-  return {
+  const result = {
     ...normalized,
     ...(position ? { position } : {}),
   };
+  recordKnownOrigins(result, node, context);
+  return result;
 }
 
 function nonNegative(value: unknown, field: string): number {
@@ -151,4 +157,70 @@ function normalizeComponent(node: PixsoRecord): ComponentReference | undefined {
       : {}),
     ...(isRecord(node.props) ? { properties: node.props } : {}),
   };
+}
+
+const normalizedTargetsByRawField = {
+  visible: ["/visible"],
+  left: ["/geometry/x", "/position/inset/left"],
+  top: ["/geometry/y", "/position/inset/top"],
+  width: ["/geometry/width"],
+  height: ["/geometry/height"],
+  nodeText: ["/text/value"],
+  fontSize: ["/text/fontSize"],
+  cornerRadius: [
+    "/appearance/radii/topLeft",
+    "/appearance/radii/topRight",
+    "/appearance/radii/bottomRight",
+    "/appearance/radii/bottomLeft",
+  ],
+  fills: ["/appearance/fills"],
+  fillPaints: ["/appearance/fills"],
+  strokes: ["/appearance/borders"],
+  strokePaints: ["/appearance/borders"],
+  strokeWeight: ["/appearance/borders"],
+  effects: ["/appearance/shadows"],
+  opacity: ["/appearance/opacity"],
+  autoLayout: ["/layout"],
+  autoLayoutAbsolutePos: ["/position/mode"],
+  componentKey: ["/component/key"],
+  componentNormName: ["/component/variant"],
+  props: ["/component/properties"],
+} as const;
+
+function recordKnownOrigins(
+  normalized: DesignNodeV2,
+  rawNode: PixsoRecord,
+  context: NormalizeNodeContext,
+): void {
+  for (const [rawField, targets] of Object.entries(
+    normalizedTargetsByRawField,
+  )) {
+    const origin = context.rawOrigins?.get(rawField);
+    if (!origin || !Object.prototype.hasOwnProperty.call(rawNode, rawField)) {
+      continue;
+    }
+    for (const targetPath of targets) {
+      if (hasJsonPointer(normalized, targetPath)) {
+        context.provenance?.push({
+          targetNodeId: normalized.id,
+          targetPath,
+          ...origin,
+        });
+      }
+    }
+  }
+}
+
+function hasJsonPointer(value: unknown, pointer: string): boolean {
+  let current: unknown = value;
+  for (const segment of pointer.slice(1).split("/")) {
+    if (
+      !isRecord(current) ||
+      !Object.prototype.hasOwnProperty.call(current, segment)
+    ) {
+      return false;
+    }
+    current = current[segment];
+  }
+  return true;
 }

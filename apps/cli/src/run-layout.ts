@@ -8,6 +8,7 @@ export interface RunLayout {
     run: string;
     snapshot: string;
     designIr: string;
+    normalizationProvenance: string;
     designSummary: string;
     uiManifest: string;
     resolutionPlan: string;
@@ -37,6 +38,7 @@ export function createRunLayout(input: {
       run: "run.json",
       snapshot: "snapshot.json",
       designIr: "design-ir.json",
+      normalizationProvenance: "normalization-provenance.json",
       designSummary: "design-summary.json",
       uiManifest: "ui-manifest.json",
       resolutionPlan: `resolution-plan.${input.packId}.json`,

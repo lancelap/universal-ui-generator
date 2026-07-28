@@ -6,10 +6,14 @@ import {
   type DesignNode,
   type DesignNodeV2,
   type Diagnostic,
+  type NormalizationProvenanceV1,
+  NormalizationProvenanceV1Schema,
+  type NormalizationValueOrigin,
   assertDesignIRV2Integrity,
   validateWithSchema,
 } from "@uig/contracts";
 
+import { materializePixsoRoot } from "./materialize-pixso-instance.js";
 import {
   normalizePixsoNode,
   normalizePixsoNodeV2,
@@ -36,7 +40,34 @@ export function normalizePixsoDesignV2(input: {
   rootNodeId?: string;
   rawDsl: unknown;
 }): DesignIRV2 {
-  return normalizePixsoDesignVersion(input, "v2") as DesignIRV2;
+  return normalizePixsoDesignV2WithProvenance(input).designIr;
+}
+
+export interface NormalizePixsoDesignV2Result {
+  designIr: DesignIRV2;
+  provenance: NormalizationProvenanceV1;
+}
+
+export function normalizePixsoDesignV2WithProvenance(input: {
+  artifactId: string;
+  rootNodeId?: string;
+  rawDsl: unknown;
+}): NormalizePixsoDesignV2Result {
+  const provenance: NormalizationValueOrigin[] = [];
+  const designIr = normalizePixsoDesignVersion(
+    input,
+    "v2",
+    provenance,
+  ) as DesignIRV2;
+  provenance.sort(compareOrigins);
+  return {
+    designIr,
+    provenance: validateWithSchema(NormalizationProvenanceV1Schema, {
+      schema: "normalization-provenance/v1",
+      sourceArtifactId: input.artifactId,
+      values: provenance,
+    }),
+  };
 }
 
 function normalizePixsoDesignVersion(
@@ -46,12 +77,24 @@ function normalizePixsoDesignVersion(
     rawDsl: unknown;
   },
   version: "v1" | "v2",
+  provenance?: NormalizationValueOrigin[],
 ): DesignIR | DesignIRV2 {
   const envelope = readPixsoEnvelope(input.rawDsl);
-  const root = selectRoot(envelope.dsl.pixTreeDslNodes, input.rootNodeId);
-  if (!isRecord(root)) {
+  const selectedRoot = selectRoot(
+    envelope.dsl.pixTreeDslNodes,
+    input.rootNodeId,
+  );
+  if (!isRecord(selectedRoot)) {
     throw unsupported("Pixso root node must be an object");
   }
+  const materialized =
+    version === "v2"
+      ? materializePixsoRoot({
+          root: selectedRoot,
+          componentDefinitions: envelope.dsl.pixComponentTreeDslNodes,
+        })
+      : undefined;
+  const root = materialized?.root ?? selectedRoot;
 
   const nodeIndex = buildNodeIndex([root]);
   addNodesToIndex(nodeIndex, envelope.dsl.pixTreeDslNodes, false);
@@ -82,10 +125,13 @@ function normalizePixsoDesignVersion(
     const childIds = resolvedChildren.map((child, index) =>
       traverse(child, `${id}/${index}`),
     );
+    const rawOrigins = materialized?.origins.get(rawNode);
     const context = {
       artifactId: input.artifactId,
       diagnostics,
       nodeId: id,
+      ...(rawOrigins ? { rawOrigins } : {}),
+      ...(provenance ? { provenance } : {}),
     };
     nodes[id] =
       version === "v2"
@@ -123,6 +169,18 @@ function normalizePixsoDesignVersion(
       error,
     );
   }
+}
+
+function compareOrigins(
+  left: NormalizationValueOrigin,
+  right: NormalizationValueOrigin,
+): number {
+  return (
+    left.targetNodeId.localeCompare(right.targetNodeId) ||
+    left.targetPath.localeCompare(right.targetPath) ||
+    left.kind.localeCompare(right.kind) ||
+    left.sourceNodeId.localeCompare(right.sourceNodeId)
+  );
 }
 
 function isVisualPropertyOverride(value: unknown): boolean {
