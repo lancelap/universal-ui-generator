@@ -24,6 +24,13 @@ export function materializePixsoRoot(_input: {
   componentDefinitions: unknown[];
 }): PixsoMaterializationResult {
   const definitions = buildDefinitionsByKey(_input.componentDefinitions);
+  const rootKey =
+    typeof _input.root.componentKey === "string"
+      ? _input.root.componentKey
+      : undefined;
+  if (rootKey) {
+    assertNoInheritanceCycle(rootKey, definitions, []);
+  }
   const origins = new WeakMap<object, Map<string, RawMaterializationOrigin>>();
   return {
     root: materializeNode(_input.root, definitions, origins),
@@ -41,14 +48,10 @@ function buildDefinitionsByKey(
   values: unknown[],
 ): ReadonlyMap<string, PixsoRecord> {
   const definitions = new Map<string, PixsoRecord>();
-  const seen = new WeakSet<object>();
-
-  const visit = (value: unknown): void => {
-    if (!isRecord(value) || seen.has(value)) {
-      return;
+  for (const value of values) {
+    if (!isRecord(value)) {
+      continue;
     }
-    seen.add(value);
-
     if (
       typeof value.componentKey === "string" &&
       value.componentKey.length > 0
@@ -62,14 +65,52 @@ function buildDefinitionsByKey(
       }
       definitions.set(value.componentKey, value);
     }
+  }
+  return definitions;
+}
 
+function assertNoInheritanceCycle(
+  componentKey: string,
+  definitions: ReadonlyMap<string, PixsoRecord>,
+  activeKeys: readonly string[],
+): void {
+  if (activeKeys.includes(componentKey)) {
+    throw new DesignNormalizationError(
+      "PIXSO_COMPONENT_INHERITANCE_CYCLE",
+      `Pixso component inheritance cycle: ${[...activeKeys, componentKey].join(" -> ")}`,
+    );
+  }
+  const definition = definitions.get(componentKey);
+  if (!definition) {
+    return;
+  }
+  for (const nestedKey of collectNestedComponentKeys(definition)) {
+    assertNoInheritanceCycle(nestedKey, definitions, [
+      ...activeKeys,
+      componentKey,
+    ]);
+  }
+}
+
+function collectNestedComponentKeys(root: PixsoRecord): string[] {
+  const keys = new Set<string>();
+  const visit = (value: unknown, isRoot: boolean): void => {
+    if (!isRecord(value)) {
+      return;
+    }
+    if (
+      !isRoot &&
+      typeof value.componentKey === "string" &&
+      value.componentKey.length > 0
+    ) {
+      keys.add(value.componentKey);
+    }
     if (Array.isArray(value.childNode)) {
-      value.childNode.forEach(visit);
+      value.childNode.forEach((child) => visit(child, false));
     }
   };
-
-  values.forEach(visit);
-  return definitions;
+  visit(root, true);
+  return [...keys].sort();
 }
 
 function materializeNode(
@@ -86,29 +127,42 @@ function materializeNode(
   const defaults = definition
     ? collectDefinitionDefaults(definition)
     : new Map<string, DefinitionDefault>();
+  let propertyForest: PixsoRecord[] = [];
 
   if (Array.isArray(source.props)) {
-    output.props = source.props.map((property) => {
+    const effectiveProperties = source.props.flatMap((property) => {
       if (!isRecord(property)) {
-        return structuredClone(property);
+        return [];
       }
-      const path =
-        typeof property.pathString === "string" ? property.pathString : "";
-      return mergeEffectiveRecord(property, defaults.get(path), {
-        origins,
-        ...(componentKey ? { componentKey } : {}),
-        ...(definition ? { definition } : {}),
-      });
+      const path = canonicalPropertyPath(property.pathString).path;
+      return [
+        mergeEffectiveRecord(property, defaults.get(path), {
+          origins,
+          ...(componentKey ? { componentKey } : {}),
+          ...(definition ? { definition } : {}),
+        }),
+      ];
     });
+    propertyForest = buildPropertyForest(effectiveProperties);
   } else if (source.props !== undefined) {
     output.props = structuredClone(source.props);
   }
 
+  const materializedChildren: PixsoRecord[] = [];
   if (Array.isArray(source.childNode)) {
-    output.childNode = source.childNode.map((child) =>
-      isRecord(child)
-        ? materializeNode(child, definitions, origins)
-        : structuredClone(child),
+    for (const child of source.childNode) {
+      if (isRecord(child)) {
+        materializedChildren.push(materializeNode(child, definitions, origins));
+      }
+    }
+  }
+  if (
+    Array.isArray(source.childNode) ||
+    Array.isArray(source.props) ||
+    propertyForest.length > 0
+  ) {
+    output.childNode = [...materializedChildren, ...propertyForest].sort(
+      compareVisualThenPath,
     );
   }
   return output;
@@ -278,6 +332,94 @@ function mergeValue(fallback: unknown, override: unknown): unknown {
     return output;
   }
   return structuredClone(override);
+}
+
+function canonicalPropertyPath(value: unknown): {
+  path: string;
+  segments: string[];
+} {
+  if (typeof value !== "string") {
+    throw new DesignNormalizationError(
+      "PIXSO_PROPERTY_PATH_INVALID",
+      "Pixso property path must be a string",
+    );
+  }
+  const segments = value.split("/");
+  if (
+    segments.length === 0 ||
+    segments.some(
+      (segment) => segment === "" || segment === "." || segment === "..",
+    )
+  ) {
+    throw new DesignNormalizationError(
+      "PIXSO_PROPERTY_PATH_INVALID",
+      `Pixso property path is invalid: ${JSON.stringify(value)}`,
+    );
+  }
+  return { path: segments.join("/"), segments };
+}
+
+function buildPropertyForest(properties: PixsoRecord[]): PixsoRecord[] {
+  const byPath = new Map<string, PixsoRecord>();
+  for (const property of properties) {
+    const { path } = canonicalPropertyPath(property.pathString);
+    if (byPath.has(path)) {
+      throw new DesignNormalizationError(
+        "PIXSO_PROPERTY_IDENTITY_CONFLICT",
+        `Pixso property path ${path} has multiple records`,
+      );
+    }
+    byPath.set(path, property);
+  }
+
+  const roots: PixsoRecord[] = [];
+  for (const [path, property] of [...byPath.entries()].sort(([left], [right]) =>
+    left.localeCompare(right),
+  )) {
+    const segments = path.split("/");
+    let parent: PixsoRecord | undefined;
+    for (let length = segments.length - 1; length > 0; length -= 1) {
+      parent = byPath.get(segments.slice(0, length).join("/"));
+      if (parent) {
+        break;
+      }
+    }
+    if (!parent) {
+      roots.push(property);
+      continue;
+    }
+    const existingChildren = Array.isArray(parent.childNode)
+      ? parent.childNode.filter(isRecord)
+      : [];
+    parent.childNode = [...existingChildren, property].sort(
+      compareVisualThenPath,
+    );
+  }
+  return roots.sort(compareVisualThenPath);
+}
+
+function compareVisualThenPath(left: PixsoRecord, right: PixsoRecord): number {
+  const vertical = sortableNumber(left.top) - sortableNumber(right.top);
+  if (vertical !== 0) {
+    return vertical;
+  }
+  const horizontal = sortableNumber(left.left) - sortableNumber(right.left);
+  if (horizontal !== 0) {
+    return horizontal;
+  }
+  const leftPath =
+    typeof left.pathString === "string" ? left.pathString : rawNodeId(left, "");
+  const rightPath =
+    typeof right.pathString === "string"
+      ? right.pathString
+      : rawNodeId(right, "");
+  return leftPath.localeCompare(rightPath);
+}
+
+function sortableNumber(value: unknown): number {
+  return typeof value === "number" && Number.isFinite(value)
+    ? value
+    : Number.POSITIVE_INFINITY;
 }
 
 function qualifyPath(prefix: string, path: string): string {
