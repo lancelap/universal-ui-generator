@@ -21,17 +21,6 @@
     },
     {
       "blocking": false,
-      "code": "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
-      "evidence": {
-        "manifestNodeId": "ui_actionGroup_4-317",
-        "semanticRole": "actionGroup"
-      },
-      "message": "Render-only structural group has no semantic children",
-      "severity": "warning",
-      "stage": "react-generation"
-    },
-    {
-      "blocking": false,
       "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
       "evidence": {
         "manifestNodeId": "ui_dialog_4-314",
@@ -81,16 +70,16 @@
   ],
   "files": [
     {
-      "byteLength": 202,
+      "byteLength": 306,
       "kind": "css-module",
       "path": "GeneratedModal.module.css",
-      "sha256": "bc23a69219643487f01e612e94e8f69629de1b02ca97117d0da9e037d08ed4e2"
+      "sha256": "3b518acb969420f41141b649e1e3c0b4c61af35e31b8da4b35eed377503d73db"
     },
     {
-      "byteLength": 859,
+      "byteLength": 1384,
       "kind": "tsx",
       "path": "GeneratedModal.tsx",
-      "sha256": "4bfda90a859c940f38917797b6edbbc2823fd79ee800516e4a7ae119236e4c51"
+      "sha256": "49a85308f47e1d0996e51e208c3dd1026983135787f3cfcec70f94ddceee0e65"
     }
   ],
   "renderOnlyProps": [
@@ -108,7 +97,7 @@
   "schema": "react-generation-report/v2",
   "sourceRunId": "run_acceptance_pixso_4_314",
   "statistics": {
-    "cssRules": 3,
+    "cssRules": 5,
     "fallbackComponents": 0,
     "filesByKind": {
       "cssModule": 1,
@@ -116,10 +105,10 @@
       "fallbackTsx": 0,
       "tsx": 1
     },
-    "generatedProps": 0,
-    "imports": 7,
-    "manifestNodes": 4,
-    "sourceByteLength": 1061
+    "generatedProps": 2,
+    "imports": 8,
+    "manifestNodes": 6,
+    "sourceByteLength": 1690
   },
   "status": "generated",
   "validation": {

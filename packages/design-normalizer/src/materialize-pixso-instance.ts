@@ -42,18 +42,25 @@ function buildDefinitionsByKey(
   values: unknown[],
 ): ReadonlyMap<string, readonly PixsoRecord[]> {
   const definitions = new Map<string, PixsoRecord[]>();
-  for (const value of values) {
+  const visit = (value: unknown): void => {
     if (!isRecord(value)) {
-      continue;
+      return;
     }
     if (
       typeof value.componentKey === "string" &&
-      value.componentKey.length > 0
+      value.componentKey.length > 0 &&
+      value.type === "SYMBOL"
     ) {
       const existing = definitions.get(value.componentKey) ?? [];
       existing.push(value);
       definitions.set(value.componentKey, existing);
     }
+    if (Array.isArray(value.childNode)) {
+      value.childNode.forEach(visit);
+    }
+  };
+  for (const value of values) {
+    visit(value);
   }
   return definitions;
 }
@@ -249,7 +256,8 @@ function collectDefinitionDefaults(
         if (!isRecord(property) || typeof property.pathString !== "string") {
           continue;
         }
-        const path = qualifyPath(prefix, property.pathString);
+        const ownerPath = node === definition ? "" : rawNodeId(node, prefix);
+        const path = qualifyPath(ownerPath, property.pathString);
         defaults.set(path, {
           record: property,
           path,

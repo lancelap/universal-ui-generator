@@ -1,5 +1,5 @@
 {
-  "schema": "pixso-map/v1",
+  "schema": "pixso-map/v2",
   "mappings": [
     {
       "componentKey": "Button/Primary",
@@ -25,7 +25,13 @@
       "componentKey": "6dabeb3a9d03214e88b1f6b11513ea08ca3889cb",
       "variant": "VariantDefault",
       "kind": "group",
-      "role": "actionGroup"
+      "role": "actionGroup",
+      "projection": {
+        "kind": "action-group",
+        "candidate": "button-shape-with-visible-label",
+        "order": "visual",
+        "roles": ["secondaryAction", "primaryAction"]
+      }
     },
     {
       "componentKey": "05a5ea85a698fd83b3d6cf60ad628231349b4eb4",

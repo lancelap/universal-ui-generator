@@ -36,6 +36,66 @@ describe("materializePixsoRoot", () => {
     expect({ definition, instance }).toEqual(original);
   });
 
+  it("indexes nested Pixso variant definitions before resolving instance defaults", () => {
+    const variant = componentDefinition();
+    const variantChildren = variant.childNode;
+    const componentSet = {
+      guid: "component-set",
+      componentKey: "ModalAction",
+      type: "SYMBOL",
+      childNode: [
+        {
+          ...variant,
+          guid: "variant-default",
+          componentNormName: "VariantDefault",
+          childNode: [
+            {
+              guid: "container",
+              type: "FRAME",
+              childNode: [
+                {
+                  guid: "right-content",
+                  type: "FRAME",
+                  childNode: variantChildren,
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    };
+    const instance = {
+      ...actionGroupInstance(),
+      componentNormName: "VariantDefault",
+    };
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [componentSet],
+    });
+    const records = flatProperties(result.root);
+
+    expect(records.get("secondary/secondary-label")?.nodeText).toBe(
+      "Cancel default",
+    );
+    expect(
+      result.origins
+        .get(records.get("secondary/secondary-label")!)
+        ?.get("nodeText"),
+    ).toMatchObject({
+      kind: "component-default",
+      componentDefinitionNodeId: "variant-default",
+    });
+    expect(
+      result.origins
+        .get(records.get("primary/primary-label")!)
+        ?.get("nodeText"),
+    ).toMatchObject({
+      kind: "instance-override",
+      componentDefinitionNodeId: "variant-default",
+    });
+  });
+
   it("treats false, zero, empty string, empty array, and null as explicit overrides", () => {
     const definition = componentDefinition();
     const defaultPrimary = (

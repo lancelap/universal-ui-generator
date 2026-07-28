@@ -15,7 +15,10 @@ import {
   stableStringify,
   validateWithSchema,
 } from "@uig/contracts";
-import { normalizePixsoDesignV2 } from "@uig/design-normalizer";
+import {
+  normalizePixsoDesignV2,
+  normalizePixsoDesignV2WithProvenance,
+} from "@uig/design-normalizer";
 import { generateReactBundle } from "@uig/generator-react";
 import { buildUiManifestV2 } from "@uig/semantic-planner";
 import { describe, expect, it } from "vitest";
@@ -244,7 +247,7 @@ describe("reviewed React generation acceptance", () => {
     },
   );
 
-  it("generates the real 4:314 Sber modal with disclosed render-only gaps", async () => {
+  it("generates the real 4:314 Sber modal with design-backed footer actions", async () => {
     const rawDsl = JSON.parse(
       await readFile(
         join(repoRoot, "fixtures", "pixso", "modal-4-314", "source.json"),
@@ -254,11 +257,12 @@ describe("reviewed React generation acceptance", () => {
     const pack = await loadDesignSystemPackV2(
       join(repoRoot, "design-system-packs", "sber-space-ui"),
     );
-    const designIr = normalizePixsoDesignV2({
+    const normalized = normalizePixsoDesignV2WithProvenance({
       artifactId: "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105",
       rootNodeId: "4:314",
       rawDsl,
     });
+    const designIr = normalized.designIr;
     const uiManifest = buildUiManifestV2({
       ir: designIr,
       exactMappings: [...pack.exactPixsoMappings],
@@ -277,6 +281,34 @@ describe("reviewed React generation acceptance", () => {
     });
 
     expect(plan.summary.blocked).toBe(0);
+    expect(normalized.provenance.values).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          targetPath: "/text/value",
+          kind: "component-default",
+          sourceNodeId: "4:557",
+        }),
+        expect.objectContaining({
+          targetPath: "/text/value",
+          kind: "instance-override",
+          sourceNodeId: "4:599",
+        }),
+      ]),
+    );
+    expect(
+      flattenUiNodes(uiManifest.root).find(
+        (node) => node.role === "secondaryAction",
+      ),
+    ).toMatchObject({
+      content: { label: "Отмена" },
+    });
+    expect(
+      flattenUiNodes(uiManifest.root).find(
+        (node) => node.role === "primaryAction",
+      ),
+    ).toMatchObject({
+      content: { label: "Подтвердить и закончить" },
+    });
     expect(generated.report.renderOnlyProps).toEqual([
       {
         manifestNodeId: "ui_combobox_4-316",
@@ -290,27 +322,28 @@ describe("reviewed React generation acceptance", () => {
           diagnostic.code === "GENERATION_RENDER_ONLY_CHILDREN_MISSING" &&
           diagnostic.evidence?.manifestNodeId === "ui_actionGroup_4-317",
       ),
-    ).toEqual([
-      expect.objectContaining({
-        code: "GENERATION_RENDER_ONLY_CHILDREN_MISSING",
-        blocking: false,
-        evidence: {
-          manifestNodeId: "ui_actionGroup_4-317",
-          semanticRole: "actionGroup",
-        },
-      }),
-    ]);
+    ).toEqual([]);
 
     const tsx = source(generated, ".tsx");
+    const readableTsx = decodeUnicodeEscapes(tsx);
     expect(tsx).toContain(
       'import { Autocomplete } from "@sber-space-ui/autocomplete";',
     );
     expect(tsx).toContain("options={[]}");
     expect(tsx).toContain("onChange={() => undefined}");
-    expect(tsx).not.toMatch(/\bButton\b/);
+    expect(tsx).toContain('import { Button } from "@sber-space-ui/button";');
+    expect(readableTsx).toContain("Отмена");
+    expect(readableTsx).toContain("Подтвердить и закончить");
+    expect(tsx.match(/<Button\b/g)).toHaveLength(2);
     await expectAcceptedBundle(join(realRoot, "generated"), generated);
   });
 });
+
+function decodeUnicodeEscapes(value: string): string {
+  return value.replace(/\\u([\dA-F]{4})/giu, (_, code: string) =>
+    String.fromCharCode(Number.parseInt(code, 16)),
+  );
+}
 
 function pixsoTextInput(componentKey: string, placeholder?: string): unknown {
   return {
@@ -372,6 +405,10 @@ function source(bundle: ReactGenerationBundleV2, suffix: string): string {
     throw new Error(`Generated bundle has no root ${suffix} file`);
   }
   return decoder.decode(file.bytes);
+}
+
+function flattenUiNodes(root: UiManifestV2["root"]): UiManifestV2["root"][] {
+  return [root, ...root.children.flatMap(flattenUiNodes)];
 }
 
 function importPackages(tsx: string): string[] {
