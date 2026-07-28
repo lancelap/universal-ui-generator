@@ -1,5 +1,10 @@
 export type DesignNormalizationErrorCode =
-  "DESIGN_DSL_UNSUPPORTED" | "DESIGN_NODE_REFERENCE_MISSING";
+  | "DESIGN_DSL_UNSUPPORTED"
+  | "DESIGN_NODE_REFERENCE_MISSING"
+  | "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS"
+  | "PIXSO_COMPONENT_INHERITANCE_CYCLE"
+  | "PIXSO_PROPERTY_IDENTITY_CONFLICT"
+  | "PIXSO_PROPERTY_PATH_INVALID";
 
 export class DesignNormalizationError extends Error {
   readonly name = "DesignNormalizationError";
