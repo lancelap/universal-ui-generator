@@ -6,6 +6,7 @@ export * from "./design-system-pack.js";
 export * from "./design-system-pack-v2.js";
 export * from "./diagnostic.js";
 export * from "./generation-run.js";
+export * from "./normalization-provenance.js";
 export * from "./resolution-plan.js";
 export * from "./resolution-plan-v2.js";
 export * from "./react-render-recipes.js";
