@@ -26,7 +26,7 @@ export function buildUiManifest(input: {
     if (!node) {
       throw new Error(`Design node does not exist: ${nodeId}`);
     }
-    const exactRecognition = exact.recognize(node);
+    const exactRecognition = exact.match(node)?.recognition;
     const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;

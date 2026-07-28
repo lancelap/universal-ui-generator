@@ -138,6 +138,78 @@ describe("buildUiManifestV2", () => {
     expect(manifest.root.interactions).toBeUndefined();
   });
 
+  it("projects pack-declared exact action children with stable interactions", () => {
+    const design = structuredClone(designFixture);
+    design.nodes["4:314"]!.component = { key: "ActionGroup" };
+    design.nodes["4:314"]!.children = ["row"];
+    design.nodes.row = groupNode("row", ["secondary", "primary"], 560, 40);
+    design.nodes.secondary = groupNode(
+      "secondary",
+      ["secondary-label"],
+      114,
+      40,
+      207,
+    );
+    design.nodes["secondary-label"] = textNode(
+      "secondary-label",
+      "Cancel",
+      true,
+    );
+    design.nodes.primary = groupNode(
+      "primary",
+      ["primary-label"],
+      231,
+      40,
+      329,
+    );
+    design.nodes["primary-label"] = textNode(
+      "primary-label",
+      "Confirm and finish",
+      true,
+    );
+
+    const manifest = buildUiManifestV2({
+      ir: design,
+      exactMappings: [
+        {
+          componentKey: "ActionGroup",
+          kind: "group",
+          role: "actionGroup",
+          projection: {
+            kind: "action-group",
+            candidate: "button-shape-with-visible-label",
+            order: "visual",
+            roles: ["secondaryAction", "primaryAction"],
+          },
+        },
+      ],
+    });
+
+    expect(findRole(manifest.root, "secondaryAction")).toMatchObject({
+      content: { text: "Cancel", label: "Cancel" },
+      sourceNodeIds: ["secondary", "secondary-label"],
+      layoutSourceNodeId: "secondary",
+      interactions: [
+        { key: "secondaryAction", event: "activate", valueType: "void" },
+      ],
+    });
+    expect(findRole(manifest.root, "primaryAction")).toMatchObject({
+      content: {
+        text: "Confirm and finish",
+        label: "Confirm and finish",
+      },
+      sourceNodeIds: ["primary", "primary-label"],
+      layoutSourceNodeId: "primary",
+      interactions: [
+        { key: "primaryAction", event: "activate", valueType: "void" },
+      ],
+    });
+    expect(
+      allNodes(manifest.root).some((node) => node.role === "unresolved"),
+    ).toBe(false);
+    expect(manifest.diagnostics).toEqual([]);
+  });
+
   it("projects one visible direct text child with provenance from an exact content boundary", () => {
     const design = structuredClone(designFixture);
     design.nodes["4:314"]!.component = { key: "ModalHeader" };
@@ -350,6 +422,31 @@ function textNode(
       opacity: 1,
     },
     text: { value },
+    source: { provider: "pixso", nodeId: id },
+  };
+}
+
+function groupNode(
+  id: string,
+  children: string[],
+  width: number,
+  height: number,
+  x = 0,
+): DesignIRV2["nodes"][string] {
+  return {
+    id,
+    type: "frame",
+    name: "",
+    visible: true,
+    children,
+    geometry: { x, y: 0, width, height },
+    appearance: {
+      fills: [],
+      borders: [],
+      radii: { topLeft: 0, topRight: 0, bottomRight: 0, bottomLeft: 0 },
+      shadows: [],
+      opacity: 1,
+    },
     source: { provider: "pixso", nodeId: id },
   };
 }

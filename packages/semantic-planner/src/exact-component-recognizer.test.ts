@@ -38,18 +38,19 @@ describe("exact component recognition", () => {
       },
     ];
 
-    expect(
-      createExactComponentRecognizer(mappings).recognize(instance),
-    ).toEqual({
-      kind: "action",
-      role: "primaryAction",
-      confidence: 1,
-      evidence: [
-        { kind: "component-key", value: "button-key", weight: 1 },
-        { kind: "component-variant", value: "Primary", weight: 1 },
-        { kind: "source-node", value: "4:341" },
-      ],
-      sourceNodeIds: ["4:341"],
+    expect(createExactComponentRecognizer(mappings).match(instance)).toEqual({
+      mapping: mappings[1],
+      recognition: {
+        kind: "action",
+        role: "primaryAction",
+        confidence: 1,
+        evidence: [
+          { kind: "component-key", value: "button-key", weight: 1 },
+          { kind: "component-variant", value: "Primary", weight: 1 },
+          { kind: "source-node", value: "4:341" },
+        ],
+        sourceNodeIds: ["4:341"],
+      },
     });
   });
 
@@ -63,7 +64,7 @@ describe("exact component recognition", () => {
       },
     ]);
 
-    expect(recognizer.recognize(instance)).toBeUndefined();
+    expect(recognizer.match(instance)).toBeUndefined();
   });
 
   it("rejects duplicate key and variant mappings", () => {

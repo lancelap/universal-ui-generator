@@ -11,6 +11,10 @@ import {
 import { createExactComponentRecognizer } from "./exact-component-recognizer.js";
 import { attachActivateInteractions } from "./interaction-recognizers.js";
 import {
+  projectCompoundBoundary,
+  type ProjectedSemanticChild,
+} from "./project-compound-boundary.js";
+import {
   confidencePolicy,
   recognizeStructure,
 } from "./structural-recognizers.js";
@@ -22,13 +26,41 @@ export function buildUiManifestV2(input: {
   const exact = createExactComponentRecognizer(input.exactMappings);
   const diagnostics: UiManifestV2["diagnostics"] = [];
   const ids = new Map<string, number>();
+  const reserveUiId = (role: string, sourceNodeId: string): string => {
+    const baseId = `ui_${role}_${sanitize(sourceNodeId)}`;
+    const collision = (ids.get(baseId) ?? 0) + 1;
+    ids.set(baseId, collision);
+    return collision === 1 ? baseId : `${baseId}_${collision}`;
+  };
+  const buildProjected = (
+    projected: ProjectedSemanticChild,
+    compoundBoundaryNodeId: string,
+  ): UiNodeV2 => ({
+    id: reserveUiId(projected.role, projected.boundaryNodeId),
+    kind: "action",
+    role: projected.role,
+    sourceNodeIds: [projected.boundaryNodeId, projected.labelNodeId],
+    layoutSourceNodeId: projected.boundaryNodeId,
+    confidence: 1,
+    evidence: [
+      { kind: "compound-boundary", value: compoundBoundaryNodeId },
+      {
+        kind: "projected-label-source-node",
+        value: projected.labelNodeId,
+      },
+      { kind: "pack-declared-role", value: projected.role },
+    ],
+    content: { text: projected.label, label: projected.label },
+    children: [],
+  });
 
   const build = (nodeId: string): UiNodeV2 => {
     const node = input.ir.nodes[nodeId];
     if (!node) {
       throw new Error(`Design node does not exist: ${nodeId}`);
     }
-    const exactRecognition = exact.recognize(node);
+    const exactMatch = exact.match(node);
+    const exactRecognition = exactMatch?.recognition;
     const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;
@@ -42,9 +74,14 @@ export function buildUiManifestV2(input: {
           exactRecognition.role === "textInput"))
         ? onlyVisibleDirectText(node.children, input.ir, exactRecognition.role)
         : undefined;
-    const baseId = `ui_${role}_${sanitize(node.id)}`;
-    const collision = (ids.get(baseId) ?? 0) + 1;
-    ids.set(baseId, collision);
+    const compoundProjection = exactMatch
+      ? projectCompoundBoundary({
+          boundary: node,
+          mapping: exactMatch.mapping,
+          ir: input.ir,
+        })
+      : { children: [], diagnostics: [] };
+    diagnostics.push(...compoundProjection.diagnostics);
 
     if (!accepted) {
       diagnostics.push({
@@ -81,7 +118,7 @@ export function buildUiManifestV2(input: {
     }
 
     return {
-      id: collision === 1 ? baseId : `${baseId}_${collision}`,
+      id: reserveUiId(role, node.id),
       kind: accepted ? recognized.kind : "unresolved",
       role,
       sourceNodeIds: accepted
@@ -132,7 +169,9 @@ export function buildUiManifestV2(input: {
             }
           : {}),
       children: exactRecognition
-        ? []
+        ? compoundProjection.children.map((projected) =>
+            buildProjected(projected, node.id),
+          )
         : node.children.flatMap((childId) =>
             input.ir.nodes[childId] ? [build(childId)] : [],
           ),

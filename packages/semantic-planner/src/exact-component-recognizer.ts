@@ -15,7 +15,12 @@ export class SemanticPlannerError extends Error {
 }
 
 export interface ExactComponentRecognizer {
-  recognize(node: DesignNode): SemanticRecognition | undefined;
+  match(node: DesignNode): ExactComponentMatch | undefined;
+}
+
+export interface ExactComponentMatch {
+  mapping: PixsoSemanticMapping;
+  recognition: SemanticRecognition;
 }
 
 export function createExactComponentRecognizer(
@@ -39,7 +44,7 @@ export function createExactComponentRecognizer(
   }
 
   return {
-    recognize(node) {
+    match(node) {
       if (!node.component) {
         return undefined;
       }
@@ -55,23 +60,26 @@ export function createExactComponentRecognizer(
       }
 
       return {
-        kind: selected.kind,
-        role: selected.role,
-        confidence: 1,
-        evidence: [
-          { kind: "component-key", value: node.component.key, weight: 1 },
-          ...(selected.variant
-            ? [
-                {
-                  kind: "component-variant",
-                  value: selected.variant,
-                  weight: 1,
-                } as const,
-              ]
-            : []),
-          { kind: "source-node", value: node.id },
-        ],
-        sourceNodeIds: [node.id],
+        mapping: selected,
+        recognition: {
+          kind: selected.kind,
+          role: selected.role,
+          confidence: 1,
+          evidence: [
+            { kind: "component-key", value: node.component.key, weight: 1 },
+            ...(selected.variant
+              ? [
+                  {
+                    kind: "component-variant",
+                    value: selected.variant,
+                    weight: 1,
+                  } as const,
+                ]
+              : []),
+            { kind: "source-node", value: node.id },
+          ],
+          sourceNodeIds: [node.id],
+        },
       };
     },
   };
