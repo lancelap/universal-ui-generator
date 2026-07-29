@@ -111,25 +111,20 @@ function buildDefinitionIndexes(values: unknown[]): DefinitionIndexes {
 function assertNoInheritanceCycle(
   instance: PixsoRecord,
   definitions: DefinitionIndexes,
-  activeKeys: readonly string[],
+  activeIdentities: readonly string[],
 ): void {
-  if (
-    typeof instance.componentKey !== "string" ||
-    instance.componentKey.length === 0
-  ) {
+  const definitionIdentityValue = definitionIdentity(instance);
+  if (!definitionIdentityValue) {
     return;
   }
-  const identity = `${instance.componentKey}\u0000${
-    typeof instance.componentNormName === "string"
-      ? instance.componentNormName
-      : ""
-  }`;
-  if (activeKeys.includes(identity)) {
+  const identity = serializeDefinitionIdentity(definitionIdentityValue);
+  if (activeIdentities.includes(identity)) {
     throw new DesignNormalizationError(
       "PIXSO_COMPONENT_INHERITANCE_CYCLE",
-      `Pixso component inheritance cycle: ${[...activeKeys, identity].join(
-        " -> ",
-      )}`,
+      `Pixso component inheritance cycle: ${[
+        ...activeIdentities,
+        identity,
+      ].join(" -> ")}`,
     );
   }
   const definition = resolveDefinition(instance, definitions);
@@ -138,10 +133,16 @@ function assertNoInheritanceCycle(
   }
   for (const nestedInstance of collectNestedComponentInstances(definition)) {
     assertNoInheritanceCycle(nestedInstance, definitions, [
-      ...activeKeys,
+      ...activeIdentities,
       identity,
     ]);
   }
+}
+
+function serializeDefinitionIdentity(identity: DefinitionIdentity): string {
+  return identity.kind === "key"
+    ? `key:${identity.componentKey}\u0000${identity.componentNormName ?? ""}`
+    : `norm:${identity.componentNormName}`;
 }
 
 function collectNestedComponentInstances(root: PixsoRecord): PixsoRecord[] {
@@ -150,11 +151,7 @@ function collectNestedComponentInstances(root: PixsoRecord): PixsoRecord[] {
     if (!isRecord(value)) {
       return;
     }
-    if (
-      !isRoot &&
-      typeof value.componentKey === "string" &&
-      value.componentKey.length > 0
-    ) {
+    if (!isRoot && definitionIdentity(value)) {
       instances.push(value);
     }
     if (Array.isArray(value.childNode)) {

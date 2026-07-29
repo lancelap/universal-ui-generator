@@ -570,6 +570,83 @@ describe("materializePixsoRoot", () => {
       }),
     );
   });
+
+  it("rejects a keyless component-definition inheritance cycle", () => {
+    const definitionA = keylessDefinition({
+      guid: "definition-a",
+      normName: "NormA",
+      childNode: [
+        keylessInstance({
+          guid: "nested-b",
+          normName: "NormB",
+        }),
+      ],
+    });
+    const definitionB = keylessDefinition({
+      guid: "definition-b",
+      normName: "NormB",
+      childNode: [
+        keylessInstance({
+          guid: "nested-a",
+          normName: "NormA",
+        }),
+      ],
+    });
+    const root = keylessInstance({
+      guid: "root",
+      normName: "NormA",
+    });
+
+    let caught: unknown;
+    try {
+      materializePixsoRoot({
+        root,
+        componentDefinitions: [definitionB, definitionA],
+      });
+    } catch (error) {
+      caught = error;
+    }
+
+    expect(caught).toMatchObject({
+      code: "PIXSO_COMPONENT_INHERITANCE_CYCLE",
+    });
+    expect(caught).toBeInstanceOf(Error);
+    expect((caught as Error).message).toContain(
+      "norm:NormA -> norm:NormB -> norm:NormA",
+    );
+  });
+
+  it("keeps key and norm cycle identities in separate namespaces", () => {
+    const keyedDefinition = {
+      ...keylessDefinition({
+        guid: "keyed-definition",
+        normName: "Variant",
+        childNode: [
+          keylessInstance({
+            guid: "nested-norm",
+            normName: "shared",
+          }),
+        ],
+      }),
+      componentKey: "shared",
+    };
+    const normDefinition = keylessDefinition({
+      guid: "norm-definition",
+      normName: "shared",
+    });
+    const root = keylessInstance({
+      guid: "root",
+      componentKey: "shared",
+      normName: "Variant",
+    });
+
+    expect(() =>
+      materializePixsoRoot({
+        root,
+        componentDefinitions: [keyedDefinition, normDefinition],
+      }),
+    ).not.toThrow();
+  });
 });
 
 function componentDefinition(): PixsoRecord {
