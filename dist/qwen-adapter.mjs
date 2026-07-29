@@ -265024,7 +265024,7 @@ function hex3(value) {
 
 // packages/design-normalizer/src/materialize-pixso-instance.ts
 function materializePixsoRoot(_input) {
-  const definitions = buildDefinitionsByKey(_input.componentDefinitions);
+  const definitions = buildDefinitionIndexes(_input.componentDefinitions);
   assertNoInheritanceCycle(_input.root, definitions, []);
   const origins = /* @__PURE__ */ new WeakMap();
   return {
@@ -265032,16 +265032,41 @@ function materializePixsoRoot(_input) {
     origins
   };
 }
-function buildDefinitionsByKey(values) {
-  const definitions = /* @__PURE__ */ new Map();
+function nonEmptyString(value) {
+  return typeof value === "string" && value.length > 0 ? value : void 0;
+}
+function definitionIdentity(instance) {
+  const componentKey = nonEmptyString(instance.componentKey);
+  const componentNormName = nonEmptyString(instance.componentNormName);
+  if (componentKey) {
+    return {
+      kind: "key",
+      componentKey,
+      ...componentNormName ? { componentNormName } : {}
+    };
+  }
+  return componentNormName ? { kind: "norm", componentNormName } : void 0;
+}
+function buildDefinitionIndexes(values) {
+  const byKey = /* @__PURE__ */ new Map();
+  const byNormName = /* @__PURE__ */ new Map();
+  const add2 = (index, identity, definition) => {
+    const candidates = index.get(identity) ?? [];
+    candidates.push(definition);
+    index.set(identity, candidates);
+  };
   const visit2 = (value) => {
     if (!isRecord(value)) {
       return;
     }
-    if (typeof value.componentKey === "string" && value.componentKey.length > 0 && value.type === "SYMBOL") {
-      const existing = definitions.get(value.componentKey) ?? [];
-      existing.push(value);
-      definitions.set(value.componentKey, existing);
+    if (value.type === "SYMBOL") {
+      const componentKey = nonEmptyString(value.componentKey);
+      const componentNormName = nonEmptyString(value.componentNormName);
+      if (componentKey) {
+        add2(byKey, componentKey, value);
+      } else if (componentNormName) {
+        add2(byNormName, componentNormName, value);
+      }
     }
     if (Array.isArray(value.childNode)) {
       value.childNode.forEach(visit2);
@@ -265050,19 +265075,21 @@ function buildDefinitionsByKey(values) {
   for (const value of values) {
     visit2(value);
   }
-  return definitions;
+  return { byKey, byNormName };
 }
-function assertNoInheritanceCycle(instance, definitions, activeKeys) {
-  if (typeof instance.componentKey !== "string" || instance.componentKey.length === 0) {
+function assertNoInheritanceCycle(instance, definitions, activeIdentities) {
+  const definitionIdentityValue = definitionIdentity(instance);
+  if (!definitionIdentityValue) {
     return;
   }
-  const identity = `${instance.componentKey}\0${typeof instance.componentNormName === "string" ? instance.componentNormName : ""}`;
-  if (activeKeys.includes(identity)) {
+  const identity = serializeDefinitionIdentity(definitionIdentityValue);
+  if (activeIdentities.includes(identity)) {
     throw new DesignNormalizationError(
       "PIXSO_COMPONENT_INHERITANCE_CYCLE",
-      `Pixso component inheritance cycle: ${[...activeKeys, identity].join(
-        " -> "
-      )}`
+      `Pixso component inheritance cycle: ${[
+        ...activeIdentities,
+        identity
+      ].join(" -> ")}`
     );
   }
   const definition = resolveDefinition(instance, definitions);
@@ -265071,10 +265098,13 @@ function assertNoInheritanceCycle(instance, definitions, activeKeys) {
   }
   for (const nestedInstance of collectNestedComponentInstances(definition)) {
     assertNoInheritanceCycle(nestedInstance, definitions, [
-      ...activeKeys,
+      ...activeIdentities,
       identity
     ]);
   }
+}
+function serializeDefinitionIdentity(identity) {
+  return identity.kind === "key" ? `key:${identity.componentKey}\0${identity.componentNormName ?? ""}` : `norm:${identity.componentNormName}`;
 }
 function collectNestedComponentInstances(root) {
   const instances = [];
@@ -265082,7 +265112,7 @@ function collectNestedComponentInstances(root) {
     if (!isRecord(value)) {
       return;
     }
-    if (!isRoot && typeof value.componentKey === "string" && value.componentKey.length > 0) {
+    if (!isRoot && definitionIdentity(value)) {
       instances.push(value);
     }
     if (Array.isArray(value.childNode)) {
@@ -265095,30 +265125,46 @@ function collectNestedComponentInstances(root) {
   );
 }
 function resolveDefinition(instance, definitions) {
-  if (typeof instance.componentKey !== "string" || instance.componentKey.length === 0) {
+  const identity = definitionIdentity(instance);
+  if (!identity) {
     return void 0;
   }
-  const candidates = definitions.get(instance.componentKey) ?? [];
-  const variant = typeof instance.componentNormName === "string" ? instance.componentNormName : void 0;
-  const compatible = variant ? candidates.filter((candidate2) => candidate2.componentNormName === variant) : candidates;
-  if (compatible.length === 1) {
-    return compatible[0];
+  if (identity.kind === "key") {
+    const candidates2 = definitions.byKey.get(identity.componentKey) ?? [];
+    const compatible = identity.componentNormName ? candidates2.filter(
+      (candidate2) => candidate2.componentNormName === identity.componentNormName
+    ) : candidates2;
+    if (compatible.length === 1) {
+      return compatible[0];
+    }
+    if (compatible.length === 0 && candidates2.length === 1) {
+      return candidates2[0];
+    }
+    if (compatible.length === 0 && candidates2.length === 0) {
+      return void 0;
+    }
+    throw new DesignNormalizationError(
+      "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
+      `Pixso component key ${identity.componentKey} has multiple compatible definitions`
+    );
   }
-  if (compatible.length === 0 && candidates.length === 1) {
+  const candidates = definitions.byNormName.get(identity.componentNormName) ?? [];
+  if (candidates.length === 0) {
+    return void 0;
+  }
+  if (candidates.length === 1) {
     return candidates[0];
   }
-  if (compatible.length === 0 && candidates.length === 0) {
-    return void 0;
-  }
+  const candidateIds = candidates.map((candidate2) => rawNodeId(candidate2, "definition")).sort((left, right) => left.localeCompare(right));
   throw new DesignNormalizationError(
     "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
-    `Pixso component key ${instance.componentKey} has multiple compatible definitions`
+    `Pixso componentNormName ${identity.componentNormName} has ${candidates.length} keyless SYMBOL definitions: ${candidateIds.join(", ")}`
   );
 }
 function materializeNode(source, definitions, origins) {
   const output = cloneOwnFields(source, origins);
-  const componentKey = typeof source.componentKey === "string" && source.componentKey.length > 0 ? source.componentKey : void 0;
-  const definition = componentKey ? resolveDefinition(source, definitions) : void 0;
+  const componentKey = nonEmptyString(source.componentKey);
+  const definition = resolveDefinition(source, definitions);
   const defaults = definition ? collectDefinitionDefaults(definition) : /* @__PURE__ */ new Map();
   let propertyForest = [];
   if (Array.isArray(source.props)) {
