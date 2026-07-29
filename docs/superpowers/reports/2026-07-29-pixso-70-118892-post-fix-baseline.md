@@ -1,10 +1,10 @@
 # Pixso 70:118892 Post-fix Baseline
 
-**Date:** 2026-07-29  
-**Fixture:** `PqSywlhYgqSRDoWr78IrdA / 70:118892`  
-**Artifact:** `pixso_PqSywlhYgqSRDoWr78IrdA_70_118892_899812d8c628`  
-**Design system:** `sber-space-ui`  
-**Run:** `run_20260729T024101358Z_70-118892`
+- **Date:** 2026-07-29
+- **Fixture:** `PqSywlhYgqSRDoWr78IrdA / 70:118892`
+- **Artifact:** `pixso_PqSywlhYgqSRDoWr78IrdA_70_118892_899812d8c628`
+- **Design system:** `sber-space-ui`
+- **Run:** `run_20260729T024101358Z_70-118892`
 
 ## Normalization
 
