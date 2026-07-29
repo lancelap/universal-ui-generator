@@ -6,7 +6,10 @@ import { loadDesignSystemPack } from "@uig/component-catalog";
 import { resolveUiManifest } from "@uig/component-resolver";
 import { stableStringify } from "@uig/contracts";
 import { buildDesignSummary } from "@uig/design-context";
-import { normalizePixsoDesign } from "@uig/design-normalizer";
+import {
+  normalizePixsoDesign,
+  normalizePixsoDesignV2WithProvenance,
+} from "@uig/design-normalizer";
 import { buildUiManifest } from "@uig/semantic-planner";
 import { describe, expect, it } from "vitest";
 
@@ -130,6 +133,72 @@ describe("offline real-Pixso acceptance", () => {
       ).toBeLessThanOrEqual(20_000);
     },
   );
+
+  it("materializes keyless defaults for Pixso 70:118892 in V2", async () => {
+    const rawDsl = JSON.parse(
+      await readFile(
+        join(repoRoot, "fixtures", "pixso", "node-70-118892", "source.json"),
+        "utf8",
+      ),
+    );
+
+    const result = normalizePixsoDesignV2WithProvenance({
+      artifactId: "pixso_PqSywlhYgqSRDoWr78IrdA_70_118892_899812d8c628",
+      rootNodeId: "70:118892",
+      rawDsl,
+    });
+    const textOrigin = result.provenance.values.find(
+      (origin) =>
+        origin.sourceNodeId === "4:63130" &&
+        origin.targetPath === "/text/value",
+    );
+    const materializedText = textOrigin
+      ? result.designIr.nodes[textOrigin.targetNodeId]
+      : undefined;
+
+    expect(result.designIr.rootNodeId).toBe("70:118892");
+    expect(materializedText).toBeDefined();
+    expect(materializedText).toMatchObject({
+      text: {
+        value:
+          "Сообщите сотруднику бизнеса (SecurityDesk) о невозможности дальнейшей обработки сделки\nОна будет остановлена",
+      },
+      geometry: {
+        x: 0,
+        y: 20,
+        width: 561,
+        height: 32,
+      },
+    });
+
+    expect(textOrigin).toMatchObject({
+      kind: "instance-override",
+      sourceNodeId: "4:63130",
+      sourcePropertyPath: "27:101325/4:63130",
+      componentDefinitionNodeId: "31:100831",
+    });
+    expect(textOrigin).not.toHaveProperty("componentKey");
+
+    for (const targetPath of [
+      "/geometry/x",
+      "/geometry/y",
+      "/geometry/width",
+      "/geometry/height",
+    ]) {
+      const geometryOrigin = result.provenance.values.find(
+        (origin) =>
+          origin.targetNodeId === materializedText!.id &&
+          origin.targetPath === targetPath,
+      );
+      expect(geometryOrigin).toMatchObject({
+        kind: "component-default",
+        sourceNodeId: "4:63130",
+        sourcePropertyPath: "27:101325/4:63130",
+        componentDefinitionNodeId: "31:100831",
+      });
+      expect(geometryOrigin).not.toHaveProperty("componentKey");
+    }
+  });
 });
 
 async function expectGolden(file: string, actual: unknown): Promise<void> {
