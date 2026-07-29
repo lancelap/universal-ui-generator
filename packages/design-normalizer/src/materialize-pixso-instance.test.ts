@@ -96,6 +96,266 @@ describe("materializePixsoRoot", () => {
     });
   });
 
+  it("resolves one exact keyless SYMBOL definition and preserves field origins", () => {
+    const definition = keylessDefinition({
+      guid: "31:100831",
+      normName: "Component_31_100831",
+      props: [
+        textProperty({
+          path: "27:101325/4:63130",
+          text: "Default copy",
+          left: 0,
+          top: 20,
+          width: 561,
+          height: 32,
+        }),
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "70:118899",
+      normName: "Component_31_100831",
+      props: [
+        textProperty({
+          path: "27:101325/4:63130",
+          text: "Instance copy",
+        }),
+      ],
+    });
+    const original = structuredClone({ definition, instance });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [definition],
+    });
+    const property = flatProperties(result.root).get("27:101325/4:63130")!;
+
+    expect(property).toMatchObject({
+      nodeText: "Instance copy",
+      left: 0,
+      top: 20,
+      width: 561,
+      height: 32,
+    });
+    expect(result.origins.get(property)?.get("nodeText")).toMatchObject({
+      kind: "instance-override",
+      sourceNodeId: "4:63130",
+      sourcePropertyPath: "27:101325/4:63130",
+      componentDefinitionNodeId: "31:100831",
+    });
+    expect(result.origins.get(property)?.get("width")).toMatchObject({
+      kind: "component-default",
+      sourceNodeId: "4:63130",
+      sourcePropertyPath: "27:101325/4:63130",
+      componentDefinitionNodeId: "31:100831",
+    });
+    expect(result.origins.get(property)?.get("nodeText")).not.toHaveProperty(
+      "componentKey",
+    );
+    expect(result.origins.get(property)?.get("width")).not.toHaveProperty(
+      "componentKey",
+    );
+    expect({ definition, instance }).toEqual(original);
+  });
+
+  it("keeps a non-empty componentKey authoritative over a norm-only candidate", () => {
+    const keyed = {
+      ...keylessDefinition({
+        guid: "keyed-definition",
+        normName: "DifferentVariant",
+        props: [textProperty({ path: "label", text: "Keyed default" })],
+      }),
+      componentKey: "authoritative-key",
+    };
+    const normOnly = keylessDefinition({
+      guid: "norm-definition",
+      normName: "SharedNorm",
+      props: [textProperty({ path: "label", text: "Norm default" })],
+    });
+    const instance = keylessInstance({
+      guid: "instance",
+      componentKey: "authoritative-key",
+      normName: "SharedNorm",
+      props: [textProperty({ path: "label" })],
+    });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [normOnly, keyed],
+    });
+
+    expect(flatProperties(result.root).get("label")?.nodeText).toBe(
+      "Keyed default",
+    );
+  });
+
+  it("does not use keyed or non-SYMBOL records as norm-only definitions", () => {
+    const keyedSymbol = {
+      ...keylessDefinition({
+        guid: "keyed",
+        normName: "SharedNorm",
+        props: [textProperty({ path: "label", text: "Wrong keyed" })],
+      }),
+      componentKey: "another-key",
+    };
+    const keylessInstanceRecord = {
+      ...keylessDefinition({
+        guid: "not-a-symbol",
+        normName: "SharedNorm",
+        props: [textProperty({ path: "label", text: "Wrong type" })],
+      }),
+      type: "INSTANCE",
+    };
+    const root = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [textProperty({ path: "label" })],
+    });
+
+    const result = materializePixsoRoot({
+      root,
+      componentDefinitions: [keyedSymbol, keylessInstanceRecord],
+    });
+
+    expect(flatProperties(result.root).get("label")).not.toHaveProperty(
+      "nodeText",
+    );
+  });
+
+  it("does not use a keyed non-SYMBOL record as a keyed definition", () => {
+    const root = keylessInstance({
+      guid: "root",
+      componentKey: "SharedKey",
+      props: [textProperty({ path: "label" })],
+    });
+    const notASymbol = {
+      ...keylessDefinition({
+        guid: "not-a-symbol",
+        normName: "SharedNorm",
+        props: [textProperty({ path: "label", text: "Wrong default" })],
+      }),
+      componentKey: "SharedKey",
+      type: "INSTANCE",
+    };
+
+    const result = materializePixsoRoot({
+      root,
+      componentDefinitions: [notASymbol],
+    });
+
+    expect(flatProperties(result.root).get("label")).not.toHaveProperty(
+      "nodeText",
+    );
+  });
+
+  it.each([
+    { componentNormName: undefined },
+    { componentNormName: null },
+    { componentNormName: "" },
+    { componentNormName: "DifferentNorm" },
+  ])(
+    "does not fall back without an exact non-empty norm: $componentNormName",
+    ({ componentNormName }) => {
+      const root = {
+        ...keylessInstance({
+          guid: "root",
+          props: [textProperty({ path: "label" })],
+        }),
+        componentNormName,
+      };
+      const result = materializePixsoRoot({
+        root,
+        componentDefinitions: [
+          keylessDefinition({
+            guid: "definition",
+            normName: "SharedNorm",
+            props: [textProperty({ path: "label", text: "Wrong default" })],
+          }),
+        ],
+      });
+
+      expect(flatProperties(result.root).get("label")).not.toHaveProperty(
+        "nodeText",
+      );
+    },
+  );
+
+  it("keeps falsy and null values as overrides after keyless resolution", () => {
+    const fields = {
+      enabled: false,
+      count: 0,
+      description: "",
+      choices: [],
+      optional: null,
+    };
+    const definition = keylessDefinition({
+      guid: "definition",
+      normName: "SharedNorm",
+      props: [
+        {
+          ...textProperty({ path: "label", text: "Default" }),
+          enabled: true,
+          count: 10,
+          description: "Default",
+          choices: ["default"],
+          optional: "default",
+        },
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [{ ...textProperty({ path: "label" }), ...fields }],
+    });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [definition],
+    });
+    const property = flatProperties(result.root).get("label")!;
+
+    expect(property).toMatchObject(fields);
+    for (const field of Object.keys(fields)) {
+      expect(result.origins.get(property)?.get(field)?.kind).toBe(
+        "instance-override",
+      );
+    }
+  });
+
+  it("blocks ambiguous keyless norm definitions with stable candidate evidence", () => {
+    const definitions = [
+      keylessDefinition({
+        guid: "definition-b",
+        normName: "SharedNorm",
+      }),
+      keylessDefinition({
+        guid: "definition-a",
+        normName: "SharedNorm",
+      }),
+    ];
+    const root = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+    });
+
+    const errors = permutations(definitions).map((componentDefinitions) => {
+      try {
+        materializePixsoRoot({ root, componentDefinitions });
+        throw new Error("expected ambiguity");
+      } catch (error) {
+        expect(error).toMatchObject({
+          code: "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
+        });
+        return (error as Error).message;
+      }
+    });
+
+    expect(new Set(errors)).toEqual(
+      new Set([
+        "Pixso componentNormName SharedNorm has 2 keyless SYMBOL definitions: definition-a, definition-b",
+      ]),
+    );
+  });
+
   it("treats false, zero, empty string, empty array, and null as explicit overrides", () => {
     const definition = componentDefinition();
     const defaultPrimary = (
@@ -384,6 +644,61 @@ function actionGroupInstance(): PixsoRecord {
         height: 16,
       },
     ],
+  };
+}
+
+function keylessDefinition(input: {
+  guid: string;
+  normName: string;
+  props?: PixsoRecord[];
+  childNode?: PixsoRecord[];
+}): PixsoRecord {
+  return {
+    guid: input.guid,
+    name: input.guid,
+    type: "SYMBOL",
+    componentKey: null,
+    componentNormName: input.normName,
+    ...(input.props ? { props: input.props } : {}),
+    ...(input.childNode ? { childNode: input.childNode } : {}),
+  };
+}
+
+function keylessInstance(input: {
+  guid: string;
+  normName?: string;
+  componentKey?: string | null;
+  props?: PixsoRecord[];
+}): PixsoRecord {
+  return {
+    guid: input.guid,
+    name: input.guid,
+    type: "INSTANCE",
+    componentKey: input.componentKey ?? null,
+    ...(input.normName
+      ? { componentNormName: input.normName }
+      : { componentNormName: null }),
+    props: input.props ?? [],
+  };
+}
+
+function textProperty(input: {
+  path: string;
+  text?: string;
+  left?: number;
+  top?: number;
+  width?: number;
+  height?: number;
+}): PixsoRecord {
+  return {
+    componentId: input.path.split("/").at(-1),
+    pathString: input.path,
+    type: "TEXT",
+    ...(input.text === undefined ? {} : { nodeText: input.text }),
+    ...(input.left === undefined ? {} : { left: input.left }),
+    ...(input.top === undefined ? {} : { top: input.top }),
+    ...(input.width === undefined ? {} : { width: input.width }),
+    ...(input.height === undefined ? {} : { height: input.height }),
   };
 }
 

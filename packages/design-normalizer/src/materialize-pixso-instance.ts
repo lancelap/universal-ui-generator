@@ -23,7 +23,7 @@ export function materializePixsoRoot(_input: {
   root: PixsoRecord;
   componentDefinitions: unknown[];
 }): PixsoMaterializationResult {
-  const definitions = buildDefinitionsByKey(_input.componentDefinitions);
+  const definitions = buildDefinitionIndexes(_input.componentDefinitions);
   assertNoInheritanceCycle(_input.root, definitions, []);
   const origins = new WeakMap<object, Map<string, RawMaterializationOrigin>>();
   return {
@@ -38,22 +38,65 @@ interface DefinitionDefault {
   sourceNodeId: string;
 }
 
-function buildDefinitionsByKey(
-  values: unknown[],
-): ReadonlyMap<string, readonly PixsoRecord[]> {
-  const definitions = new Map<string, PixsoRecord[]>();
+interface DefinitionIndexes {
+  byKey: ReadonlyMap<string, readonly PixsoRecord[]>;
+  byNormName: ReadonlyMap<string, readonly PixsoRecord[]>;
+}
+
+type DefinitionIdentity =
+  | {
+      kind: "key";
+      componentKey: string;
+      componentNormName?: string;
+    }
+  | {
+      kind: "norm";
+      componentNormName: string;
+    };
+
+function nonEmptyString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function definitionIdentity(
+  instance: PixsoRecord,
+): DefinitionIdentity | undefined {
+  const componentKey = nonEmptyString(instance.componentKey);
+  const componentNormName = nonEmptyString(instance.componentNormName);
+  if (componentKey) {
+    return {
+      kind: "key",
+      componentKey,
+      ...(componentNormName ? { componentNormName } : {}),
+    };
+  }
+  return componentNormName ? { kind: "norm", componentNormName } : undefined;
+}
+
+function buildDefinitionIndexes(values: unknown[]): DefinitionIndexes {
+  const byKey = new Map<string, PixsoRecord[]>();
+  const byNormName = new Map<string, PixsoRecord[]>();
+  const add = (
+    index: Map<string, PixsoRecord[]>,
+    identity: string,
+    definition: PixsoRecord,
+  ): void => {
+    const candidates = index.get(identity) ?? [];
+    candidates.push(definition);
+    index.set(identity, candidates);
+  };
   const visit = (value: unknown): void => {
     if (!isRecord(value)) {
       return;
     }
-    if (
-      typeof value.componentKey === "string" &&
-      value.componentKey.length > 0 &&
-      value.type === "SYMBOL"
-    ) {
-      const existing = definitions.get(value.componentKey) ?? [];
-      existing.push(value);
-      definitions.set(value.componentKey, existing);
+    if (value.type === "SYMBOL") {
+      const componentKey = nonEmptyString(value.componentKey);
+      const componentNormName = nonEmptyString(value.componentNormName);
+      if (componentKey) {
+        add(byKey, componentKey, value);
+      } else if (componentNormName) {
+        add(byNormName, componentNormName, value);
+      }
     }
     if (Array.isArray(value.childNode)) {
       value.childNode.forEach(visit);
@@ -62,12 +105,12 @@ function buildDefinitionsByKey(
   for (const value of values) {
     visit(value);
   }
-  return definitions;
+  return { byKey, byNormName };
 }
 
 function assertNoInheritanceCycle(
   instance: PixsoRecord,
-  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
+  definitions: DefinitionIndexes,
   activeKeys: readonly string[],
 ): void {
   if (
@@ -126,50 +169,63 @@ function collectNestedComponentInstances(root: PixsoRecord): PixsoRecord[] {
 
 function resolveDefinition(
   instance: PixsoRecord,
-  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
+  definitions: DefinitionIndexes,
 ): PixsoRecord | undefined {
-  if (
-    typeof instance.componentKey !== "string" ||
-    instance.componentKey.length === 0
-  ) {
+  const identity = definitionIdentity(instance);
+  if (!identity) {
     return undefined;
   }
-  const candidates = definitions.get(instance.componentKey) ?? [];
-  const variant =
-    typeof instance.componentNormName === "string"
-      ? instance.componentNormName
-      : undefined;
-  const compatible = variant
-    ? candidates.filter((candidate) => candidate.componentNormName === variant)
-    : candidates;
-  if (compatible.length === 1) {
-    return compatible[0];
+
+  if (identity.kind === "key") {
+    const candidates = definitions.byKey.get(identity.componentKey) ?? [];
+    const compatible = identity.componentNormName
+      ? candidates.filter(
+          (candidate) =>
+            candidate.componentNormName === identity.componentNormName,
+        )
+      : candidates;
+    if (compatible.length === 1) {
+      return compatible[0];
+    }
+    if (compatible.length === 0 && candidates.length === 1) {
+      return candidates[0];
+    }
+    if (compatible.length === 0 && candidates.length === 0) {
+      return undefined;
+    }
+    throw new DesignNormalizationError(
+      "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
+      `Pixso component key ${identity.componentKey} has multiple compatible definitions`,
+    );
   }
-  if (compatible.length === 0 && candidates.length === 1) {
+
+  const candidates =
+    definitions.byNormName.get(identity.componentNormName) ?? [];
+  if (candidates.length === 0) {
+    return undefined;
+  }
+  if (candidates.length === 1) {
     return candidates[0];
   }
-  if (compatible.length === 0 && candidates.length === 0) {
-    return undefined;
-  }
+  const candidateIds = candidates
+    .map((candidate) => rawNodeId(candidate, "definition"))
+    .sort((left, right) => left.localeCompare(right));
   throw new DesignNormalizationError(
     "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
-    `Pixso component key ${instance.componentKey} has multiple compatible definitions`,
+    `Pixso componentNormName ${identity.componentNormName} has ${
+      candidates.length
+    } keyless SYMBOL definitions: ${candidateIds.join(", ")}`,
   );
 }
 
 function materializeNode(
   source: PixsoRecord,
-  definitions: ReadonlyMap<string, readonly PixsoRecord[]>,
+  definitions: DefinitionIndexes,
   origins: WeakMap<object, Map<string, RawMaterializationOrigin>>,
 ): PixsoRecord {
   const output = cloneOwnFields(source, origins);
-  const componentKey =
-    typeof source.componentKey === "string" && source.componentKey.length > 0
-      ? source.componentKey
-      : undefined;
-  const definition = componentKey
-    ? resolveDefinition(source, definitions)
-    : undefined;
+  const componentKey = nonEmptyString(source.componentKey);
+  const definition = resolveDefinition(source, definitions);
   const defaults = definition
     ? collectDefinitionDefaults(definition)
     : new Map<string, DefinitionDefault>();
