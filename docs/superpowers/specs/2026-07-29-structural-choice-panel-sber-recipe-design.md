@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-29
 
-**Status:** approved direction, awaiting written-spec review
+**Status:** approved design
 
 **Repository:** `/Users/danilel/Documents/Codex/universal-ui-generator`
 
