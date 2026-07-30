@@ -23,6 +23,10 @@ export const LayoutPositionSchema = closedObject({
   ),
 });
 
+export const AssetMetadataSchema = closedObject({
+  name: Type.String({ minLength: 1 }),
+});
+
 export const DesignNodeV2Schema = closedObject({
   id: Type.String({ minLength: 1 }),
   type: Type.String({ minLength: 1 }),
@@ -35,6 +39,7 @@ export const DesignNodeV2Schema = closedObject({
   appearance: AppearanceSchema,
   text: Type.Optional(TextContentSchema),
   component: Type.Optional(ComponentReferenceSchema),
+  asset: Type.Optional(AssetMetadataSchema),
   source: closedObject({
     provider: Type.Literal("pixso"),
     nodeId: Type.String({ minLength: 1 }),
@@ -51,6 +56,7 @@ export const DesignIRV2Schema = closedObject({
 });
 
 export type LayoutPosition = Static<typeof LayoutPositionSchema>;
+export type AssetMetadata = Static<typeof AssetMetadataSchema>;
 export type DesignNodeV2 = Static<typeof DesignNodeV2Schema>;
 export type DesignIRV2 = Static<typeof DesignIRV2Schema>;
 

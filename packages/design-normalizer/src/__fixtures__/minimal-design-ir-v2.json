@@ -120,6 +120,9 @@
         },
         "shadows": []
       },
+      "asset": {
+        "name": "size=m"
+      },
       "children": [],
       "component": {
         "key": "Button/Primary",

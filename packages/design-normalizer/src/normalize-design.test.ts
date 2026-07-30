@@ -313,6 +313,51 @@ describe("normalizePixsoDesignV2 positioning", () => {
     expect(result.nodes["4:316"]?.position).toBeUndefined();
   });
 
+  it("preserves a component norm name as factual asset metadata without a component key", () => {
+    const root = fixtureRoot();
+    root.componentNormName = "files";
+
+    const result = normalizePixsoDesignV2WithProvenance({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.designIr.nodes["4:314"]?.asset).toEqual({
+      name: "files",
+    });
+    expect(result.designIr.nodes["4:314"]?.component).toBeUndefined();
+    expect(result.provenance.values).toContainEqual(
+      expect.objectContaining({
+        targetNodeId: "4:314",
+        targetPath: "/asset/name",
+        kind: "instance-value",
+        sourceNodeId: "4:314",
+      }),
+    );
+  });
+
+  it("omits whitespace-only component norm names from asset metadata", () => {
+    const root = fixtureRoot();
+    root.componentNormName = "   ";
+
+    const result = normalizePixsoDesignV2WithProvenance({
+      artifactId,
+      rawDsl: {
+        dsl: { ...minimalPixsoDsl.dsl, pixTreeDslNodes: [root] },
+      },
+    });
+
+    expect(result.designIr.nodes["4:314"]?.asset).toBeUndefined();
+    expect(result.provenance.values).not.toContainEqual(
+      expect.objectContaining({
+        targetNodeId: "4:314",
+        targetPath: "/asset/name",
+      }),
+    );
+  });
+
   it("materializes inherited text and records default and override provenance", () => {
     const rawDsl = definitionBackedActionGroup();
     const input = {

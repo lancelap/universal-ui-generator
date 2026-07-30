@@ -112,9 +112,14 @@ export function normalizePixsoNodeV2(
 ): DesignNodeV2 {
   const normalized = normalizePixsoNode(node, childIds, context);
   const position = normalizePosition(node);
+  const assetName =
+    typeof node.componentNormName === "string"
+      ? node.componentNormName.trim() || undefined
+      : undefined;
   const result = {
     ...normalized,
     ...(position ? { position } : {}),
+    ...(assetName ? { asset: { name: assetName } } : {}),
   };
   recordKnownOrigins(result, node, context);
   return result;
@@ -183,7 +188,7 @@ const normalizedTargetsByRawField = {
   autoLayout: ["/layout"],
   autoLayoutAbsolutePos: ["/position/mode"],
   componentKey: ["/component/key"],
-  componentNormName: ["/component/variant"],
+  componentNormName: ["/component/variant", "/asset/name"],
   props: ["/component/properties"],
 } as const;
 

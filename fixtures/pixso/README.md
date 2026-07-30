@@ -61,6 +61,21 @@ place exported dependency roots before it. The normalizer must select
         "kind": "live-project-client",
         "retrievedOn": "2026-07-26"
       }
+    },
+    {
+      "path": "node-70-118899/source.json",
+      "sourceUrl": "https://pixso.net/app/design/PqSywlhYgqSRDoWr78IrdA?item-id=70:118899",
+      "fileKey": "PqSywlhYgqSRDoWr78IrdA",
+      "requestedNodeId": "70:118899",
+      "exportedRootNodeIds": ["70:118899"],
+      "dslVersion": "2.1.15",
+      "converterVersion": "2.2.13",
+      "byteLength": 1132326,
+      "sha256": "1ff9d4c8045430873dc7314da91887415609ed8362eb2869582c8c47c7365289",
+      "acquisition": {
+        "kind": "live-project-client",
+        "retrievedOn": "2026-07-29"
+      }
     }
   ]
 }
