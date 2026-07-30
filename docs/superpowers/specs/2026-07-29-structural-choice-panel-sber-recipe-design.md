@@ -154,6 +154,52 @@ The existing exact Pixso compound projector remains responsible for
 pack-declared exact component mappings such as the prior `actionGroup` slice.
 The new recognizer must not overload that Pixso-specific API.
 
+### 4.1 Responsibility analysis for the accepted baseline
+
+The accepted `70:118899` baseline demonstrates several independent gaps. They
+must not be treated as one generic "parser failed" problem:
+
+| Evidence | Diagnosis | Owning change |
+| --- | --- | --- |
+| The raw Pixso source contains the selected marker appearance, but normalized property ellipses have no corresponding border/fill evidence | A source fact is lost before semantic planning | Pixso effective-instance materialization or appearance normalization |
+| `DesignIRV2` contains the panel geometry, five option labels, descriptions, markers, and trailing indicators, but planning leaves 79 primitive nodes unresolved | Facts are present but not combined into one single-selection control | Provider-neutral structural compound recognizer |
+| The manifest expresses `choicePanel`, but Sber components and their repeated option composition are not available to generation | Library implementation knowledge is incomplete | Sber catalog closure and structured render recipe |
+| A target project may expose `AppRadioGroup` or forbid direct `@sber-space-ui/*` imports | Target-project implementation preference is unknown | Future project scan and effective component catalog |
+
+The fixes are deliberately independent:
+
+```text
+lost selected appearance
+    → normalizer repair for reusable instance appearance inheritance
+
+unrecognized repeated option structure
+    → reusable choice-panel recognizer
+
+Sber RadioGroup, RadioButton, descriptions, and icons
+    → verified Sber pack recipe
+
+project AppRadioGroup or import facade
+    → project scan, mappings, and policies
+```
+
+Changing the normalizer alone cannot safely infer `choicePanel`. Adding the
+recognizer cannot restore a selected state that is absent from `DesignIR`.
+Adding a Sber recipe cannot decide whether a project-local wrapper is
+mandatory.
+
+The following apparent shortcuts are forbidden:
+
+```ts
+node.id === "70:118899";
+text.includes("Сделка требует корректировок");
+node.name === "Radiobutton";
+source.provider === "pixso"; // inside the provider-neutral recognizer
+```
+
+The regression fixture may assert the real node IDs and copy as expected
+evidence, but production recognition cannot branch on them. Each correction
+must make a reusable class of designs more complete.
+
 ## 5. Manifest contract
 
 ### 5.1 Role and node kind

@@ -503,6 +503,54 @@ Default handling:
 Thresholds are configuration, but confidence and evidence always remain in the
 artifact.
 
+### Choosing the extension layer
+
+A blocked design does not automatically mean that the provider parser must be
+changed. The first investigation must locate the earliest layer that lost or
+failed to interpret the required evidence:
+
+| Observed gap | Owning layer | Required change |
+| --- | --- | --- |
+| A fact present in the source is absent or incorrect in `DesignIR` | provider materializer or normalizer | Preserve the fact through a provider-neutral contract |
+| Geometry, text, appearance, and hierarchy are present, but their UI meaning is not recognized | primitive or compound semantic recognizer | Add deterministic structural recognition for the whole pattern class |
+| The semantic role is correct, but no library component or composition is selected | design-system pack, catalog, policy, or render recipe | Add verified library knowledge and resolution rules |
+| The project exposes a preferred wrapper or forbids direct library imports | project scan and effective component catalog | Add project facts, explicit mappings, and policies without changing design interpretation |
+| Evidence is genuinely insufficient or ambiguous | annotation boundary or planning diagnostics | Require an explicit annotation or remain `blocked` |
+
+The extension must repair the earliest incorrect boundary. Downstream code
+must not compensate for information that an upstream contract lost. Likewise,
+the normalizer must not acquire UI-library or business semantics merely
+because a later recognizer is missing.
+
+Every parser, recognizer, catalog, or recipe change must cover a reusable class
+of inputs. The following are forbidden as recognition or repair predicates:
+
+```text
+one document ID
+one node ID
+one user-visible phrase
+one designer layer name
+one fixture path
+```
+
+A source component identity may be retained as provenance and may participate
+in an explicit verified mapping. It must not become an undocumented special
+case.
+
+The expected long-term behavior is:
+
+```text
+new design
+  → existing normalizer preserves facts
+  → existing primitive and compound recognizers identify known patterns
+  → effective catalog selects verified library or project components
+  → generator emits code
+```
+
+New work is expected only when the design exposes a previously lost source
+fact, a genuinely new semantic pattern, a missing design-system recipe, or a
+new project policy/component mapping. It is not expected for every new screen.
+
 The Slice 1 semantic vocabulary is:
 
 - dialog;
