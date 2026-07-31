@@ -38,6 +38,11 @@ interface DefinitionDefault {
   sourceNodeId: string;
 }
 
+interface DefinitionDefaults {
+  byPath: ReadonlyMap<string, DefinitionDefault>;
+  byGuid: ReadonlyMap<string, readonly DefinitionDefault[]>;
+}
+
 interface DefinitionIndexes {
   byKey: ReadonlyMap<string, readonly PixsoRecord[]>;
   byNormName: ReadonlyMap<string, readonly PixsoRecord[]>;
@@ -225,7 +230,7 @@ function materializeNode(
   const definition = resolveDefinition(source, definitions);
   const defaults = definition
     ? collectDefinitionDefaults(definition)
-    : new Map<string, DefinitionDefault>();
+    : { byPath: new Map(), byGuid: new Map() };
   let propertyForest: PixsoRecord[] = [];
 
   if (Array.isArray(source.props)) {
@@ -233,9 +238,12 @@ function materializeNode(
       if (!isRecord(property)) {
         return [];
       }
-      const path = canonicalPropertyPath(property.pathString).path;
+      const canonicalPath = canonicalPropertyPath(property.pathString);
+      const fallback =
+        defaults.byPath.get(canonicalPath.path) ??
+        resolveSingleSegmentGuidDefault(canonicalPath, defaults);
       return [
-        mergeEffectiveRecord(property, defaults.get(path), {
+        mergeEffectiveRecord(property, fallback, {
           origins,
           ...(componentKey ? { componentKey } : {}),
           ...(definition ? { definition } : {}),
@@ -292,16 +300,29 @@ function cloneOwnFields(
 
 function collectDefinitionDefaults(
   definition: PixsoRecord,
-): ReadonlyMap<string, DefinitionDefault> {
-  const defaults = new Map<string, DefinitionDefault>();
+): DefinitionDefaults {
+  const byPath = new Map<string, DefinitionDefault>();
+  const byGuid = new Map<string, DefinitionDefault[]>();
+
+  const addGuidDefault = (
+    node: PixsoRecord,
+    fallback: DefinitionDefault,
+  ): void => {
+    if (typeof node.guid !== "string" || node.guid.length === 0) {
+      return;
+    }
+    byGuid.set(node.guid, [...(byGuid.get(node.guid) ?? []), fallback]);
+  };
 
   const visit = (node: PixsoRecord, prefix: string): void => {
     if (prefix.length > 0) {
-      defaults.set(prefix, {
+      const fallback = {
         record: node,
         path: prefix,
         sourceNodeId: rawNodeId(node, prefix),
-      });
+      };
+      byPath.set(prefix, fallback);
+      addGuidDefault(node, fallback);
     }
 
     if (Array.isArray(node.props)) {
@@ -311,11 +332,13 @@ function collectDefinitionDefaults(
         }
         const ownerPath = node === definition ? "" : rawNodeId(node, prefix);
         const path = qualifyPath(ownerPath, property.pathString);
-        defaults.set(path, {
+        const fallback = {
           record: property,
           path,
           sourceNodeId: rawNodeId(property, path),
-        });
+        };
+        byPath.set(path, fallback);
+        addGuidDefault(property, fallback);
       }
     }
 
@@ -345,7 +368,33 @@ function collectDefinitionDefaults(
       }
     }
   }
-  return defaults;
+  for (const values of byGuid.values()) {
+    values.sort(
+      (left, right) =>
+        left.path.localeCompare(right.path) ||
+        left.sourceNodeId.localeCompare(right.sourceNodeId),
+    );
+  }
+  return { byPath, byGuid };
+}
+
+function resolveSingleSegmentGuidDefault(
+  propertyPath: { path: string; segments: string[] },
+  defaults: DefinitionDefaults,
+): DefinitionDefault | undefined {
+  if (propertyPath.segments.length !== 1) {
+    return undefined;
+  }
+  const candidates = defaults.byGuid.get(propertyPath.path) ?? [];
+  if (candidates.length <= 1) {
+    return candidates[0];
+  }
+  throw new DesignNormalizationError(
+    "PIXSO_PROPERTY_DEFINITION_AMBIGUOUS",
+    `Pixso property path ${propertyPath.path} matches ${candidates.length} definition nodes: ${candidates
+      .map((candidate) => candidate.path)
+      .join(", ")}`,
+  );
 }
 
 function mergeEffectiveRecord(

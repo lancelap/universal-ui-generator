@@ -3,6 +3,7 @@ import minimalDesignIrV2 from "./__fixtures__/minimal-design-ir-v2.json";
 import minimalPixsoDsl from "./__fixtures__/minimal-pixso-dsl.json";
 
 import { stableStringify } from "@uig/contracts";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -355,6 +356,47 @@ describe("normalizePixsoDesignV2 positioning", () => {
         targetNodeId: "4:314",
         targetPath: "/asset/name",
       }),
+    );
+  });
+
+  it("restores the real choice-panel title and header asset from exact flattened defaults", () => {
+    const rawDsl = JSON.parse(
+      readFileSync(
+        new URL(
+          "../../../fixtures/pixso/node-70-118899/source.json",
+          import.meta.url,
+        ),
+        "utf8",
+      ),
+    ) as unknown;
+
+    const result = normalizePixsoDesignV2WithProvenance({
+      artifactId,
+      rootNodeId: "70:118899",
+      rawDsl,
+    });
+
+    expect(result.designIr.nodes["27:101322"]?.text?.value).toBe(
+      "Выберите необходимые действия",
+    );
+    expect(result.designIr.nodes["2:7982/27:101320"]?.asset).toEqual({
+      name: "files",
+    });
+    expect(result.provenance.values).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          targetNodeId: "27:101322",
+          targetPath: "/text/value",
+          kind: "component-default",
+          sourceNodeId: "27:101322",
+        }),
+        expect.objectContaining({
+          targetNodeId: "2:7982/27:101320",
+          targetPath: "/asset/name",
+          kind: "component-default",
+          sourceNodeId: "27:101320",
+        }),
+      ]),
     );
   });
 

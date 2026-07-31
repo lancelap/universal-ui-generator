@@ -148,6 +148,8 @@ CHOICE_ICON_UNRESOLVED
 - Modify `fixtures/pixso/README.md` with the exact URL, file key, node ID, versions, byte length, SHA-256, retrieval date, and exported root.
 - Modify `packages/contracts/src/design-ir-v2.ts` to add optional factual `asset.name`.
 - Modify `packages/design-normalizer/src/normalize-node.ts` to preserve a non-empty raw `componentNormName` as `asset.name` even when no component key exists.
+- Modify `packages/design-normalizer/src/materialize-pixso-instance.ts` to recover absent fields from a uniquely matching definition node only for an exact single-segment property path.
+- Modify `packages/design-normalizer/src/materialize-pixso-instance.test.ts` to prove exact matching, ambiguity rejection, nested-path exclusion, explicit override preservation, and provenance.
 - Modify `packages/design-normalizer/src/normalize-design.test.ts` to verify asset preservation and provenance.
 
 ### Manifest contract and semantic planning
@@ -265,6 +267,40 @@ exportedRootIds: [70:118899]
   ```bash
   git add fixtures/pixso/node-70-118899/source.json fixtures/pixso/README.md packages/contracts/src/design-ir-v2.ts packages/design-normalizer/src/normalize-node.ts packages/design-normalizer/src/normalize-design.test.ts
   git commit -m "feat: preserve normalized asset names"
+  ```
+
+---
+
+## Task 1b: Recover exact single-segment definition defaults
+
+**Files:**
+
+- Modify: `packages/design-normalizer/src/materialize-pixso-instance.ts`
+- Modify: `packages/design-normalizer/src/materialize-pixso-instance.test.ts`
+- Modify: `packages/design-normalizer/src/normalize-design.test.ts`
+
+- [ ] Add failing synthetic tests proving a flattened property whose `pathString` contains exactly one segment inherits absent fields from the unique node with `guid === pathString` inside the already resolved component definition.
+
+- [ ] Prove the fallback is rejected when the definition GUID is ambiguous, is not attempted for multi-segment paths, and never matches by suffix, text, name, geometry, `componentId`, or fuzzy similarity.
+
+- [ ] Prove explicit instance values `false`, `0`, `""`, `[]`, and `null` remain authoritative and inherited values record `component-default` provenance.
+
+- [ ] Implement a definition-local unique GUID index and consult it only after the existing exact canonical-path lookup misses for a single-segment property path.
+
+- [ ] Add the real regression proving `27:101322.text.value` and `2:7982/27:101320.asset.name` are restored for fixture `70:118899` without exposing raw definition data to the semantic planner.
+
+- [ ] Run:
+
+  ```bash
+  pnpm vitest run packages/design-normalizer/src/materialize-pixso-instance.test.ts packages/design-normalizer/src/normalize-design.test.ts
+  pnpm typecheck
+  ```
+
+- [ ] Commit:
+
+  ```bash
+  git add packages/design-normalizer/src/materialize-pixso-instance.ts packages/design-normalizer/src/materialize-pixso-instance.test.ts packages/design-normalizer/src/normalize-design.test.ts docs/superpowers/plans/2026-07-30-structural-choice-panel-sber-recipe-plan.md
+  git commit -m "fix: recover exact flattened definition defaults"
   ```
 
 ---

@@ -157,6 +157,188 @@ describe("materializePixsoRoot", () => {
     expect({ definition, instance }).toEqual(original);
   });
 
+  it("inherits absent fields from one exact single-segment definition GUID", () => {
+    const definition = keylessDefinition({
+      guid: "definition",
+      normName: "SharedNorm",
+      childNode: [
+        {
+          guid: "container",
+          type: "FRAME",
+          childNode: [
+            {
+              guid: "title",
+              type: "TEXT",
+              nodeText: "Definition title",
+              componentNormName: "files",
+              visible: true,
+              left: 32,
+              top: 2,
+              width: 680,
+              height: 20,
+            },
+          ],
+        },
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [
+        {
+          componentId: "title",
+          pathString: "title",
+          type: "TEXT",
+          visible: true,
+          left: 32,
+          top: 2,
+          width: 680,
+          height: 20,
+        },
+      ],
+    });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [definition],
+    });
+    const property = flatProperties(result.root).get("title")!;
+
+    expect(property).toMatchObject({
+      nodeText: "Definition title",
+      componentNormName: "files",
+    });
+    expect(result.origins.get(property)?.get("nodeText")).toMatchObject({
+      kind: "component-default",
+      sourceNodeId: "title",
+      componentDefinitionNodeId: "definition",
+      sourcePropertyPath: "title",
+    });
+  });
+
+  it("rejects an ambiguous exact single-segment definition GUID", () => {
+    const definition = keylessDefinition({
+      guid: "definition",
+      normName: "SharedNorm",
+      childNode: [
+        {
+          guid: "first-container",
+          type: "FRAME",
+          childNode: [{ guid: "title", type: "TEXT", nodeText: "First" }],
+        },
+        {
+          guid: "second-container",
+          type: "FRAME",
+          childNode: [{ guid: "title", type: "TEXT", nodeText: "Second" }],
+        },
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [textProperty({ path: "title" })],
+    });
+
+    expect(() =>
+      materializePixsoRoot({
+        root: instance,
+        componentDefinitions: [definition],
+      }),
+    ).toThrowError(
+      expect.objectContaining({
+        code: "PIXSO_PROPERTY_DEFINITION_AMBIGUOUS",
+        message:
+          "Pixso property path title matches 2 definition nodes: first-container/title, second-container/title",
+      }),
+    );
+  });
+
+  it("does not suffix-match a multi-segment property path", () => {
+    const definition = keylessDefinition({
+      guid: "definition",
+      normName: "SharedNorm",
+      childNode: [
+        {
+          guid: "outer",
+          type: "FRAME",
+          childNode: [
+            {
+              guid: "container",
+              type: "FRAME",
+              childNode: [
+                { guid: "title", type: "TEXT", nodeText: "Wrong default" },
+              ],
+            },
+          ],
+        },
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [textProperty({ path: "container/title" })],
+    });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [definition],
+    });
+
+    expect(
+      flatProperties(result.root).get("container/title"),
+    ).not.toHaveProperty("nodeText");
+  });
+
+  it("keeps explicit falsy values authoritative in the GUID fallback", () => {
+    const fields = {
+      enabled: false,
+      count: 0,
+      description: "",
+      choices: [],
+      optional: null,
+    };
+    const definition = keylessDefinition({
+      guid: "definition",
+      normName: "SharedNorm",
+      childNode: [
+        {
+          guid: "container",
+          type: "FRAME",
+          childNode: [
+            {
+              guid: "title",
+              type: "TEXT",
+              nodeText: "Default",
+              enabled: true,
+              count: 10,
+              description: "Default",
+              choices: ["default"],
+              optional: "default",
+            },
+          ],
+        },
+      ],
+    });
+    const instance = keylessInstance({
+      guid: "root",
+      normName: "SharedNorm",
+      props: [{ ...textProperty({ path: "title" }), ...fields }],
+    });
+
+    const result = materializePixsoRoot({
+      root: instance,
+      componentDefinitions: [definition],
+    });
+    const property = flatProperties(result.root).get("title")!;
+
+    expect(property).toMatchObject(fields);
+    for (const field of Object.keys(fields)) {
+      expect(result.origins.get(property)?.get(field)?.kind).toBe(
+        "instance-override",
+      );
+    }
+  });
+
   it("keeps a non-empty componentKey authoritative over a norm-only candidate", () => {
     const keyed = {
       ...keylessDefinition({
