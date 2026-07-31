@@ -115,13 +115,40 @@ export function extractChoicePanelCandidate(input: {
     };
   }
 
-  const sections = buildSections({
+  const inferredSection = inferSectionLayout({
     directChildren,
     rows: orderedRows,
     titleNodeId: titleResult.title.id,
-    indicators: trailingIndicators,
+    ir: input.ir,
   });
-  const duplicateDiagnostics = orderedRows.flatMap((row, optionIndex) =>
+  const semanticRows = inferredSection
+    ? [
+        ...orderedRows.filter(
+          (row) => !inferredSection.rowIds.has(row.boundary.id),
+        ),
+        ...orderedRows.filter((row) =>
+          inferredSection.rowIds.has(row.boundary.id),
+        ),
+      ]
+    : orderedRows;
+
+  const sections = buildSections({
+    directChildren,
+    rows: semanticRows,
+    titleNodeId: titleResult.title.id,
+    indicators: trailingIndicators,
+    ...(inferredSection
+      ? {
+          forcedSection: {
+            label: inferredSection.label,
+            nextRowId: semanticRows.find((row) =>
+              inferredSection.rowIds.has(row.boundary.id),
+            )!.boundary.id,
+          },
+        }
+      : {}),
+  });
+  const duplicateDiagnostics = semanticRows.flatMap((row, optionIndex) =>
     row.duplicateDescriptionIds.length > 0
       ? [
           {
@@ -167,7 +194,7 @@ export function extractChoicePanelCandidate(input: {
   const alternativeImplementationNodeIds = rows
     .filter((row) => !selectedBoundaryIds.has(row.boundary.id))
     .filter((row) =>
-      sharesDefinitionProvenance(row, orderedRows, input.provenance),
+      sharesDefinitionProvenance(row, semanticRows, input.provenance),
     )
     .flatMap((row) => descendantClosure(row.boundary.id, input.ir));
   const hiddenImplementationNodeIds = boundary.children
@@ -215,8 +242,8 @@ export function extractChoicePanelCandidate(input: {
     sections,
   };
   const supporting = {
-    trailing: trailingIndicators.length === orderedRows.length,
-    descriptions: orderedRows.every((row) => Boolean(row.description)),
+    trailing: trailingIndicators.length === semanticRows.length,
+    descriptions: semanticRows.every((row) => Boolean(row.description)),
     section: sections.length > 1,
     outline:
       boundary.appearance.borders.length > 0 &&
@@ -248,7 +275,7 @@ export function extractChoicePanelCandidate(input: {
       evidence: [
         {
           kind: "repeated-option-rows",
-          value: String(orderedRows.length),
+          value: String(semanticRows.length),
           weight: 0.2,
         },
         { kind: "unique-option-labels", value: "all", weight: 0.15 },
@@ -348,6 +375,7 @@ function buildSections(input: {
   rows: RowCandidate[];
   titleNodeId: string;
   indicators: DesignNodeV2[];
+  forcedSection?: { label: DesignNodeV2; nextRowId: string };
 }): ChoicePanelSection[] {
   const rowIndex = new Map(
     input.rows.map((row) => [
@@ -355,23 +383,31 @@ function buildSections(input: {
       input.directChildren.findIndex((child) => child.id === row.boundary.id),
     ]),
   );
-  const sectionLabels = input.directChildren.filter(
-    (child) =>
-      child.id !== input.titleNodeId &&
-      Boolean(child.text?.value.trim()) &&
-      input.rows.some((row, index) => {
-        if (index === 0) {
-          return false;
-        }
-        const previous = rowIndex.get(input.rows[index - 1]!.boundary.id)!;
-        const current = rowIndex.get(row.boundary.id)!;
-        const candidate = input.directChildren.findIndex(
-          (entry) => entry.id === child.id,
-        );
-        return candidate > previous && candidate < current;
-      }),
-  );
+  const sectionLabels = input.forcedSection
+    ? []
+    : input.directChildren.filter(
+        (child) =>
+          child.id !== input.titleNodeId &&
+          Boolean(child.text?.value.trim()) &&
+          input.rows.some((row, index) => {
+            if (index === 0) {
+              return false;
+            }
+            const previous = rowIndex.get(input.rows[index - 1]!.boundary.id)!;
+            const current = rowIndex.get(row.boundary.id)!;
+            const candidate = input.directChildren.findIndex(
+              (entry) => entry.id === child.id,
+            );
+            return candidate > previous && candidate < current;
+          }),
+      );
   const labelByNextRow = new Map<string, DesignNodeV2>();
+  if (input.forcedSection) {
+    labelByNextRow.set(
+      input.forcedSection.nextRowId,
+      input.forcedSection.label,
+    );
+  }
   for (const label of sectionLabels) {
     const labelIndex = input.directChildren.findIndex(
       (child) => child.id === label.id,
@@ -425,6 +461,127 @@ function buildSections(input: {
     sections.at(-1)!.options.push(option);
   });
   return sections;
+}
+
+function inferSectionLayout(input: {
+  directChildren: DesignNodeV2[];
+  rows: RowCandidate[];
+  titleNodeId: string;
+  ir: DesignIRV2;
+}): { label: DesignNodeV2; rowIds: Set<string> } | undefined {
+  const rowIndexes = input.rows.map((row) =>
+    input.directChildren.findIndex((child) => child.id === row.boundary.id),
+  );
+  const labels = input.directChildren.filter((child) => {
+    if (child.id === input.titleNodeId || !child.text?.value.trim()) {
+      return false;
+    }
+    const index = input.directChildren.findIndex(
+      (candidate) => candidate.id === child.id,
+    );
+    return rowIndexes.some(
+      (rowIndex, rowOffset) =>
+        rowOffset > 0 && index > rowIndexes[rowOffset - 1]! && index < rowIndex,
+    );
+  });
+  if (labels.length !== 1) {
+    return undefined;
+  }
+  const label = labels[0]!;
+  const emptyFrames = input.directChildren.filter(
+    (child) =>
+      (child.type === "frame" || child.type === "unknown") &&
+      descendantClosure(child.id, input.ir).every((id) => {
+        const node = input.ir.nodes[id]!;
+        return !node.text && !node.component && !node.asset;
+      }),
+  );
+  const labelWrappers = emptyFrames.filter(
+    (frame) =>
+      frame.layout?.mode === "vertical" &&
+      frame.geometry.y > label.geometry.y + geometryTolerance &&
+      Math.abs(frame.geometry.width - label.geometry.width) <=
+        geometryTolerance &&
+      Math.abs(frame.geometry.height - label.geometry.height) <=
+        geometryTolerance,
+  );
+  if (labelWrappers.length !== 1) {
+    return undefined;
+  }
+  const labelWrapper = labelWrappers[0]!;
+  const rowHeights = new Set(
+    input.rows.map((row) => Math.round(row.boundary.geometry.height)),
+  );
+  const slots = emptyFrames
+    .filter(
+      (frame) =>
+        frame.layout?.mode === "horizontal" &&
+        frame.geometry.y >
+          labelWrapper.geometry.y + labelWrapper.geometry.height &&
+        Math.abs(frame.geometry.width - label.geometry.width) <=
+          geometryTolerance &&
+        rowHeights.has(Math.round(frame.geometry.height)),
+    )
+    .sort(
+      (left, right) =>
+        left.geometry.y - right.geometry.y || left.id.localeCompare(right.id),
+    );
+  const chains = slots.flatMap((first) => {
+    const gap =
+      first.geometry.y -
+      (labelWrapper.geometry.y + labelWrapper.geometry.height);
+    if (gap <= geometryTolerance) {
+      return [];
+    }
+    const chain = [first];
+    let expectedY = first.geometry.y + first.geometry.height + gap;
+    while (true) {
+      const next = slots.find(
+        (slot) =>
+          !chain.includes(slot) &&
+          Math.abs(slot.geometry.y - expectedY) <= geometryTolerance,
+      );
+      if (!next) {
+        break;
+      }
+      chain.push(next);
+      expectedY = next.geometry.y + next.geometry.height + gap;
+    }
+    return chain.length >= 2 ? [chain] : [];
+  });
+  const longest = Math.max(0, ...chains.map((chain) => chain.length));
+  const best = chains.filter((chain) => chain.length === longest);
+  if (longest < 2 || best.length !== 1) {
+    return undefined;
+  }
+  const labelIndex = input.directChildren.findIndex(
+    (child) => child.id === label.id,
+  );
+  const candidates = input.rows.filter(
+    (row) =>
+      input.directChildren.findIndex((child) => child.id === row.boundary.id) >
+      labelIndex,
+  );
+  const selected: RowCandidate[] = [];
+  for (const slot of best[0]!) {
+    const row = candidates.find(
+      (candidate) =>
+        !selected.includes(candidate) &&
+        Math.abs(candidate.boundary.geometry.height - slot.geometry.height) <=
+          geometryTolerance,
+    );
+    if (!row) {
+      return undefined;
+    }
+    selected.push(row);
+  }
+  if (selected.length >= input.rows.length) {
+    return undefined;
+  }
+  return {
+    label,
+    rowIds: new Set(selected.map((row) => row.boundary.id)),
+  };
 }
 
 function hasAmbiguousSectionLabel(

@@ -494,7 +494,7 @@ describe("buildUiManifestV2", () => {
       role: "choicePanel",
       sourceNodeIds: expect.arrayContaining(["70:118899"]),
       content: {
-        sections: [{ options: [{}, {}] }, { options: [{}, {}, {}] }],
+        sections: [{ options: [{}, {}, {}] }, { options: [{}, {}] }],
       },
       children: [],
     });
