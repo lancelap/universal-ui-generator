@@ -167,11 +167,58 @@ export interface ReactIntrinsicWrapperModel extends ReactElementBaseModel {
   className: string;
 }
 
+export interface ReactSingleSelectionOptionModel {
+  id: string;
+  sourceNodeIds: string[];
+  label: string;
+  description?: string;
+  hasTrailingAsset: boolean;
+  props: ReactPropModel[];
+}
+
+export interface ReactSingleSelectionSectionModel {
+  id: string;
+  label?: string;
+  options: ReactSingleSelectionOptionModel[];
+}
+
+export interface ReactSingleSelectionCollectionElementModel extends ReactElementBaseModel {
+  kind: "single-selection-collection";
+  rootComponentId: string;
+  rootLocalName: string;
+  localName: string;
+  props: ReactPropModel[];
+  optionComponentId: string;
+  optionLocalName: string;
+  layoutComponentId: string;
+  layoutLocalName: string;
+  titleComponentId: string;
+  titleLocalName: string;
+  descriptionComponentId: string;
+  descriptionLocalName: string;
+  leadingAssetLocalName?: string;
+  trailingAssetLocalName?: string;
+  title: string;
+  rootProps: ReactPropModel[];
+  sections: ReactSingleSelectionSectionModel[];
+  classNames: {
+    root: string;
+    header: string;
+    section: string;
+    sectionLabel: string;
+    optionRow: string;
+    optionContent: string;
+    description: string;
+    trailingAsset: string;
+  };
+}
+
 export type ReactElementModel =
   | ReactReuseElementModel
   | ReactComposeElementModel
   | ReactFallbackElementModel
-  | ReactIntrinsicWrapperModel;
+  | ReactIntrinsicWrapperModel
+  | ReactSingleSelectionCollectionElementModel;
 
 export interface ReactGenerationModel {
   imports: ReactImportModel[];

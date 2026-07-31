@@ -11,6 +11,7 @@ import type {
 import { buildFallbackModel } from "./build-fallback-model.js";
 import { buildImportModel } from "./build-import-model.js";
 import { buildPropsModel } from "./build-props-model.js";
+import { buildSingleSelectionModel } from "./build-single-selection-model.js";
 import {
   buildStyleModel,
   type ParentPositioningEvidence,
@@ -57,6 +58,25 @@ export function buildReactGenerationModel(
         "GENERATION_INPUT_INVALID",
         `Node ${node.id} has no usable resolution`,
       );
+    }
+
+    const structuredRecipe =
+      input.pack.reactRenderRecipes.singleSelectionCollections?.find(
+        (candidate) => candidate.semanticRole === node.role,
+      );
+    if (structuredRecipe) {
+      if (resolution.decision !== "compose") {
+        throw new ReactGenerationError(
+          "GENERATION_INPUT_INVALID",
+          `Structured node ${node.id} must have a compose resolution`,
+        );
+      }
+      return buildSingleSelectionModel({
+        node,
+        resolution,
+        recipe: structuredRecipe,
+        localNames,
+      });
     }
 
     if (resolution.decision === "fallback") {

@@ -4,6 +4,7 @@ import type {
   DesignIRV2,
   ReactComponentRecipeV1,
   ReactComponentRecipeV2,
+  ReactSingleSelectionCollectionRecipe,
   ResolutionNode,
   ResolutionPlanV2,
   UiManifestV2,
@@ -192,6 +193,81 @@ describe("buildReactGenerationModel", () => {
         { name: "body", children: [{ nodeId: "body" }] },
         { name: "actions", children: [{ nodeId: "actions" }] },
       ],
+    });
+  });
+
+  it("routes a structured selection recipe before generic composition lowering", () => {
+    const root = node("choice", "choicePanel", [], {
+      title: "Choose",
+      titleSourceNodeId: "source-choice",
+      sections: [
+        {
+          id: "first",
+          options: [
+            {
+              id: "one",
+              sourceNodeIds: ["source-choice"],
+              label: "One",
+              labelSourceNodeId: "source-choice",
+              selected: false,
+            },
+            {
+              id: "two",
+              sourceNodeIds: ["source-choice"],
+              label: "Two",
+              labelSourceNodeId: "source-choice",
+              selected: false,
+            },
+          ],
+        },
+      ],
+    });
+    root.kind = "control";
+    root.state = { selectionMode: "single", selectedOptionId: null };
+    const componentIds = [
+      "base.Group",
+      "base.Option",
+      "base.Layout",
+      "base.Title",
+      "base.Description",
+    ];
+    const model = buildReactGenerationModel(
+      readyInput({
+        root,
+        resolutions: [
+          compose(
+            "choice",
+            "choicePanel",
+            componentIds.map((componentId) =>
+              binding(componentId, componentId.split(".").at(-1)!),
+            ),
+          ),
+        ],
+        recipes: componentIds.map((componentId) =>
+          recipe(componentId, "optional"),
+        ),
+        structuredRecipes: [singleSelectionRecipe()],
+      }),
+    );
+
+    expect(model.root).toMatchObject({
+      kind: "single-selection-collection",
+      rootComponentId: "base.Group",
+      sections: [{ options: [{ id: "one" }, { id: "two" }] }],
+      rootProps: expect.arrayContaining([
+        { name: "value", value: { kind: "literal", value: "" } },
+        { name: "onChange", value: { kind: "noop" } },
+      ]),
+    });
+    expect(model.externalProps).toEqual([]);
+    expect(model.imports).toHaveLength(1);
+    expect(model.imports[0]).toMatchObject({
+      kind: "named",
+      specifiers: expect.arrayContaining(
+        componentIds.map((componentId) =>
+          expect.objectContaining({ componentId }),
+        ),
+      ),
     });
   });
 
@@ -398,6 +474,7 @@ function readyInput(input: {
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
   withLayout?: boolean;
+  structuredRecipes?: ReactSingleSelectionCollectionRecipe[];
 }): ReadyGenerationInput {
   const designNodes = Object.fromEntries(
     flatten(input.root).map((semanticNode) => [
@@ -479,6 +556,7 @@ function packFixture(input: {
   composition?: boolean;
   fallbackAllowed?: boolean;
   styleWrapper?: "allowed" | "forbidden";
+  structuredRecipes?: ReactSingleSelectionCollectionRecipe[];
 }): LoadedDesignSystemPackV2 {
   const bindings = input.resolutions.flatMap((resolution) =>
     resolution.decision === "reuse"
@@ -567,6 +645,7 @@ function packFixture(input: {
             },
           ]
         : [],
+      singleSelectionCollections: input.structuredRecipes ?? [],
     },
     reactStylePolicy: {
       schema: "react-style-policy/v1",
@@ -694,6 +773,35 @@ function binding(componentId: string, exportName: string): ComponentBinding {
     package: "@test/ui",
     export: exportName,
     exportKind: "named",
+  };
+}
+
+function singleSelectionRecipe(): ReactSingleSelectionCollectionRecipe {
+  return {
+    kind: "single-selection-collection",
+    semanticRole: "choicePanel",
+    rootComponentId: "base.Group",
+    optionComponentId: "base.Option",
+    layoutComponentId: "base.Layout",
+    titleComponentId: "base.Title",
+    descriptionComponentId: "base.Description",
+    sources: {
+      title: "content.title",
+      sections: "content.sections",
+      selectedValue: "state.selectedOptionId",
+    },
+    rootProps: {
+      valueTarget: "value",
+      emptyValue: "",
+      onChangeTarget: "onChange",
+      onChangeValue: "noop",
+      directionTarget: "direction",
+      directionValue: "column",
+      groupNameTarget: "groupName",
+      groupNameSource: "content.title",
+    },
+    optionProps: { valueTarget: "value", valueSource: "option.id" },
+    provenance: { kind: "test", source: "fixture" },
   };
 }
 
