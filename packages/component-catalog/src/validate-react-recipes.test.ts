@@ -28,6 +28,7 @@ describe("loadDesignSystemPackV2", () => {
 
     expect(loaded.manifest.schema).toBe("design-system-pack/v2");
     expect(loaded.reactRenderRecipes.components).toHaveLength(11);
+    expect(loaded.reactRenderRecipes.singleSelectionCollections).toEqual([]);
     expect(loaded.reactStylePolicy.defaults.inlineStyles).toBe(false);
     expect(loaded.sha256).toMatch(/^[a-f0-9]{64}$/);
   });
@@ -178,6 +179,100 @@ describe("loadDesignSystemPackV2", () => {
     });
   });
 
+  it("loads one valid single-selection collection recipe", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipes.singleSelectionCollections = [singleSelectionRecipe()];
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).resolves.toMatchObject({
+      reactRenderRecipes: {
+        singleSelectionCollections: [
+          { kind: "single-selection-collection", semanticRole: "choicePanel" },
+        ],
+      },
+    });
+  });
+
+  it("rejects duplicate structured recipes for one semantic role", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipes.singleSelectionCollections = [
+      singleSelectionRecipe(),
+      singleSelectionRecipe(),
+    ];
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "REACT_STRUCTURED_RECIPE_INVALID",
+    });
+  });
+
+  it.each([
+    ["required", { titleComponentId: "base.Missing" }],
+    ["optional", { leadingAssetComponentId: "base.Missing" }],
+  ] as const)(
+    "rejects a missing %s structured binding",
+    async (_label, change) => {
+      const packDirectory = await createV2Pack();
+      const recipes = await readJson(
+        join(packDirectory, "react-render-recipes.json"),
+      );
+      promoteRecipesToV2(recipes);
+      recipes.singleSelectionCollections = [singleSelectionRecipe(change)];
+      await writeJson(
+        join(packDirectory, "react-render-recipes.json"),
+        recipes,
+      );
+
+      await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject(
+        {
+          code: "REACT_STRUCTURED_RECIPE_INVALID",
+        },
+      );
+    },
+  );
+
+  it("rejects an identical root and option component", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipes.singleSelectionCollections = [
+      singleSelectionRecipe({ optionComponentId: "base.FormControl" }),
+    ];
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "REACT_STRUCTURED_RECIPE_INVALID",
+    });
+  });
+
+  it("rejects a structured leaf without a scalar render recipe", async () => {
+    const packDirectory = await createV2Pack();
+    const recipes = await readJson(
+      join(packDirectory, "react-render-recipes.json"),
+    );
+    promoteRecipesToV2(recipes);
+    recipes.singleSelectionCollections = [singleSelectionRecipe()];
+    recipes.components = recipes.components.filter(
+      (recipe: { componentId: string }) =>
+        recipe.componentId !== "base.Typography",
+    );
+    await writeJson(join(packDirectory, "react-render-recipes.json"), recipes);
+
+    await expect(loadDesignSystemPackV2(packDirectory)).rejects.toMatchObject({
+      code: "REACT_STRUCTURED_RECIPE_INVALID",
+    });
+  });
+
   it("rejects style rules for a missing component", async () => {
     const packDirectory = await createV2Pack();
     const policy = await readJson(
@@ -324,6 +419,39 @@ function promoteRecipesToV2(recipes: any): void {
     ...recipe,
     staticProps: [],
   }));
+}
+
+function singleSelectionRecipe(overrides: Record<string, unknown> = {}) {
+  return {
+    kind: "single-selection-collection",
+    semanticRole: "choicePanel",
+    rootComponentId: "base.FormControl",
+    optionComponentId: "base.FormLabel",
+    layoutComponentId: "base.Stack",
+    titleComponentId: "base.Typography",
+    descriptionComponentId: "base.ModalBody",
+    sources: {
+      title: "content.title",
+      sections: "content.sections",
+      selectedValue: "state.selectedOptionId",
+    },
+    rootProps: {
+      valueTarget: "value",
+      emptyValue: "",
+      onChangeTarget: "onChange",
+      onChangeValue: "noop",
+      directionTarget: "direction",
+      directionValue: "column",
+      groupNameTarget: "groupName",
+      groupNameSource: "content.title",
+    },
+    optionProps: { valueTarget: "value", valueSource: "option.id" },
+    provenance: {
+      kind: "verified-public-api",
+      source: "test fixture declaration",
+    },
+    ...overrides,
+  };
 }
 
 function recipeFor(recipes: any, componentId: string): any {

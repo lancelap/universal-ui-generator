@@ -8,6 +8,7 @@ export type DesignSystemPackErrorCode =
   | "REACT_RECIPE_COMPONENT_UNCOVERED"
   | "REACT_RECIPE_PROP_CONFLICT"
   | "REACT_COMPOSITION_RECIPE_INVALID"
+  | "REACT_STRUCTURED_RECIPE_INVALID"
   | "REACT_STYLE_COMPONENT_MISSING";
 
 export class DesignSystemPackError extends Error {

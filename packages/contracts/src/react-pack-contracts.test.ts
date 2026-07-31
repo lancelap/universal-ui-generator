@@ -88,6 +88,38 @@ const recipesV2Fixture = {
   compositions: [],
 } as const;
 
+const singleSelectionCollectionRecipe = {
+  kind: "single-selection-collection",
+  semanticRole: "choicePanel",
+  rootComponentId: "base.RadioGroup",
+  optionComponentId: "base.RadioButton",
+  layoutComponentId: "base.Stack",
+  titleComponentId: "base.Typography",
+  descriptionComponentId: "base.FormDescription",
+  leadingAssetComponentId: "icon.DocumentText",
+  trailingAssetComponentId: "icon.Info",
+  sources: {
+    title: "content.title",
+    sections: "content.sections",
+    selectedValue: "state.selectedOptionId",
+  },
+  rootProps: {
+    valueTarget: "value",
+    emptyValue: "",
+    onChangeTarget: "onChange",
+    onChangeValue: "noop",
+    directionTarget: "direction",
+    directionValue: "column",
+    groupNameTarget: "groupName",
+    groupNameSource: "content.title",
+  },
+  optionProps: {
+    valueTarget: "value",
+    valueSource: "option.id",
+  },
+  provenance,
+} as const;
+
 const stylePolicyFixture = {
   schema: "react-style-policy/v1",
   defaults: {
@@ -183,6 +215,59 @@ describe("React pack contracts", () => {
         },
       ],
     });
+  });
+
+  it("accepts the bounded single-selection collection recipe", () => {
+    expect(
+      validateWithSchema(ReactRenderRecipesV2Schema, {
+        ...recipesV2Fixture,
+        singleSelectionCollections: [singleSelectionCollectionRecipe],
+      }),
+    ).toMatchObject({
+      singleSelectionCollections: [singleSelectionCollectionRecipe],
+    });
+  });
+
+  it.each([
+    ["unknown recipe field", { executableTemplate: "options.map(render)" }],
+    ["unknown recipe kind", { kind: "collection-template" }],
+    ["unsupported semantic role", { semanticRole: "radioList" }],
+    [
+      "arbitrary title source",
+      {
+        sources: {
+          ...singleSelectionCollectionRecipe.sources,
+          title: "content.jsonPath",
+        },
+      },
+    ],
+    [
+      "arbitrary selected source",
+      {
+        sources: {
+          ...singleSelectionCollectionRecipe.sources,
+          selectedValue: "state.value",
+        },
+      },
+    ],
+    [
+      "executable option source",
+      {
+        optionProps: {
+          ...singleSelectionCollectionRecipe.optionProps,
+          valueSource: "eval(option.id)",
+        },
+      },
+    ],
+  ] as const)("rejects %s in a structured recipe", (_label, change) => {
+    expect(() =>
+      validateWithSchema(ReactRenderRecipesV2Schema, {
+        ...recipesV2Fixture,
+        singleSelectionCollections: [
+          { ...singleSelectionCollectionRecipe, ...change },
+        ],
+      }),
+    ).toThrowError(ContractValidationError);
   });
 
   it("narrows the read union to v2 static props", () => {

@@ -167,6 +167,7 @@ describe("loadDesignSystemPack", () => {
         },
       ],
       compositions: v1.compositions,
+      singleSelectionCollections: [],
     });
     expect(v1).toEqual({
       schema: "react-render-recipes/v1",
@@ -184,7 +185,7 @@ describe("loadDesignSystemPack", () => {
     });
   });
 
-  it("clones a validated v2 recipe document without changing its bytes", () => {
+  it("clones a historical v2 recipe into the effective structured shape", () => {
     const v2: ReactRenderRecipesV2 = {
       schema: "react-render-recipes/v2",
       components: [
@@ -209,7 +210,10 @@ describe("loadDesignSystemPack", () => {
     const validated = validateWithSchema(ReactRenderRecipesSchema, v2);
     const normalized = normalizeReactRenderRecipes(validated);
 
-    expect(JSON.stringify(normalized)).toBe(JSON.stringify(v2));
+    expect(normalized).toEqual({
+      ...v2,
+      singleSelectionCollections: [],
+    });
     normalized.components[0]?.staticProps.push({
       target: "onChange",
       value: { kind: "noop" },

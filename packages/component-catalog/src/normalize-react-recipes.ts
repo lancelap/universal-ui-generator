@@ -7,7 +7,12 @@ export function normalizeReactRenderRecipes(
   input: ReactRenderRecipesV1 | ReactRenderRecipesV2,
 ): ReactRenderRecipesV2 {
   if (input.schema === "react-render-recipes/v2") {
-    return structuredClone(input);
+    return {
+      ...structuredClone(input),
+      singleSelectionCollections: structuredClone(
+        input.singleSelectionCollections ?? [],
+      ),
+    };
   }
   return {
     schema: "react-render-recipes/v2",
@@ -16,5 +21,6 @@ export function normalizeReactRenderRecipes(
       staticProps: [],
     })),
     compositions: structuredClone(input.compositions),
+    singleSelectionCollections: [],
   };
 }

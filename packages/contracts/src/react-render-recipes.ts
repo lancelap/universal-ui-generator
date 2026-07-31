@@ -159,6 +159,38 @@ export const ReactCompositionRecipeSchema = closedObject({
   provenance: RecipeProvenanceSchema,
 });
 
+export const ReactSingleSelectionCollectionRecipeSchema = closedObject({
+  kind: Type.Literal("single-selection-collection"),
+  semanticRole: Type.Literal("choicePanel"),
+  rootComponentId: Type.String({ minLength: 1 }),
+  optionComponentId: Type.String({ minLength: 1 }),
+  layoutComponentId: Type.String({ minLength: 1 }),
+  titleComponentId: Type.String({ minLength: 1 }),
+  descriptionComponentId: Type.String({ minLength: 1 }),
+  leadingAssetComponentId: Type.Optional(Type.String({ minLength: 1 })),
+  trailingAssetComponentId: Type.Optional(Type.String({ minLength: 1 })),
+  sources: closedObject({
+    title: Type.Literal("content.title"),
+    sections: Type.Literal("content.sections"),
+    selectedValue: Type.Literal("state.selectedOptionId"),
+  }),
+  rootProps: closedObject({
+    valueTarget: Type.String({ minLength: 1 }),
+    emptyValue: Type.Literal(""),
+    onChangeTarget: Type.String({ minLength: 1 }),
+    onChangeValue: Type.Literal("noop"),
+    directionTarget: Type.String({ minLength: 1 }),
+    directionValue: Type.Literal("column"),
+    groupNameTarget: Type.String({ minLength: 1 }),
+    groupNameSource: Type.Literal("content.title"),
+  }),
+  optionProps: closedObject({
+    valueTarget: Type.String({ minLength: 1 }),
+    valueSource: Type.Literal("option.id"),
+  }),
+  provenance: RecipeProvenanceSchema,
+});
+
 export const ReactRenderRecipesV1Schema = closedObject({
   schema: Type.Literal("react-render-recipes/v1"),
   components: Type.Array(ReactComponentRecipeV1Schema),
@@ -169,6 +201,9 @@ export const ReactRenderRecipesV2Schema = closedObject({
   schema: Type.Literal("react-render-recipes/v2"),
   components: Type.Array(ReactComponentRecipeV2Schema),
   compositions: Type.Array(ReactCompositionRecipeSchema),
+  singleSelectionCollections: Type.Optional(
+    Type.Array(ReactSingleSelectionCollectionRecipeSchema),
+  ),
 });
 
 export const ReactRenderRecipesSchema = Type.Union([
@@ -204,6 +239,9 @@ export type ReactComponentRecipe =
 export type ReactCompositionSlot = Static<typeof ReactCompositionSlotSchema>;
 export type ReactCompositionRecipe = Static<
   typeof ReactCompositionRecipeSchema
+>;
+export type ReactSingleSelectionCollectionRecipe = Static<
+  typeof ReactSingleSelectionCollectionRecipeSchema
 >;
 export type ReactRenderRecipesV1 = Static<typeof ReactRenderRecipesV1Schema>;
 export type ReactRenderRecipesV2 = Static<typeof ReactRenderRecipesV2Schema>;

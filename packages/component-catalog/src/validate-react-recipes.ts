@@ -20,10 +20,74 @@ export function validateReactRecipes(input: {
     input.reactRenderRecipes.components,
     input.componentsById,
   );
+  validateSingleSelectionCollections(input, recipesByComponentId);
   validateRecipeCoverage(input, recipesByComponentId);
   validatePropTargets(input.reactRenderRecipes.components);
   validateCompositionRecipes(input);
   validateStylePolicy(input);
+}
+
+function validateSingleSelectionCollections(
+  input: {
+    componentsById: ReadonlyMap<string, ComponentCatalogEntry>;
+    reactRenderRecipes: ReactRenderRecipesV2;
+  },
+  recipesByComponentId: ReadonlyMap<string, ReactComponentRecipeV2>,
+): void {
+  const roles = new Set<string>();
+  for (const recipe of input.reactRenderRecipes.singleSelectionCollections ??
+    []) {
+    if (roles.has(recipe.semanticRole)) {
+      structuredRecipeError(
+        `Duplicate structured recipe for ${recipe.semanticRole}`,
+      );
+    }
+    roles.add(recipe.semanticRole);
+
+    if (recipe.rootComponentId === recipe.optionComponentId) {
+      structuredRecipeError(
+        `Structured recipe ${recipe.semanticRole} uses one component as both root and option`,
+      );
+    }
+
+    const componentIds = [
+      recipe.rootComponentId,
+      recipe.optionComponentId,
+      recipe.layoutComponentId,
+      recipe.titleComponentId,
+      recipe.descriptionComponentId,
+      ...(recipe.leadingAssetComponentId
+        ? [recipe.leadingAssetComponentId]
+        : []),
+      ...(recipe.trailingAssetComponentId
+        ? [recipe.trailingAssetComponentId]
+        : []),
+    ];
+    for (const componentId of componentIds) {
+      if (!input.componentsById.has(componentId)) {
+        structuredRecipeError(
+          `Structured recipe ${recipe.semanticRole} references unknown component ${componentId}`,
+        );
+      }
+      if (!recipesByComponentId.has(componentId)) {
+        structuredRecipeError(
+          `Structured recipe ${recipe.semanticRole} component ${componentId} has no scalar render recipe`,
+        );
+      }
+    }
+
+    const rootTargets = [
+      recipe.rootProps.valueTarget,
+      recipe.rootProps.onChangeTarget,
+      recipe.rootProps.directionTarget,
+      recipe.rootProps.groupNameTarget,
+    ];
+    if (new Set(rootTargets).size !== rootTargets.length) {
+      structuredRecipeError(
+        `Structured recipe ${recipe.semanticRole} maps multiple root values to one prop`,
+      );
+    }
+  }
 }
 
 function indexComponentRecipes(
@@ -249,4 +313,8 @@ function recipeConflict(componentId: string, message: string): never {
     "REACT_RECIPE_PROP_CONFLICT",
     `React recipe ${componentId} ${message}`,
   );
+}
+
+function structuredRecipeError(message: string): never {
+  throw new DesignSystemPackError("REACT_STRUCTURED_RECIPE_INVALID", message);
 }
