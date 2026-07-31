@@ -90,6 +90,23 @@
       "layout": { "allowed": ["width", "maxWidth"] },
       "appearance": { "allowed": [] },
       "wrapper": "allowed"
+    },
+    {
+      "componentId": "base.RadioGroup",
+      "layout": {
+        "allowed": [
+          "display",
+          "flexDirection",
+          "gap",
+          "padding",
+          "width",
+          "maxWidth"
+        ]
+      },
+      "appearance": {
+        "allowed": ["background", "border", "borderRadius"]
+      },
+      "wrapper": "allowed"
     }
   ],
   "fallback": {

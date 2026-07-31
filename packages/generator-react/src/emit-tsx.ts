@@ -8,6 +8,7 @@ import type {
   ReactGenerationModel,
   ReactPropModel,
   ReactPropValueModel,
+  ReactSingleSelectionCollectionElementModel,
 } from "./generation-model.js";
 
 const factory = ts.factory;
@@ -335,6 +336,9 @@ function emitComponent(
 function emitElement(
   element: ReactElementModel,
 ): ts.JsxElement | ts.JsxSelfClosingElement {
+  if (element.kind === "single-selection-collection") {
+    return emitSingleSelectionCollection(element);
+  }
   const tagName =
     element.kind === "intrinsic-wrapper"
       ? factory.createIdentifier(element.tag)
@@ -374,6 +378,134 @@ function emitElement(
       : element.children.map(emitElement)),
   ];
   return jsxElement(tagName, props, children);
+}
+
+function emitSingleSelectionCollection(
+  element: ReactSingleSelectionCollectionElementModel,
+): ts.JsxElement {
+  const classProp = (className: string): ReactPropModel => ({
+    name: "className",
+    value: { kind: "class-name", className },
+  });
+  const textElement = (
+    localName: string,
+    value: string,
+    props: ReactPropModel[] = [],
+  ) => jsxElement(factory.createIdentifier(localName), props, [jsxText(value)]);
+  const headerChildren: Array<ts.JsxChild | ts.JsxElement> = [];
+  if (element.leadingAssetLocalName) {
+    headerChildren.push(
+      jsxElement(
+        factory.createIdentifier(element.leadingAssetLocalName),
+        [],
+        [],
+      ),
+    );
+  }
+  headerChildren.push(textElement(element.titleLocalName, element.title));
+  const header = jsxElement(
+    factory.createIdentifier(element.layoutLocalName),
+    [classProp(element.classNames.header)],
+    headerChildren,
+  );
+
+  const sections = element.sections.map((section) => {
+    const children: Array<ts.JsxChild | ts.JsxElement> = [];
+    if (section.label) {
+      children.push(
+        textElement(element.titleLocalName, section.label, [
+          classProp(element.classNames.sectionLabel),
+        ]),
+      );
+    }
+    for (const option of section.options) {
+      const optionContent: Array<ts.JsxChild | ts.JsxElement> = [
+        textElement(element.titleLocalName, option.label),
+      ];
+      if (option.description) {
+        optionContent.push(
+          textElement(element.descriptionLocalName, option.description, [
+            classProp(element.classNames.description),
+          ]),
+        );
+      }
+      const optionElement = jsxElement(
+        factory.createIdentifier(element.optionLocalName),
+        option.props,
+        [
+          jsxElement(
+            factory.createIdentifier(element.layoutLocalName),
+            [classProp(element.classNames.optionContent)],
+            optionContent,
+          ),
+        ],
+      );
+      const rowChildren: Array<ts.JsxChild | ts.JsxElement> = [optionElement];
+      if (option.hasTrailingAsset && element.trailingAssetLocalName) {
+        rowChildren.push(
+          jsxElement(
+            factory.createIdentifier(element.trailingAssetLocalName),
+            [classProp(element.classNames.trailingAsset)],
+            [],
+          ),
+        );
+      }
+      children.push(
+        jsxElement(
+          factory.createIdentifier(element.layoutLocalName),
+          [classProp(element.classNames.optionRow)],
+          rowChildren,
+        ),
+      );
+    }
+    return jsxElement(
+      factory.createIdentifier("section"),
+      [classProp(element.classNames.section)],
+      children,
+    );
+  });
+  const group = jsxStructuredElement(
+    factory.createIdentifier(element.rootLocalName),
+    element.rootProps,
+    sections,
+  );
+  return jsxElement(
+    factory.createIdentifier("section"),
+    [classProp(element.classNames.root)],
+    [header, group],
+  ) as ts.JsxElement;
+}
+
+function jsxStructuredElement(
+  tagName: ts.JsxTagNameExpression,
+  props: ReactPropModel[],
+  children: Array<ts.JsxChild | ts.JsxSelfClosingElement | ts.JsxElement>,
+): ts.JsxElement {
+  const attributes = factory.createJsxAttributes(
+    props.map((prop) =>
+      prop.value.kind === "noop"
+        ? factory.createJsxAttribute(
+            factory.createIdentifier(prop.name),
+            factory.createJsxExpression(
+              undefined,
+              factory.createArrowFunction(
+                undefined,
+                undefined,
+                [],
+                undefined,
+                factory.createToken(ts.SyntaxKind.EqualsGreaterThanToken),
+                factory.createBlock([], false),
+              ),
+            ),
+          )
+        : emitProp(prop),
+    ),
+  );
+  return factory.createJsxElement(
+    factory.createJsxOpeningElement(tagName, undefined, attributes),
+    children,
+    factory.createJsxClosingElement(tagName),
+  );
 }
 
 function jsxElement(
@@ -454,6 +586,9 @@ function jsxText(value: string): ts.JsxExpression {
 }
 
 function containsClassName(element: ReactElementModel): boolean {
+  if (element.kind === "single-selection-collection") {
+    return true;
+  }
   const props =
     element.kind === "reuse" || element.kind === "compose" ? element.props : [];
   return (

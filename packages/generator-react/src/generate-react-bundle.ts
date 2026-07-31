@@ -26,7 +26,6 @@ import type {
 import { validateGenerationInput } from "./validate-generation-input.js";
 import { validateGeneratedTsx } from "./validate-generated-source.js";
 
-const componentName = "GeneratedModal";
 const encoder = new TextEncoder();
 
 /** Compiles validated v2 planning artifacts into a deterministic React bundle. */
@@ -46,6 +45,11 @@ export function generateReactBundle(
     assertReactGenerationBundleIntegrity(bundle);
     return bundle;
   }
+
+  const componentName =
+    input.uiManifest.root.role === "choicePanel"
+      ? "GeneratedChoicePanel"
+      : "GeneratedModal";
 
   const model = reserveFallbackComponentNames(
     buildReactGenerationModel(validated),
@@ -154,7 +158,7 @@ export function generateReactBundle(
       ),
     );
   }
-  const report = reportForGenerated(input, model, files);
+  const report = reportForGenerated(input, model, files, componentName);
   const bundle: ReactGenerationBundleV2 = {
     schema: "react-generation-bundle/v2",
     status: "generated",
@@ -244,6 +248,7 @@ function reportForGenerated(
   input: ReactGenerationInput,
   model: ReactGenerationModel,
   files: GeneratedSourceFile[],
+  componentName: string,
 ): ReactGenerationReportV2 {
   const fileReports = files.map((file) => ({
     path: file.path,
@@ -325,6 +330,20 @@ function sourceFile(
 function jsxNames(root: ReactElementModel): string[] {
   const names = new Set<string>();
   const visit = (element: ReactElementModel): void => {
+    if (element.kind === "single-selection-collection") {
+      [
+        element.rootLocalName,
+        element.optionLocalName,
+        element.layoutLocalName,
+        element.titleLocalName,
+        element.descriptionLocalName,
+        element.leadingAssetLocalName,
+        element.trailingAssetLocalName,
+      ].forEach((name) => {
+        if (name) names.add(name);
+      });
+      return;
+    }
     if (element.kind !== "intrinsic-wrapper") {
       names.add(
         element.kind === "fallback"
@@ -345,6 +364,9 @@ function jsxNames(root: ReactElementModel): string[] {
 }
 
 function rootUsesStyles(root: ReactElementModel): boolean {
+  if (root.kind === "single-selection-collection") {
+    return true;
+  }
   const props =
     root.kind === "reuse" || root.kind === "compose" ? root.props : [];
   return (

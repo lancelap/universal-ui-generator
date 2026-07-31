@@ -13,6 +13,7 @@ import { buildImportModel } from "./build-import-model.js";
 import { buildPropsModel } from "./build-props-model.js";
 import { buildSingleSelectionModel } from "./build-single-selection-model.js";
 import {
+  buildSingleSelectionStyleModel,
   buildStyleModel,
   type ParentPositioningEvidence,
 } from "./build-style-model.js";
@@ -71,12 +72,24 @@ export function buildReactGenerationModel(
           `Structured node ${node.id} must have a compose resolution`,
         );
       }
-      return buildSingleSelectionModel({
+      const structured = buildSingleSelectionModel({
         node,
         resolution,
         recipe: structuredRecipe,
         localNames,
       });
+      mergeStyleResult(
+        styles,
+        diagnostics,
+        buildSingleSelectionStyleModel({
+          node,
+          designNode: requireDesignNode(input, node),
+          rootComponentId: structured.rootComponentId,
+          policy: input.pack.reactStylePolicy,
+          classNames: structured.classNames,
+        }),
+      );
+      return structured;
     }
 
     if (resolution.decision === "fallback") {

@@ -7,7 +7,10 @@ import type {
 import { describe, expect, it } from "vitest";
 
 import { ReactGenerationError } from "./errors.js";
-import { buildStyleModel } from "./build-style-model.js";
+import {
+  buildSingleSelectionStyleModel,
+  buildStyleModel,
+} from "./build-style-model.js";
 
 describe("buildStyleModel", () => {
   it("lowers a vertical flow layout in the fixed declaration order", () => {
@@ -246,6 +249,99 @@ describe("buildStyleModel", () => {
     expect(
       declarations.every(({ value }) => !value.includes("!important")),
     ).toBe(true);
+  });
+
+  it("emits policy-approved choice root facts and fixed structural rules", () => {
+    const stylePolicy = policy({
+      layout: ["display", "flexDirection", "gap", "padding"],
+      appearance: ["background", "border", "borderRadius"],
+    });
+    stylePolicy.components.push({
+      componentId: "base.SelectionGroup",
+      layout: {
+        allowed: ["display", "flexDirection", "gap", "padding"],
+      },
+      appearance: { allowed: ["background", "border", "borderRadius"] },
+      wrapper: "allowed",
+    });
+
+    const result = buildSingleSelectionStyleModel({
+      node: { ...node("choice"), role: "choicePanel" },
+      designNode: designNode({
+        layout: {
+          mode: "vertical",
+          gap: 16,
+          padding: { top: 24, right: 24, bottom: 24, left: 24 },
+          alignItems: "stretch",
+        },
+        appearance: {
+          fills: [{ type: "solid", color: "#FFFFFF", opacity: 1 }],
+          borders: [
+            {
+              width: { top: 1, right: 1, bottom: 1, left: 1 },
+              style: "solid",
+              color: "#D0D3D8",
+              opacity: 1,
+              position: "inside",
+            },
+          ],
+          radii: {
+            topLeft: 12,
+            topRight: 12,
+            bottomRight: 12,
+            bottomLeft: 12,
+          },
+          shadows: [],
+          opacity: 1,
+        },
+      }),
+      rootComponentId: "base.SelectionGroup",
+      policy: stylePolicy,
+      classNames: {
+        root: "choicePanel",
+        header: "choicePanelHeader",
+        section: "choiceSection",
+        sectionLabel: "choiceSectionLabel",
+        optionRow: "choiceOptionRow",
+        optionContent: "choiceOptionContent",
+        description: "choiceDescription",
+        trailingAsset: "choiceTrailingAsset",
+      },
+    });
+
+    expect(result.rules).toEqual(
+      expect.arrayContaining([
+        {
+          className: "choicePanel",
+          declarations: [
+            { property: "display", value: "flex" },
+            { property: "flexDirection", value: "column" },
+            { property: "gap", value: "16px" },
+            { property: "padding", value: "24px 24px" },
+            { property: "background", value: "#FFFFFF" },
+            { property: "border", value: "1px solid #D0D3D8" },
+            {
+              property: "borderRadius",
+              value: "12px 12px 12px 12px",
+            },
+          ],
+        },
+        {
+          className: "choicePanelHeader",
+          declarations: expect.arrayContaining([
+            { property: "display", value: "flex" },
+            { property: "flexDirection", value: "row" },
+          ]),
+        },
+        {
+          className: "choiceTrailingAsset",
+          declarations: [{ property: "alignSelf", value: "flex-start" }],
+        },
+      ]),
+    );
+    expect(JSON.stringify(result.rules)).not.toMatch(
+      /!important|70:118899|selected|green/,
+    );
   });
 });
 

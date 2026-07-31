@@ -13,6 +13,7 @@ import type {
   StyleBuildResult,
   StyleDeclarationModel,
   StyleRuleModel,
+  ReactSingleSelectionCollectionElementModel,
 } from "./generation-model.js";
 
 const propertyOrder = [
@@ -182,6 +183,91 @@ export function buildStyleModel(input: {
           ],
     diagnostics: sortDiagnostics(diagnostics),
     requiresRelativeParent,
+  };
+}
+
+export function buildSingleSelectionStyleModel(input: {
+  node: UiNodeV2;
+  designNode: DesignNodeV2;
+  rootComponentId: string;
+  policy: ReactStylePolicy;
+  classNames: ReactSingleSelectionCollectionElementModel["classNames"];
+}): StyleBuildResult {
+  const root = buildStyleModel({
+    node: input.node,
+    designNode: input.designNode,
+    componentId: input.rootComponentId,
+    recipe: {
+      componentId: input.rootComponentId,
+      staticProps: [],
+      stateProps: [],
+      eventProps: [],
+      semanticChildrenPolicy: "required",
+      wrapper: "allowed",
+      provenance: {
+        kind: "generator",
+        source: "single-selection structural lowering",
+      },
+    },
+    policy: input.policy,
+  });
+  const rootRules = root.rules.map((rule) => ({
+    ...rule,
+    className: input.classNames.root,
+  }));
+  const fixedRules: StyleRuleModel[] = [
+    {
+      className: input.classNames.header,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "row" },
+        { property: "alignItems", value: "center" },
+        { property: "gap", value: "12px" },
+      ],
+    },
+    {
+      className: input.classNames.section,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "column" },
+        { property: "gap", value: "12px" },
+      ],
+    },
+    {
+      className: input.classNames.sectionLabel,
+      declarations: [{ property: "width", value: "100%" }],
+    },
+    {
+      className: input.classNames.optionRow,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "row" },
+        { property: "alignItems", value: "flex-start" },
+        { property: "gap", value: "12px" },
+      ],
+    },
+    {
+      className: input.classNames.optionContent,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "column" },
+        { property: "gap", value: "4px" },
+        { property: "width", value: "100%" },
+      ],
+    },
+    {
+      className: input.classNames.description,
+      declarations: [{ property: "width", value: "100%" }],
+    },
+    {
+      className: input.classNames.trailingAsset,
+      declarations: [{ property: "alignSelf", value: "flex-start" }],
+    },
+  ];
+  return {
+    rules: [...rootRules, ...fixedRules],
+    diagnostics: root.diagnostics,
+    requiresRelativeParent: false,
   };
 }
 

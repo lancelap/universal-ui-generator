@@ -48,6 +48,31 @@ describe("emitTsx", () => {
     );
   });
 
+  it("emits one bounded selection group with two sections and five options", () => {
+    const source = emitTsx(choicePanelModel(), "GeneratedChoicePanel");
+
+    expect(source.match(/<SelectionGroup\b/g)).toHaveLength(1);
+    expect(source.match(/<SelectionOption\b/g)).toHaveLength(5);
+    expect(
+      source.match(/className=\{styles\["choiceSection"\]\}/g),
+    ).toHaveLength(2);
+    expect(source).toContain('value=""');
+    expect(source).toContain("onChange={() => { }}");
+    expect(source).toContain('direction="column"');
+    expect(source).toContain('groupName="Choose actions"');
+    expect(source).toContain('value="option-5"');
+    expect(source).toContain("Second section");
+    expect(source).toContain("Description five");
+    expect(source).toContain("<LeadingAsset");
+    expect(source.match(/<TrailingAsset\b/g)).toHaveLength(5);
+    expect(source.indexOf("choiceSection")).toBeGreaterThan(
+      source.indexOf("<SelectionGroup"),
+    );
+    expect(source).not.toMatch(
+      /<input\b|type="radio"|checkbox|useState|Tooltip/,
+    );
+  });
+
   it("AST-imports generated fallbacks from stable relative paths", () => {
     const source = emitTsx(modelWithFallback(), "DialogPreview", [
       {
@@ -436,6 +461,100 @@ function model(): ReactGenerationModel {
           ],
         },
       ],
+      children: [],
+    },
+  };
+}
+
+function choicePanelModel(): ReactGenerationModel {
+  const options = Array.from({ length: 5 }, (_, index) => ({
+    id: `option-${index + 1}`,
+    sourceNodeIds: [`source-${index + 1}`],
+    label: `Option ${index + 1}`,
+    description: index === 4 ? "Description five" : `Description ${index + 1}`,
+    hasTrailingAsset: true,
+    props: [
+      {
+        name: "value",
+        value: { kind: "literal" as const, value: `option-${index + 1}` },
+      },
+    ],
+  }));
+  return {
+    imports: [
+      {
+        kind: "named",
+        package: "@test/ui",
+        specifiers: [
+          ["group", "SelectionGroup"],
+          ["option", "SelectionOption"],
+          ["layout", "Layout"],
+          ["title", "Text"],
+          ["description", "Description"],
+          ["leading", "LeadingAsset"],
+          ["trailing", "TrailingAsset"],
+        ].map(([componentId, local]) => ({
+          componentId: componentId!,
+          imported: local!,
+          local: local!,
+        })),
+      },
+    ],
+    externalProps: [],
+    renderOnlyProps: [],
+    styles: [],
+    fallbacks: [],
+    diagnostics: [],
+    root: {
+      kind: "single-selection-collection",
+      nodeId: "choice-panel",
+      sourceNodeIds: ["source-root"],
+      rootComponentId: "group",
+      rootLocalName: "SelectionGroup",
+      localName: "SelectionGroup",
+      optionComponentId: "option",
+      optionLocalName: "SelectionOption",
+      layoutComponentId: "layout",
+      layoutLocalName: "Layout",
+      titleComponentId: "title",
+      titleLocalName: "Text",
+      descriptionComponentId: "description",
+      descriptionLocalName: "Description",
+      leadingAssetLocalName: "LeadingAsset",
+      trailingAssetLocalName: "TrailingAsset",
+      title: "Choose actions",
+      rootProps: [
+        { name: "value", value: { kind: "literal", value: "" } },
+        { name: "onChange", value: { kind: "noop" } },
+        { name: "direction", value: { kind: "literal", value: "column" } },
+        {
+          name: "groupName",
+          value: { kind: "literal", value: "Choose actions" },
+        },
+      ],
+      props: [
+        { name: "value", value: { kind: "literal", value: "" } },
+        { name: "onChange", value: { kind: "noop" } },
+        { name: "direction", value: { kind: "literal", value: "column" } },
+        {
+          name: "groupName",
+          value: { kind: "literal", value: "Choose actions" },
+        },
+      ],
+      sections: [
+        { id: "first", options: options.slice(0, 2) },
+        { id: "second", label: "Second section", options: options.slice(2) },
+      ],
+      classNames: {
+        root: "choicePanel",
+        header: "choicePanelHeader",
+        section: "choiceSection",
+        sectionLabel: "choiceSectionLabel",
+        optionRow: "choiceOptionRow",
+        optionContent: "choiceOptionContent",
+        description: "choiceDescription",
+        trailingAsset: "choiceTrailingAsset",
+      },
       children: [],
     },
   };
