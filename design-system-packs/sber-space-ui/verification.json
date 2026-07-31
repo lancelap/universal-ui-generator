@@ -55,6 +55,31 @@
       "componentId": "base.Typography",
       "status": "verified",
       "source": "gigacode-mcp catalog"
+    },
+    {
+      "componentId": "base.RadioGroup",
+      "status": "verified",
+      "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+    },
+    {
+      "componentId": "base.RadioButton",
+      "status": "verified",
+      "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+    },
+    {
+      "componentId": "base.FormDescription",
+      "status": "verified",
+      "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+    },
+    {
+      "componentId": "icon.DocumentText",
+      "status": "verified",
+      "source": "gigacode-mcp get_icon_paths DocumentText"
+    },
+    {
+      "componentId": "icon.ExclamationMarkInfo",
+      "status": "verified",
+      "source": "gigacode-mcp get_icon_paths ExclamationMarkInfo"
     }
   ]
 }

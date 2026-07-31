@@ -1,13 +1,20 @@
-import type { LoadedDesignSystemPackV2 } from "@uig/component-catalog";
+import {
+  loadDesignSystemPackV2,
+  type LoadedDesignSystemPackV2,
+} from "@uig/component-catalog";
 import {
   type DesignIRV2,
   stableStringify,
   type UiManifestV2,
 } from "@uig/contracts";
 import { sha256 } from "@uig/design-context";
+import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { resolveUiManifestV2 } from "./resolve-ui-manifest-v2.js";
+
+const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
 
 const designIr: DesignIRV2 = {
   schema: "design-ir/v2",
@@ -146,7 +153,170 @@ describe("resolveUiManifestV2", () => {
     expect(second.nodes).toEqual(first.nodes);
     expect(second.source).toEqual(first.source);
   });
+
+  it("resolves a choice panel as one complete structured composition", async () => {
+    const pack = await loadDesignSystemPackV2(
+      join(repoRoot, "design-system-packs", "sber-space-ui"),
+    );
+
+    const plan = resolveUiManifestV2({
+      manifest: choicePanelManifest(),
+      designIr,
+      pack,
+    });
+
+    expect(plan.summary).toEqual({
+      reuse: 0,
+      compose: 1,
+      fallback: 0,
+      blocked: 0,
+    });
+    expect(plan.nodes[0]).toMatchObject({
+      decision: "compose",
+      bindings: expect.arrayContaining(
+        [
+          "base.RadioGroup",
+          "base.RadioButton",
+          "base.Stack",
+          "base.Typography",
+          "base.FormDescription",
+          "icon.DocumentText",
+          "icon.ExclamationMarkInfo",
+        ].map((componentId) => expect.objectContaining({ componentId })),
+      ),
+    });
+    expect(plan.diagnostics).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ blocking: true })]),
+    );
+  });
+
+  it.each([
+    ["base.RadioButton", "CHOICE_CONTROL_RESOLUTION_BLOCKED"],
+    ["base.FormDescription", "CHOICE_DESCRIPTION_COMPANION_BLOCKED"],
+  ] as const)(
+    "blocks a choice panel when required binding %s is unavailable",
+    async (componentId, code) => {
+      const pack = await choicePanelPackWithout(componentId);
+
+      const plan = resolveUiManifestV2({
+        manifest: choicePanelManifest(),
+        designIr,
+        pack,
+      });
+
+      expect(plan.summary.blocked).toBe(1);
+      expect(plan.summary.fallback).toBe(0);
+      expect(plan.diagnostics).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ code, blocking: true }),
+        ]),
+      );
+    },
+  );
+
+  it("warns and omits only a requested optional icon binding", async () => {
+    const pack = await choicePanelPackWithout("icon.ExclamationMarkInfo");
+
+    const plan = resolveUiManifestV2({
+      manifest: choicePanelManifest(),
+      designIr,
+      pack,
+    });
+
+    expect(plan.summary.compose).toBe(1);
+    expect(plan.summary.blocked).toBe(0);
+    expect(plan.nodes[0]).toMatchObject({
+      decision: "compose",
+      bindings: expect.not.arrayContaining([
+        expect.objectContaining({ componentId: "icon.ExclamationMarkInfo" }),
+      ]),
+    });
+    expect(plan.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "CHOICE_ICON_UNRESOLVED",
+          blocking: false,
+        }),
+      ]),
+    );
+  });
 });
+
+function choicePanelManifest(): UiManifestV2 {
+  return {
+    schema: "ui-manifest/v2",
+    sourceArtifactId: designIr.sourceArtifactId,
+    root: {
+      id: "ui_choicePanel_4-314",
+      kind: "control",
+      role: "choicePanel",
+      sourceNodeIds: ["4:314"],
+      layoutSourceNodeId: "4:314",
+      confidence: 1,
+      evidence: [{ kind: "structural-pattern", value: "choice-panel" }],
+      content: {
+        title: "Choose",
+        titleSourceNodeId: "4:314",
+        headerIcon: { hint: "files", sourceNodeId: "4:314" },
+        sections: [
+          {
+            id: "section-1",
+            options: [
+              {
+                id: "option-1",
+                sourceNodeIds: ["4:314"],
+                label: "First",
+                labelSourceNodeId: "4:314",
+                info: {
+                  present: true,
+                  hint: "information",
+                  sourceNodeId: "4:314",
+                },
+                selected: false,
+              },
+              {
+                id: "option-2",
+                sourceNodeIds: ["4:314"],
+                label: "Second",
+                labelSourceNodeId: "4:314",
+                selected: false,
+              },
+            ],
+          },
+        ],
+      },
+      state: { selectionMode: "single", selectedOptionId: null },
+      children: [],
+    },
+    diagnostics: [],
+  };
+}
+
+async function choicePanelPackWithout(
+  componentId: string,
+): Promise<LoadedDesignSystemPackV2> {
+  const pack = await loadDesignSystemPackV2(
+    join(repoRoot, "design-system-packs", "sber-space-ui"),
+  );
+  const componentsById = new Map(pack.componentsById);
+  componentsById.delete(componentId);
+  return {
+    ...pack,
+    componentsById,
+    candidatesByRole: new Map(
+      [...pack.candidatesByRole].map(([role, components]) => [
+        role,
+        components.filter((component) => component.id !== componentId),
+      ]),
+    ),
+    verification: {
+      ...pack.verification,
+      components: pack.verification.components.filter(
+        (entry) => entry.componentId !== componentId,
+      ),
+    },
+  };
+}
 
 function packFixture(
   id: string,

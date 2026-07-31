@@ -68,6 +68,40 @@ describe("loadDesignSystemPack", () => {
     expect(pack.sha256).toMatch(/^[a-f0-9]{64}$/);
   });
 
+  it("loads the verified Sber choice panel recipe and its complete binding closure", async () => {
+    const pack = await loadDesignSystemPackV2(sberPack);
+    const recipe = pack.reactRenderRecipes.singleSelectionCollections?.find(
+      (candidate) => candidate.semanticRole === "choicePanel",
+    );
+
+    expect(recipe).toMatchObject({
+      kind: "single-selection-collection",
+      rootComponentId: "base.RadioGroup",
+      optionComponentId: "base.RadioButton",
+      layoutComponentId: "base.Stack",
+      titleComponentId: "base.Typography",
+      descriptionComponentId: "base.FormDescription",
+      leadingAssetComponentId: "icon.DocumentText",
+      trailingAssetComponentId: "icon.ExclamationMarkInfo",
+    });
+    expect(pack.semanticPolicy.roles.choicePanel).toMatchObject({
+      allowedDecisions: expect.arrayContaining(["compose"]),
+      candidateComponentIds: ["base.RadioGroup"],
+      nativeFallback: false,
+    });
+    expect(
+      [
+        "base.RadioGroup",
+        "base.RadioButton",
+        "base.Stack",
+        "base.Typography",
+        "base.FormDescription",
+        "icon.DocumentText",
+        "icon.ExclamationMarkInfo",
+      ].every((id) => pack.componentsById.get(id)?.verified),
+    ).toBe(true);
+  });
+
   it("rejects a manifest path that escapes the pack directory", async () => {
     const pack = await copyPack();
     const manifest = await readJson(join(pack, "pack.json"));

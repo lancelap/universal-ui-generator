@@ -202,6 +202,101 @@
         "kind": "existing-catalog",
         "source": "gigacode-mcp/resources/sber-space-ui/catalog.json"
       }
+    },
+    {
+      "id": "base.RadioGroup",
+      "package": "@sber-space-ui/radio",
+      "export": "RadioGroup",
+      "exportKind": "named",
+      "semanticRoles": ["choicePanel"],
+      "capabilities": ["single-selection", "value", "change", "direction"],
+      "formAdapters": ["controlled"],
+      "priority": 100,
+      "verified": true,
+      "requiredComponentIds": [
+        "base.RadioButton",
+        "base.Stack",
+        "base.Typography",
+        "base.FormDescription"
+      ],
+      "optionalComponentIds": ["icon.DocumentText", "icon.ExclamationMarkInfo"],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+      }
+    },
+    {
+      "id": "base.RadioButton",
+      "package": "@sber-space-ui/radio",
+      "export": "RadioButton",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["single-selection-option", "value"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+      }
+    },
+    {
+      "id": "base.FormDescription",
+      "package": "@sber-space-ui/form-control",
+      "export": "FormDescription",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["description"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+      }
+    },
+    {
+      "id": "icon.DocumentText",
+      "package": "@sber-space-ui/icons/24/Stroke/File_And_Folder",
+      "export": "DocumentText",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["decorative-icon"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "verified-export-path",
+        "source": "gigacode-mcp get_icon_paths DocumentText"
+      }
+    },
+    {
+      "id": "icon.ExclamationMarkInfo",
+      "package": "@sber-space-ui/icons/24/Stroke/UserInterface",
+      "export": "ExclamationMarkInfo",
+      "exportKind": "named",
+      "semanticRoles": [],
+      "capabilities": ["informational-icon"],
+      "formAdapters": [],
+      "priority": 0,
+      "verified": true,
+      "requiredComponentIds": [],
+      "optionalComponentIds": [],
+      "defaultProps": {},
+      "provenance": {
+        "kind": "verified-export-path",
+        "source": "gigacode-mcp get_icon_paths ExclamationMarkInfo"
+      }
     }
   ]
 }

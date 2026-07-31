@@ -188,6 +188,73 @@
         "kind": "canonical-library-doc",
         "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Typography/Typography.md"
       }
+    },
+    {
+      "componentId": "base.RadioGroup",
+      "staticProps": [],
+      "stateProps": [],
+      "eventProps": [{ "source": "change", "target": "onChange" }],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "required",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+      }
+    },
+    {
+      "componentId": "base.RadioButton",
+      "staticProps": [],
+      "content": { "source": "content.label", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "optional",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/RadioButton/RadioButton.md"
+      }
+    },
+    {
+      "componentId": "base.FormDescription",
+      "staticProps": [],
+      "content": { "source": "content.text", "target": "children" },
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "canonical-library-doc",
+        "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/FormControl/FormControl.md"
+      }
+    },
+    {
+      "componentId": "icon.DocumentText",
+      "staticProps": [],
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "verified-export-path",
+        "source": "gigacode-mcp get_icon_paths DocumentText"
+      }
+    },
+    {
+      "componentId": "icon.ExclamationMarkInfo",
+      "staticProps": [],
+      "stateProps": [],
+      "eventProps": [],
+      "classNameProp": "className",
+      "semanticChildrenPolicy": "forbidden",
+      "wrapper": "allowed",
+      "provenance": {
+        "kind": "verified-export-path",
+        "source": "gigacode-mcp get_icon_paths ExclamationMarkInfo"
+      }
     }
   ],
   "compositions": [
@@ -217,6 +284,42 @@
       "provenance": {
         "kind": "canonical-library-doc",
         "source": "gigacode-mcp/resources/sber-space-ui/library-docs/@sber-space-ui/Modal/Modal.md"
+      }
+    }
+  ],
+  "singleSelectionCollections": [
+    {
+      "kind": "single-selection-collection",
+      "semanticRole": "choicePanel",
+      "rootComponentId": "base.RadioGroup",
+      "optionComponentId": "base.RadioButton",
+      "layoutComponentId": "base.Stack",
+      "titleComponentId": "base.Typography",
+      "descriptionComponentId": "base.FormDescription",
+      "leadingAssetComponentId": "icon.DocumentText",
+      "trailingAssetComponentId": "icon.ExclamationMarkInfo",
+      "sources": {
+        "title": "content.title",
+        "sections": "content.sections",
+        "selectedValue": "state.selectedOptionId"
+      },
+      "rootProps": {
+        "valueTarget": "value",
+        "emptyValue": "",
+        "onChangeTarget": "onChange",
+        "onChangeValue": "noop",
+        "directionTarget": "direction",
+        "directionValue": "column",
+        "groupNameTarget": "groupName",
+        "groupNameSource": "content.title"
+      },
+      "optionProps": {
+        "valueTarget": "value",
+        "valueSource": "option.id"
+      },
+      "provenance": {
+        "kind": "approved-pack-policy",
+        "source": "choicePanel single-selection collection spec"
       }
     }
   ]

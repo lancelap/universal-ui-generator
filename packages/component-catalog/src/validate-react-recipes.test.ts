@@ -27,7 +27,7 @@ describe("loadDesignSystemPackV2", () => {
     const loaded = await loadDesignSystemPackV2(packDirectory);
 
     expect(loaded.manifest.schema).toBe("design-system-pack/v2");
-    expect(loaded.reactRenderRecipes.components).toHaveLength(11);
+    expect(loaded.reactRenderRecipes.components).toHaveLength(16);
     expect(loaded.reactRenderRecipes.singleSelectionCollections).toEqual([]);
     expect(loaded.reactStylePolicy.defaults.inlineStyles).toBe(false);
     expect(loaded.sha256).toMatch(/^[a-f0-9]{64}$/);

@@ -67,6 +67,12 @@
       "nativeFallback": false,
       "unresolvedCode": "COMPONENT_UNRESOLVED"
     },
+    "choicePanel": {
+      "allowedDecisions": ["compose", "blocked"],
+      "candidateComponentIds": ["base.RadioGroup"],
+      "nativeFallback": false,
+      "unresolvedCode": "CHOICE_CONTROL_RESOLUTION_BLOCKED"
+    },
     "unresolved": {
       "allowedDecisions": ["blocked"],
       "candidateComponentIds": [],
