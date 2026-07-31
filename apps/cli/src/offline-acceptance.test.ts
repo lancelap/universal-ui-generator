@@ -2,15 +2,21 @@ import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { loadDesignSystemPack } from "@uig/component-catalog";
-import { resolveUiManifest } from "@uig/component-resolver";
+import {
+  loadDesignSystemPack,
+  loadDesignSystemPackV2,
+} from "@uig/component-catalog";
+import {
+  resolveUiManifest,
+  resolveUiManifestV2,
+} from "@uig/component-resolver";
 import { stableStringify } from "@uig/contracts";
 import { buildDesignSummary } from "@uig/design-context";
 import {
   normalizePixsoDesign,
   normalizePixsoDesignV2WithProvenance,
 } from "@uig/design-normalizer";
-import { buildUiManifest } from "@uig/semantic-planner";
+import { buildUiManifest, buildUiManifestV2 } from "@uig/semantic-planner";
 import { describe, expect, it } from "vitest";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
@@ -198,6 +204,58 @@ describe("offline real-Pixso acceptance", () => {
       });
       expect(geometryOrigin).not.toHaveProperty("componentKey");
     }
+  });
+
+  it("plans the real 70:118899 choice panel offline without low-confidence blockers", async () => {
+    const rawDsl = JSON.parse(
+      await readFile(
+        join(repoRoot, "fixtures", "pixso", "node-70-118899", "source.json"),
+        "utf8",
+      ),
+    );
+    const pack = await loadDesignSystemPackV2(
+      join(repoRoot, "design-system-packs", "sber-space-ui"),
+    );
+    const normalized = normalizePixsoDesignV2WithProvenance({
+      artifactId: "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+      rootNodeId: "70:118899",
+      rawDsl,
+    });
+    const manifest = buildUiManifestV2({
+      ir: normalized.designIr,
+      provenance: normalized.provenance,
+      exactMappings: [...pack.exactPixsoMappings],
+    });
+    const plan = resolveUiManifestV2({
+      manifest,
+      designIr: normalized.designIr,
+      pack,
+    });
+
+    expect(manifest.root).toMatchObject({
+      role: "choicePanel",
+      children: [],
+      content: {
+        sections: [{ options: [{}, {}, {}] }, { options: [{}, {}] }],
+      },
+    });
+    expect(plan.summary).toEqual({
+      reuse: 0,
+      compose: 1,
+      fallback: 0,
+      blocked: 0,
+    });
+    expect(
+      [...manifest.diagnostics, ...plan.diagnostics].map(
+        (diagnostic) => diagnostic.code,
+      ),
+    ).not.toContain("SEMANTIC_CONFIDENCE_TOO_LOW");
+    expect(
+      manifest.diagnostics.filter(
+        (diagnostic) =>
+          diagnostic.code === "DUPLICATE_MATERIALIZED_NODE_COLLAPSED",
+      ),
+    ).toHaveLength(1);
   });
 });
 

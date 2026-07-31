@@ -1,0 +1,48 @@
+.choiceDescription {
+  width: 100%;
+}
+
+.choiceOptionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.choiceOptionRow {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.choicePanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  padding: 20px 20px;
+  width: 752px;
+  border: 1px solid rgba(31, 20, 51, 0.12);
+  border-radius: 16px 16px 16px 16px;
+}
+
+.choicePanelHeader {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  align-items: center;
+}
+
+.choiceSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.choiceSectionLabel {
+  width: 100%;
+}
+
+.choiceTrailingAsset {
+  align-self: flex-start;
+}

@@ -1,0 +1,283 @@
+{
+  "componentName": "GeneratedChoicePanel",
+  "designSystem": "sber-space-ui",
+  "diagnostics": [
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#D0D3D8"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "70:118899"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#D0D3D8"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101368"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101322"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:7983/27:101320/2:7983"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:140087/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:190047/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:193139/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101335"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:196451/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:198331/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8146/27:101362/2:8146"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8209/27:101337/2:8209"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8146/27:101342/2:8146"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "DUPLICATE_MATERIALIZED_NODE_COLLAPSED",
+      "evidence": {
+        "collapsedNodeIds": [
+          "4:63130/27:101325/4:63130"
+        ],
+        "retainedNodeId": "4:63082/27:101325/4:63082",
+        "semanticSlot": "options[0].description"
+      },
+      "message": "Collapsed overlapping materialized nodes in one choice option description slot",
+      "severity": "info",
+      "source": {
+        "artifactId": "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+        "nodeId": "4:63078/27:101325"
+      },
+      "stage": "semantic-planning"
+    }
+  ],
+  "files": [
+    {
+      "byteLength": 697,
+      "kind": "css-module",
+      "path": "GeneratedChoicePanel.module.css",
+      "sha256": "9fa05ed31d3884851205e8e86b79d4409adb28859c17b34221d95214c4e3b72d"
+    },
+    {
+      "byteLength": 6433,
+      "kind": "tsx",
+      "path": "GeneratedChoicePanel.tsx",
+      "sha256": "4055b5817d5b930053a98100c4d6ddf1890908cc59988f3788b0bcfc9e3b5f04"
+    }
+  ],
+  "renderOnlyProps": [],
+  "schema": "react-generation-report/v2",
+  "sourceRunId": "run_acceptance_pixso_70_118899",
+  "statistics": {
+    "cssRules": 8,
+    "fallbackComponents": 0,
+    "filesByKind": {
+      "cssModule": 1,
+      "fallbackCssModule": 0,
+      "fallbackTsx": 0,
+      "tsx": 1
+    },
+    "generatedProps": 0,
+    "imports": 7,
+    "manifestNodes": 1,
+    "sourceByteLength": 7130
+  },
+  "status": "generated",
+  "validation": {
+    "inputContracts": "passed",
+    "pack": "passed",
+    "syntax": "passed",
+    "targetTypecheck": "not-run"
+  }
+}

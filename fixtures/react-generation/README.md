@@ -5,8 +5,8 @@ generation always happens outside `fixtures/`; `pnpm verify:fixtures` checks
 every accepted byte length and SHA-256 below.
 
 The neutral modal uses one unchanged v2 manifest for both packs. The real
-`4:314` Sber output is regenerated only from the lossless Pixso source recorded
-in `fixtures/pixso/README.md`.
+`4:314` modal and `70:118899` choice-panel Sber outputs are regenerated only
+from the lossless Pixso sources recorded in `fixtures/pixso/README.md`.
 
 The Sber Field recipe's optional semantic children are grounded in the
 portable canonical resource identifier:
@@ -49,7 +49,7 @@ inputs stay self-closing `Field` elements.
     {
       "path": "modal/material-ui/resolution-plan.json",
       "byteLength": 6178,
-      "sha256": "b45ef1158e130c403281c8faa7a55048fb95fee40bf86bc924150dd6c47bd9e4"
+      "sha256": "a9ea8f8d9566513b09477a502f866ff4f7d3ba64c4f80cd2d2e06e4f15eacce9"
     },
     {
       "path": "modal/sber-space-ui/generated/GeneratedModal.module.css",
@@ -69,7 +69,7 @@ inputs stay self-closing `Field` elements.
     {
       "path": "modal/sber-space-ui/resolution-plan.json",
       "byteLength": 5761,
-      "sha256": "d062d9b4bf6a5f88cd375080907675b67235202f4dca03660f54e7316eaa2c59"
+      "sha256": "a50d862e7e29ca15af7ce3b20c8413e235a1d43da3346940fa1d4120241d9286"
     },
     {
       "path": "modal/source.design-ir.json",
@@ -93,8 +93,28 @@ inputs stay self-closing `Field` elements.
     },
     {
       "path": "pixso-4-314/sber-space-ui/generated/generation-report.json",
-      "byteLength": 3211,
-      "sha256": "55461467c5565b60b524b58941d1d35f17057e610d64f16ce518f95b80c44861"
+      "byteLength": 6355,
+      "sha256": "f0b1b8d96312ea19abf52069925a2a9cc4461b0dfdece46891c56fd68792bb7d"
+    },
+    {
+      "path": "pixso-70-118899/sber-space-ui/generated/GeneratedChoicePanel.module.css",
+      "byteLength": 697,
+      "sha256": "9fa05ed31d3884851205e8e86b79d4409adb28859c17b34221d95214c4e3b72d"
+    },
+    {
+      "path": "pixso-70-118899/sber-space-ui/generated/GeneratedChoicePanel.tsx",
+      "byteLength": 6433,
+      "sha256": "4055b5817d5b930053a98100c4d6ddf1890908cc59988f3788b0bcfc9e3b5f04"
+    },
+    {
+      "path": "pixso-70-118899/sber-space-ui/generated/generation-report.json",
+      "byteLength": 8454,
+      "sha256": "f245fabc5110a3379128086f0e6a23a8d5e4047aef64f5ca1ede1177cbd65be8"
+    },
+    {
+      "path": "pixso-70-118899/sber-space-ui/resolution-plan.json",
+      "byteLength": 10491,
+      "sha256": "5454c690e28bae6cd5f9f99a635eae6d9c0be99d9da9b0e6a2a9e3e296b533d4"
     }
   ]
 }

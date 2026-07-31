@@ -34,6 +34,13 @@ const realRoot = join(
   "pixso-4-314",
   "sber-space-ui",
 );
+const choiceRoot = join(
+  repoRoot,
+  "fixtures",
+  "react-generation",
+  "pixso-70-118899",
+  "sber-space-ui",
+);
 const decoder = new TextDecoder();
 
 describe("reviewed React generation acceptance", () => {
@@ -340,6 +347,95 @@ describe("reviewed React generation acceptance", () => {
     expect(readableTsx).toContain("Подтвердить и закончить");
     expect(tsx.match(/<Button\b/g)).toHaveLength(2);
     await expectAcceptedBundle(join(realRoot, "generated"), generated);
+  });
+
+  it("generates the reviewed real 70:118899 Sber choice panel", async () => {
+    const rawDsl = JSON.parse(
+      await readFile(
+        join(repoRoot, "fixtures", "pixso", "node-70-118899", "source.json"),
+        "utf8",
+      ),
+    );
+    const pack = await loadDesignSystemPackV2(
+      join(repoRoot, "design-system-packs", "sber-space-ui"),
+    );
+    const normalized = normalizePixsoDesignV2WithProvenance({
+      artifactId: "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+      rootNodeId: "70:118899",
+      rawDsl,
+    });
+    const uiManifest = buildUiManifestV2({
+      ir: normalized.designIr,
+      provenance: normalized.provenance,
+      exactMappings: [...pack.exactPixsoMappings],
+    });
+    const plan = resolveUiManifestV2({
+      manifest: uiManifest,
+      designIr: normalized.designIr,
+      pack,
+    });
+    const generated = generateReactBundle({
+      sourceRunId: "run_acceptance_pixso_70_118899",
+      designIr: normalized.designIr,
+      uiManifest,
+      resolutionPlan: plan,
+      pack,
+    });
+
+    expect(uiManifest.root).toMatchObject({
+      role: "choicePanel",
+      content: {
+        sections: [{ options: [{}, {}, {}] }, { options: [{}, {}] }],
+      },
+      children: [],
+    });
+    expect(plan.summary).toEqual({
+      reuse: 0,
+      compose: 1,
+      fallback: 0,
+      blocked: 0,
+    });
+    expect(generated.report).toMatchObject({
+      status: "generated",
+      componentName: "GeneratedChoicePanel",
+      statistics: { manifestNodes: 1, fallbackComponents: 0 },
+    });
+    expect(generated.report.diagnostics).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ blocking: true })]),
+    );
+    const tsx = source(generated, ".tsx");
+    const readableTsx = decodeUnicodeEscapes(tsx);
+    expect(tsx).toContain(
+      'import { RadioButton, RadioGroup } from "@sber-space-ui/radio";',
+    );
+    expect(tsx).toContain(
+      'import { FormDescription } from "@sber-space-ui/form-control";',
+    );
+    expect(tsx).toContain(
+      'import { DocumentText } from "@sber-space-ui/icons/24/Stroke/File_And_Folder";',
+    );
+    expect(tsx).toContain(
+      'import { ExclamationMarkInfo } from "@sber-space-ui/icons/24/Stroke/UserInterface";',
+    );
+    expect(tsx.match(/<RadioGroup\b/g)).toHaveLength(1);
+    expect(tsx.match(/<RadioButton\b/g)).toHaveLength(5);
+    expect(tsx.match(/className=\{styles\["choiceSection"\]\}/g)).toHaveLength(
+      2,
+    );
+    expect(readableTsx.indexOf("Переформормировать запрос")).toBeLessThan(
+      readableTsx.indexOf("Сделка требует корректировок:"),
+    );
+    expect(tsx).not.toMatch(/useState|<input\b|type="radio"|Tooltip/);
+    expect(source(generated, ".module.css")).toContain(
+      "border: 1px solid rgba(31, 20, 51, 0.12);",
+    );
+
+    const acceptedPlan = await readContract<ResolutionPlanV2>(
+      join(choiceRoot, "resolution-plan.json"),
+      ResolutionPlanV2Schema,
+    );
+    expect(stableStringify(plan)).toBe(stableStringify(acceptedPlan));
+    await expectAcceptedBundle(join(choiceRoot, "generated"), generated);
   });
 });
 

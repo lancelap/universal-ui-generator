@@ -6,6 +6,23 @@
       "blocking": false,
       "code": "VISUAL_TOKEN_MISMATCH",
       "evidence": {
+        "designValue": "#148F2B",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_primaryAction_4-597-4-461",
+        "nodeId": "4:597/4:461"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
         "designValue": "#1F1433",
         "property": "border.color",
         "tokenName": "border.default",
@@ -16,6 +33,40 @@
       "source": {
         "manifestNodeId": "ui_dialog_4-314",
         "nodeId": "4:314"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1E1F",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_secondaryAction_4-555-4-460",
+        "nodeId": "4:555/4:460"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1E1F",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_heading_4-315",
+        "nodeId": "3:45"
       },
       "stage": "appearance-comparison"
     },
@@ -64,6 +115,54 @@
         "semanticRole": "dialog"
       },
       "message": "Style boxShadow is not permitted for ui_dialog_4-314",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_primaryAction_4-597-4-461",
+        "property": "background",
+        "semanticRole": "primaryAction"
+      },
+      "message": "Style background is not permitted for ui_primaryAction_4-597-4-461",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_primaryAction_4-597-4-461",
+        "property": "borderRadius",
+        "semanticRole": "primaryAction"
+      },
+      "message": "Style borderRadius is not permitted for ui_primaryAction_4-597-4-461",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_secondaryAction_4-555-4-460",
+        "property": "background",
+        "semanticRole": "secondaryAction"
+      },
+      "message": "Style background is not permitted for ui_secondaryAction_4-555-4-460",
+      "severity": "warning",
+      "stage": "react-generation"
+    },
+    {
+      "blocking": false,
+      "code": "GENERATION_STYLE_OVERRIDE_FORBIDDEN",
+      "evidence": {
+        "manifestNodeId": "ui_secondaryAction_4-555-4-460",
+        "property": "borderRadius",
+        "semanticRole": "secondaryAction"
+      },
+      "message": "Style borderRadius is not permitted for ui_secondaryAction_4-555-4-460",
       "severity": "warning",
       "stage": "react-generation"
     }

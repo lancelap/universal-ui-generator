@@ -133,6 +133,48 @@ export async function generateReactAcceptanceCandidates(
   await writeBundle(join(realCandidateDirectory, "generated"), realBundle);
   summaries.push(summarize(realBundle, realCandidateDirectory));
 
+  const choiceRawDsl = JSON.parse(
+    await readFile(
+      join(repoRoot, "fixtures", "pixso", "node-70-118899", "source.json"),
+      "utf8",
+    ),
+  );
+  const choiceNormalized = normalizePixsoDesignV2WithProvenance({
+    artifactId: "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+    rootNodeId: "70:118899",
+    rawDsl: choiceRawDsl,
+  });
+  const choiceManifest = buildUiManifestV2({
+    ir: choiceNormalized.designIr,
+    provenance: choiceNormalized.provenance,
+    exactMappings: [...sber.exactPixsoMappings],
+  });
+  const choicePlan = resolveUiManifestV2({
+    manifest: choiceManifest,
+    designIr: choiceNormalized.designIr,
+    pack: sber,
+  });
+  const choiceBundle = generateReactBundle({
+    sourceRunId: "run_acceptance_pixso_70_118899",
+    designIr: choiceNormalized.designIr,
+    uiManifest: choiceManifest,
+    resolutionPlan: choicePlan,
+    pack: sber,
+  });
+  const choiceCandidateDirectory = join(
+    destination,
+    "pixso-70-118899",
+    "sber-space-ui",
+  );
+  await mkdir(choiceCandidateDirectory, { recursive: true });
+  await writeFile(
+    join(choiceCandidateDirectory, "resolution-plan.json"),
+    stableStringify(choicePlan),
+    "utf8",
+  );
+  await writeBundle(join(choiceCandidateDirectory, "generated"), choiceBundle);
+  summaries.push(summarize(choiceBundle, choiceCandidateDirectory));
+
   return summaries;
 }
 

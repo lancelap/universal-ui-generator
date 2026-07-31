@@ -1,0 +1,354 @@
+{
+  "diagnostics": [
+    {
+      "blocking": false,
+      "code": "DUPLICATE_MATERIALIZED_NODE_COLLAPSED",
+      "evidence": {
+        "collapsedNodeIds": [
+          "4:63130/27:101325/4:63130"
+        ],
+        "retainedNodeId": "4:63082/27:101325/4:63082",
+        "semanticSlot": "options[0].description"
+      },
+      "message": "Collapsed overlapping materialized nodes in one choice option description slot",
+      "severity": "info",
+      "source": {
+        "artifactId": "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+        "nodeId": "4:63078/27:101325"
+      },
+      "stage": "semantic-planning"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#D0D3D8"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "70:118899"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101322"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:7983/27:101320/2:7983"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:140087/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:190047/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:193139/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101335"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:196451/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:28703/70:198331/4:64520/2:9503/2:28703"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8146/27:101362/2:8146"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8209/27:101337/2:8209"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "fill.color",
+        "tokenName": "surface.default",
+        "tokenValue": "#FFFFFF"
+      },
+      "message": "fill.color differs from design-system token surface.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "2:8146/27:101342/2:8146"
+      },
+      "stage": "appearance-comparison"
+    },
+    {
+      "blocking": false,
+      "code": "VISUAL_TOKEN_MISMATCH",
+      "evidence": {
+        "designValue": "#1F1433",
+        "property": "border.color",
+        "tokenName": "border.default",
+        "tokenValue": "#D0D3D8"
+      },
+      "message": "border.color differs from design-system token border.default",
+      "severity": "warning",
+      "source": {
+        "manifestNodeId": "ui_choicePanel_70-118899",
+        "nodeId": "27:101368"
+      },
+      "stage": "appearance-comparison"
+    }
+  ],
+  "nodes": [
+    {
+      "bindings": [
+        {
+          "componentId": "base.RadioGroup",
+          "export": "RadioGroup",
+          "exportKind": "named",
+          "package": "@sber-space-ui/radio"
+        },
+        {
+          "componentId": "base.RadioButton",
+          "export": "RadioButton",
+          "exportKind": "named",
+          "package": "@sber-space-ui/radio"
+        },
+        {
+          "componentId": "base.Stack",
+          "export": "Stack",
+          "exportKind": "named",
+          "package": "@sber-space-ui/atom"
+        },
+        {
+          "componentId": "base.Typography",
+          "export": "Typography",
+          "exportKind": "named",
+          "package": "@sber-space-ui/atom"
+        },
+        {
+          "componentId": "base.FormDescription",
+          "export": "FormDescription",
+          "exportKind": "named",
+          "package": "@sber-space-ui/form-control"
+        },
+        {
+          "componentId": "icon.DocumentText",
+          "export": "DocumentText",
+          "exportKind": "named",
+          "package": "@sber-space-ui/icons/24/Stroke/File_And_Folder"
+        },
+        {
+          "componentId": "icon.ExclamationMarkInfo",
+          "export": "ExclamationMarkInfo",
+          "exportKind": "named",
+          "package": "@sber-space-ui/icons/24/Stroke/UserInterface"
+        }
+      ],
+      "confidence": 1,
+      "decision": "compose",
+      "diagnosticCodes": [],
+      "evidence": [
+        {
+          "kind": "repeated-option-rows",
+          "value": "5",
+          "weight": 0.2
+        },
+        {
+          "kind": "unique-option-labels",
+          "value": "all",
+          "weight": 0.15
+        },
+        {
+          "kind": "consistent-leading-marker-column",
+          "value": "present",
+          "weight": 0.15
+        },
+        {
+          "kind": "common-panel-boundary",
+          "value": "70:118899",
+          "weight": 0.15
+        },
+        {
+          "kind": "unique-header-title",
+          "value": "27:101322",
+          "weight": 0.15
+        },
+        {
+          "kind": "semantic-role",
+          "value": "choicePanel"
+        }
+      ],
+      "manifestNodeId": "ui_choicePanel_70-118899",
+      "props": {},
+      "semanticRole": "choicePanel"
+    }
+  ],
+  "schema": "resolution-plan/v2",
+  "source": {
+    "designIr": {
+      "artifactId": "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+      "schema": "design-ir/v2",
+      "sha256": "467ae2826edc756d9b29efe049587d8bb5f9a7978536cb79120f10abadcf1c31"
+    },
+    "uiManifest": {
+      "artifactId": "pixso_PqSywlhYgqSRDoWr78IrdA_70_118899_1ff9d4c80454",
+      "schema": "ui-manifest/v2",
+      "sha256": "1c1b5b07aea69a30ed7f00d2afe7d25f5ec7391976f7837e5b2e49b0af06a723"
+    }
+  },
+  "summary": {
+    "blocked": 0,
+    "compose": 1,
+    "fallback": 0,
+    "reuse": 0
+  },
+  "target": {
+    "designSystem": "sber-space-ui",
+    "designSystemVersion": "2.0.0",
+    "framework": "react",
+    "language": "typescript",
+    "packSha256": "baef4aae0582c18f7f234359cb0e1464a3e2f3a8703bf81945550cac2109119d"
+  }
+}
