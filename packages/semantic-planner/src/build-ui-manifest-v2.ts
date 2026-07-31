@@ -1,5 +1,6 @@
 import {
   type DesignIRV2,
+  type NormalizationProvenanceV1,
   type PixsoSemanticMapping,
   type UiManifestV2,
   type UiNodeV2,
@@ -10,6 +11,7 @@ import {
 
 import { createExactComponentRecognizer } from "./exact-component-recognizer.js";
 import { attachActivateInteractions } from "./interaction-recognizers.js";
+import { recognizeChoicePanel } from "./recognize-choice-panel.js";
 import {
   projectCompoundBoundary,
   type ProjectedSemanticChild,
@@ -21,8 +23,14 @@ import {
 
 export function buildUiManifestV2(input: {
   ir: DesignIRV2;
+  provenance: NormalizationProvenanceV1;
   exactMappings: PixsoSemanticMapping[];
 }): UiManifestV2 {
+  if (input.provenance.sourceArtifactId !== input.ir.sourceArtifactId) {
+    throw new Error(
+      `V2_CONTRACT_INTEGRITY: normalization provenance artifact "${input.provenance.sourceArtifactId}" does not match DesignIR artifact "${input.ir.sourceArtifactId}"`,
+    );
+  }
   const exact = createExactComponentRecognizer(input.exactMappings);
   const diagnostics: UiManifestV2["diagnostics"] = [];
   const ids = new Map<string, number>();
@@ -61,6 +69,23 @@ export function buildUiManifestV2(input: {
     }
     const exactMatch = exact.match(node);
     const exactRecognition = exactMatch?.recognition;
+    const compoundRecognition = exactMatch
+      ? { status: "not-recognized" as const, diagnostics: [] }
+      : recognizeChoicePanel({
+          ir: input.ir,
+          provenance: input.provenance,
+          boundaryNodeId: node.id,
+        });
+    if (compoundRecognition.status === "recognized") {
+      diagnostics.push(...compoundRecognition.diagnostics);
+      return {
+        ...compoundRecognition.node,
+        id: reserveUiId("choicePanel", node.id),
+      };
+    }
+    if (compoundRecognition.status === "blocked") {
+      diagnostics.push(compoundRecognition.diagnostic);
+    }
     const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted =
       recognized && recognized.confidence >= confidencePolicy.warning;

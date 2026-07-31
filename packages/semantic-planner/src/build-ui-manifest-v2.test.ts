@@ -1,8 +1,14 @@
 import minimalDesignIrV2 from "../../design-normalizer/src/__fixtures__/minimal-design-ir-v2.json";
 
-import type { DesignIRV2, UiNodeV2 } from "@uig/contracts";
+import type {
+  DesignIRV2,
+  NormalizationProvenanceV1,
+  UiNodeV2,
+} from "@uig/contracts";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
+import { normalizePixsoDesignV2WithProvenance } from "../../design-normalizer/src/normalize-design.js";
 import { buildUiManifestV2 } from "./build-ui-manifest-v2.js";
 
 const designFixture = minimalDesignIrV2 as DesignIRV2;
@@ -11,6 +17,7 @@ describe("buildUiManifestV2", () => {
   it("emits an explicit layout anchor and activation interaction", () => {
     const manifest = buildUiManifestV2({
       ir: designFixture,
+      provenance: provenanceFor(designFixture),
       exactMappings: [
         {
           componentKey: "Button/Primary",
@@ -45,6 +52,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "Field/Text",
@@ -66,6 +74,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "Field/Text",
@@ -99,6 +108,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "Field/Text",
@@ -121,6 +131,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ActionGroup",
@@ -170,6 +181,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ActionGroup",
@@ -223,6 +235,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ModalHeader",
@@ -255,6 +268,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ModalHeader",
@@ -291,6 +305,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ModalHeader",
@@ -313,6 +328,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ModalHeader",
@@ -344,6 +360,7 @@ describe("buildUiManifestV2", () => {
 
     const manifest = buildUiManifestV2({
       ir: design,
+      provenance: provenanceFor(design),
       exactMappings: [
         {
           componentKey: "ModalHeader",
@@ -371,6 +388,7 @@ describe("buildUiManifestV2", () => {
     expect(() =>
       buildUiManifestV2({
         ir: design,
+        provenance: provenanceFor(design),
         exactMappings: [
           {
             componentKey: "Button/Primary",
@@ -392,6 +410,107 @@ describe("buildUiManifestV2", () => {
       }),
     );
   });
+
+  it("rejects provenance from a different source artifact", () => {
+    expect(() =>
+      buildUiManifestV2({
+        ir: designFixture,
+        provenance: {
+          ...provenanceFor(designFixture),
+          sourceArtifactId: "different-artifact",
+        },
+        exactMappings: [],
+      }),
+    ).toThrow(/^V2_CONTRACT_INTEGRITY:/);
+  });
+
+  it("keeps an exact pack mapping authoritative over choice panel recognition", () => {
+    const normalized = realChoicePanelNormalized();
+    normalized.designIr.nodes[normalized.designIr.rootNodeId]!.component = {
+      key: "Pack/ExactBoundary",
+    };
+
+    const manifest = buildUiManifestV2({
+      ir: normalized.designIr,
+      provenance: normalized.provenance,
+      exactMappings: [
+        {
+          componentKey: "Pack/ExactBoundary",
+          kind: "group",
+          role: "packExactBoundary",
+        },
+      ],
+    });
+
+    expect(manifest.root).toMatchObject({
+      kind: "group",
+      role: "packExactBoundary",
+      children: [],
+    });
+    expect(manifest.root.role).not.toBe("choicePanel");
+  });
+
+  it("keeps scalar traversal when a choice panel has meaningful unconsumed content", () => {
+    const normalized = realChoicePanelNormalized();
+    const root = normalized.designIr.nodes[normalized.designIr.rootNodeId]!;
+    normalized.designIr.nodes.unexpected = {
+      ...textNode("unexpected", "Непредусмотренное действие", true),
+      geometry: { x: 40, y: 460, width: 260, height: 16 },
+    };
+    root.children.push("unexpected");
+
+    const manifest = buildUiManifestV2({
+      ir: normalized.designIr,
+      provenance: normalized.provenance,
+      exactMappings: [],
+    });
+
+    expect(manifest.root.role).not.toBe("choicePanel");
+    expect(allNodes(manifest.root).length).toBeGreaterThan(1);
+    expect(manifest.diagnostics).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "CHOICE_PANEL_STRUCTURE_INCOMPLETE",
+          blocking: true,
+          evidence: expect.objectContaining({
+            unconsumedMeaningfulNodeIds: expect.arrayContaining(["unexpected"]),
+          }),
+        }),
+      ]),
+    );
+  });
+
+  it("plans the real choice panel as one compound node without descendant blockers", () => {
+    const normalized = realChoicePanelNormalized();
+
+    const manifest = buildUiManifestV2({
+      ir: normalized.designIr,
+      provenance: normalized.provenance,
+      exactMappings: [],
+    });
+
+    expect(manifest.root).toMatchObject({
+      kind: "control",
+      role: "choicePanel",
+      sourceNodeIds: expect.arrayContaining(["70:118899"]),
+      content: {
+        sections: [{ options: [{}, {}] }, { options: [{}, {}, {}] }],
+      },
+      children: [],
+    });
+    expect(manifest.root.sourceNodeIds).toHaveLength(83);
+    expect(manifest.diagnostics).toEqual([
+      expect.objectContaining({
+        code: "DUPLICATE_MATERIALIZED_NODE_COLLAPSED",
+        blocking: false,
+      }),
+    ]);
+    expect(manifest.diagnostics).not.toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ code: "SEMANTIC_CONFIDENCE_TOO_LOW" }),
+      ]),
+    );
+  });
 });
 
 function allNodes(root: UiNodeV2): UiNodeV2[] {
@@ -400,6 +519,31 @@ function allNodes(root: UiNodeV2): UiNodeV2[] {
 
 function findRole(root: UiNodeV2, role: string): UiNodeV2 | undefined {
   return allNodes(root).find((node) => node.role === role);
+}
+
+function provenanceFor(ir: DesignIRV2): NormalizationProvenanceV1 {
+  return {
+    schema: "normalization-provenance/v1",
+    sourceArtifactId: ir.sourceArtifactId,
+    values: [],
+  };
+}
+
+function realChoicePanelNormalized() {
+  const rawDsl = JSON.parse(
+    readFileSync(
+      new URL(
+        "../../../fixtures/pixso/node-70-118899/source.json",
+        import.meta.url,
+      ),
+      "utf8",
+    ),
+  ) as unknown;
+  return normalizePixsoDesignV2WithProvenance({
+    artifactId: "choice-panel-fixture",
+    rootNodeId: "70:118899",
+    rawDsl,
+  });
 }
 
 function textNode(

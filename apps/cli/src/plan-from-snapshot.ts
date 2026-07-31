@@ -58,6 +58,7 @@ export async function planFromSnapshot(
   });
   const uiManifest = buildUiManifestV2({
     ir: designIr,
+    provenance: normalized.provenance,
     exactMappings: [...pack.exactPixsoMappings],
   });
   const resolutionPlan = resolveUiManifestV2({

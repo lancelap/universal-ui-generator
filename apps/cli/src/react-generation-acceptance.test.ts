@@ -15,10 +15,7 @@ import {
   stableStringify,
   validateWithSchema,
 } from "@uig/contracts";
-import {
-  normalizePixsoDesignV2,
-  normalizePixsoDesignV2WithProvenance,
-} from "@uig/design-normalizer";
+import { normalizePixsoDesignV2WithProvenance } from "@uig/design-normalizer";
 import { generateReactBundle } from "@uig/generator-react";
 import { buildUiManifestV2 } from "@uig/semantic-planner";
 import { describe, expect, it } from "vitest";
@@ -169,13 +166,15 @@ describe("reviewed React generation acceptance", () => {
       const pack = await loadDesignSystemPackV2(
         join(repoRoot, "design-system-packs", packId),
       );
-      const withPlaceholder = normalizePixsoDesignV2({
+      const withPlaceholderNormalized = normalizePixsoDesignV2WithProvenance({
         artifactId: `pixso_${packId}_text_input`,
         rootNodeId: "10:1",
         rawDsl: pixsoTextInput(componentKey, "Введите название"),
       });
+      const withPlaceholder = withPlaceholderNormalized.designIr;
       const uiManifest = buildUiManifestV2({
         ir: withPlaceholder,
+        provenance: withPlaceholderNormalized.provenance,
         exactMappings: [...pack.exactPixsoMappings],
       });
       const plan = resolveUiManifestV2({
@@ -219,13 +218,17 @@ describe("reviewed React generation acceptance", () => {
         /\b(useState|useEffect|options|fetch|axios|react-hook-form)\b/,
       );
 
-      const withoutPlaceholder = normalizePixsoDesignV2({
-        artifactId: `pixso_${packId}_empty_text_input`,
-        rootNodeId: "10:1",
-        rawDsl: pixsoTextInput(componentKey),
-      });
+      const withoutPlaceholderNormalized = normalizePixsoDesignV2WithProvenance(
+        {
+          artifactId: `pixso_${packId}_empty_text_input`,
+          rootNodeId: "10:1",
+          rawDsl: pixsoTextInput(componentKey),
+        },
+      );
+      const withoutPlaceholder = withoutPlaceholderNormalized.designIr;
       const emptyManifest = buildUiManifestV2({
         ir: withoutPlaceholder,
+        provenance: withoutPlaceholderNormalized.provenance,
         exactMappings: [...pack.exactPixsoMappings],
       });
       const emptyPlan = resolveUiManifestV2({
@@ -265,6 +268,7 @@ describe("reviewed React generation acceptance", () => {
     const designIr = normalized.designIr;
     const uiManifest = buildUiManifestV2({
       ir: designIr,
+      provenance: normalized.provenance,
       exactMappings: [...pack.exactPixsoMappings],
     });
     const plan = resolveUiManifestV2({

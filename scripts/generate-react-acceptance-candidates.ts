@@ -23,7 +23,7 @@ import {
   validateWithSchema,
 } from "../packages/contracts/src/index.js";
 import { sha256 } from "../packages/design-context/src/index.js";
-import { normalizePixsoDesignV2 } from "../packages/design-normalizer/src/index.js";
+import { normalizePixsoDesignV2WithProvenance } from "../packages/design-normalizer/src/index.js";
 import { generateReactBundle } from "../packages/generator-react/src/index.js";
 import { buildUiManifestV2 } from "../packages/semantic-planner/src/index.js";
 
@@ -102,13 +102,15 @@ export async function generateReactAcceptanceCandidates(
   const sber = await loadDesignSystemPackV2(
     join(repoRoot, "design-system-packs", "sber-space-ui"),
   );
-  const realDesignIr = normalizePixsoDesignV2({
+  const realNormalized = normalizePixsoDesignV2WithProvenance({
     artifactId: "pixso_WSLukjrKancvZG0zbaMnyA_4_314_0d6c50995105",
     rootNodeId: "4:314",
     rawDsl,
   });
+  const realDesignIr = realNormalized.designIr;
   const realManifest = buildUiManifestV2({
     ir: realDesignIr,
+    provenance: realNormalized.provenance,
     exactMappings: [...sber.exactPixsoMappings],
   });
   const realPlan = resolveUiManifestV2({
