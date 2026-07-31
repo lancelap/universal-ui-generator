@@ -3112,17 +3112,17 @@ var require_typescript = __commonJS({
         }
         return t;
       }
-      function equalOwnProperties(left, right, equalityComparer = equateValues) {
-        if (left === right) return true;
-        if (!left || !right) return false;
+      function equalOwnProperties(left, right2, equalityComparer = equateValues) {
+        if (left === right2) return true;
+        if (!left || !right2) return false;
         for (const key in left) {
           if (hasOwnProperty.call(left, key)) {
-            if (!hasOwnProperty.call(right, key)) return false;
-            if (!equalityComparer(left[key], right[key])) return false;
+            if (!hasOwnProperty.call(right2, key)) return false;
+            if (!equalityComparer(left[key], right2[key])) return false;
           }
         }
-        for (const key in right) {
-          if (hasOwnProperty.call(right, key)) {
+        for (const key in right2) {
+          if (hasOwnProperty.call(right2, key)) {
             if (!hasOwnProperty.call(left, key)) return false;
           }
         }
@@ -4913,14 +4913,14 @@ ${lanes.join("\n")}
           build: build22
         };
       }
-      function comparePrereleaseIdentifiers(left, right) {
-        if (left === right) return 0;
-        if (left.length === 0) return right.length === 0 ? 0 : 1;
-        if (right.length === 0) return -1;
-        const length2 = Math.min(left.length, right.length);
+      function comparePrereleaseIdentifiers(left, right2) {
+        if (left === right2) return 0;
+        if (left.length === 0) return right2.length === 0 ? 0 : 1;
+        if (right2.length === 0) return -1;
+        const length2 = Math.min(left.length, right2.length);
         for (let i = 0; i < length2; i++) {
           const leftIdentifier = left[i];
-          const rightIdentifier = right[i];
+          const rightIdentifier = right2[i];
           if (leftIdentifier === rightIdentifier) continue;
           const leftIsNumeric = numericIdentifierRegExp.test(leftIdentifier);
           const rightIsNumeric = numericIdentifierRegExp.test(rightIdentifier);
@@ -4933,7 +4933,7 @@ ${lanes.join("\n")}
             if (result) return result;
           }
         }
-        return compareValues(left.length, right.length);
+        return compareValues(left.length, right2.length);
       }
       var VersionRange = class _VersionRange {
         constructor(spec) {
@@ -4997,10 +4997,10 @@ ${lanes.join("\n")}
         );
         return { version: version22, major, minor, patch };
       }
-      function parseHyphen(left, right, comparators) {
+      function parseHyphen(left, right2, comparators) {
         const leftResult = parsePartial(left);
         if (!leftResult) return false;
-        const rightResult = parsePartial(right);
+        const rightResult = parsePartial(right2);
         if (!rightResult) return false;
         if (!isWildcard(leftResult.major)) {
           comparators.push(createComparator(">=", leftResult.version));
@@ -19758,8 +19758,8 @@ ${lanes.join("\n")}
         return !!getAssignmentTarget(node);
       }
       function isCompoundLikeAssignment(assignment) {
-        const right = skipParentheses(assignment.right);
-        return right.kind === 227 && isShiftOperatorOrHigher(right.operatorToken.kind);
+        const right2 = skipParentheses(assignment.right);
+        return right2.kind === 227 && isShiftOperatorOrHigher(right2.operatorToken.kind);
       }
       function isInCompoundLikeAssignment(node) {
         const target = getAssignmentTarget(node);
@@ -24149,40 +24149,40 @@ ${lanes.join("\n")}
               break;
             case 227: {
               const left = evaluate(expr.left, location);
-              const right = evaluate(expr.right, location);
-              isSyntacticallyString = (left.isSyntacticallyString || right.isSyntacticallyString) && expr.operatorToken.kind === 40;
-              resolvedOtherFiles = left.resolvedOtherFiles || right.resolvedOtherFiles;
-              hasExternalReferences = left.hasExternalReferences || right.hasExternalReferences;
-              if (typeof left.value === "number" && typeof right.value === "number") {
+              const right2 = evaluate(expr.right, location);
+              isSyntacticallyString = (left.isSyntacticallyString || right2.isSyntacticallyString) && expr.operatorToken.kind === 40;
+              resolvedOtherFiles = left.resolvedOtherFiles || right2.resolvedOtherFiles;
+              hasExternalReferences = left.hasExternalReferences || right2.hasExternalReferences;
+              if (typeof left.value === "number" && typeof right2.value === "number") {
                 switch (expr.operatorToken.kind) {
                   case 52:
-                    return evaluatorResult(left.value | right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value | right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 51:
-                    return evaluatorResult(left.value & right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value & right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 49:
-                    return evaluatorResult(left.value >> right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value >> right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 50:
-                    return evaluatorResult(left.value >>> right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value >>> right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 48:
-                    return evaluatorResult(left.value << right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value << right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 53:
-                    return evaluatorResult(left.value ^ right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value ^ right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 42:
-                    return evaluatorResult(left.value * right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value * right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 44:
-                    return evaluatorResult(left.value / right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value / right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 40:
-                    return evaluatorResult(left.value + right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value + right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 41:
-                    return evaluatorResult(left.value - right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value - right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 45:
-                    return evaluatorResult(left.value % right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value % right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                   case 43:
-                    return evaluatorResult(left.value ** right.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
+                    return evaluatorResult(left.value ** right2.value, isSyntacticallyString, resolvedOtherFiles, hasExternalReferences);
                 }
-              } else if ((typeof left.value === "string" || typeof left.value === "number") && (typeof right.value === "string" || typeof right.value === "number") && expr.operatorToken.kind === 40) {
+              } else if ((typeof left.value === "string" || typeof left.value === "number") && (typeof right2.value === "string" || typeof right2.value === "number") && expr.operatorToken.kind === 40) {
                 return evaluatorResult(
-                  "" + left.value + right.value,
+                  "" + left.value + right2.value,
                   isSyntacticallyString,
                   resolvedOtherFiles,
                   hasExternalReferences
@@ -25597,7 +25597,7 @@ ${lanes.join("\n")}
         const setOriginal = flags & 8 ? identity : setOriginalNode;
         const parenthesizerRules = memoize(() => flags & 1 ? nullParenthesizerRules : createParenthesizerRules(factory22));
         const converters = memoize(() => flags & 2 ? nullNodeConverters : createNodeConverters(factory22));
-        const getBinaryCreateFunction = memoizeOne((operator) => (left, right) => createBinaryExpression(left, operator, right));
+        const getBinaryCreateFunction = memoizeOne((operator) => (left, right2) => createBinaryExpression(left, operator, right2));
         const getPrefixUnaryCreateFunction = memoizeOne((operator) => (operand) => createPrefixUnaryExpression(operator, operand));
         const getPostfixUnaryCreateFunction = memoizeOne((operator) => (operand) => createPostfixUnaryExpression(operand, operator));
         const getJSDocPrimaryTypeCreateFunction = memoizeOne((kind) => () => createJSDocPrimaryTypeWorker(kind));
@@ -26889,19 +26889,19 @@ ${lanes.join("\n")}
           ));
           return result.length ? result : void 0;
         }
-        function createQualifiedName(left, right) {
+        function createQualifiedName(left, right2) {
           const node = createBaseNode(
             167
             /* QualifiedName */
           );
           node.left = left;
-          node.right = asName(right);
+          node.right = asName(right2);
           node.transformFlags |= propagateChildFlags(node.left) | propagateIdentifierNameFlags(node.right);
           node.flowNode = void 0;
           return node;
         }
-        function updateQualifiedName(node, left, right) {
-          return node.left !== left || node.right !== right ? update(createQualifiedName(left, right), node) : node;
+        function updateQualifiedName(node, left, right2) {
+          return node.left !== left || node.right !== right2 ? update(createQualifiedName(left, right2), node) : node;
         }
         function createComputedPropertyName(expression) {
           const node = createBaseNode(
@@ -28047,7 +28047,7 @@ ${lanes.join("\n")}
         function updatePostfixUnaryExpression(node, operand) {
           return node.operand !== operand ? update(createPostfixUnaryExpression(operand, node.operator), node) : node;
         }
-        function createBinaryExpression(left, operator, right) {
+        function createBinaryExpression(left, operator, right2) {
           const node = createBaseDeclaration(
             227
             /* BinaryExpression */
@@ -28056,7 +28056,7 @@ ${lanes.join("\n")}
           const operatorKind = operatorToken.kind;
           node.left = parenthesizerRules().parenthesizeLeftSideOfBinary(operatorKind, left);
           node.operatorToken = operatorToken;
-          node.right = parenthesizerRules().parenthesizeRightSideOfBinary(operatorKind, node.left, right);
+          node.right = parenthesizerRules().parenthesizeRightSideOfBinary(operatorKind, node.left, right2);
           node.transformFlags |= propagateChildFlags(node.left) | propagateChildFlags(node.operatorToken) | propagateChildFlags(node.right);
           if (operatorKind === 61) {
             node.transformFlags |= 32;
@@ -28080,8 +28080,8 @@ ${lanes.join("\n")}
         function propagateAssignmentPatternFlags(node) {
           return containsObjectRestOrSpread(node) ? 65536 : 0;
         }
-        function updateBinaryExpression(node, left, operator, right) {
-          return node.left !== left || node.operatorToken !== operator || node.right !== right ? update(createBinaryExpression(left, operator, right), node) : node;
+        function updateBinaryExpression(node, left, operator, right2) {
+          return node.left !== left || node.operatorToken !== operator || node.right !== right2 ? update(createBinaryExpression(left, operator, right2), node) : node;
         }
         function createConditionalExpression(condition, questionToken, whenTrue, colonToken, whenFalse) {
           const node = createBaseNode(
@@ -29331,18 +29331,18 @@ ${lanes.join("\n")}
         function updateJSDocNameReference(node, name) {
           return node.name !== name ? update(createJSDocNameReference(name), node) : node;
         }
-        function createJSDocMemberName(left, right) {
+        function createJSDocMemberName(left, right2) {
           const node = createBaseNode(
             312
             /* JSDocMemberName */
           );
           node.left = left;
-          node.right = right;
+          node.right = right2;
           node.transformFlags |= propagateChildFlags(node.left) | propagateChildFlags(node.right);
           return node;
         }
-        function updateJSDocMemberName(node, left, right) {
-          return node.left !== left || node.right !== right ? update(createJSDocMemberName(left, right), node) : node;
+        function updateJSDocMemberName(node, left, right2) {
+          return node.left !== left || node.right !== right2 ? update(createJSDocMemberName(left, right2), node) : node;
         }
         function createJSDocLink(name, text) {
           const node = createBaseNode(
@@ -32972,9 +32972,9 @@ ${lanes.join("\n")}
       function createJsxFactoryExpressionFromEntityName(factory22, jsxFactory, parent2) {
         if (isQualifiedName(jsxFactory)) {
           const left = createJsxFactoryExpressionFromEntityName(factory22, jsxFactory.left, parent2);
-          const right = factory22.createIdentifier(idText(jsxFactory.right));
-          right.escapedText = jsxFactory.right.escapedText;
-          return factory22.createPropertyAccessExpression(left, right);
+          const right2 = factory22.createIdentifier(idText(jsxFactory.right));
+          right2.escapedText = jsxFactory.right.escapedText;
+          return factory22.createPropertyAccessExpression(left, right2);
         } else {
           return createReactNamespace(idText(jsxFactory), parent2);
         }
@@ -33079,8 +33079,8 @@ ${lanes.join("\n")}
       function createExpressionFromEntityName(factory22, node) {
         if (isQualifiedName(node)) {
           const left = createExpressionFromEntityName(factory22, node.left);
-          const right = setParent(setTextRange(factory22.cloneNode(node.right), node.right), node.right.parent);
-          return setTextRange(factory22.createPropertyAccessExpression(left, right), node);
+          const right2 = setParent(setTextRange(factory22.cloneNode(node.right), node.right), node.right.parent);
+          return setTextRange(factory22.createPropertyAccessExpression(left, right2), node);
         } else {
           return setParent(setTextRange(factory22.cloneNode(node), node), node.parent);
         }
@@ -33733,10 +33733,10 @@ ${lanes.join("\n")}
           return stackIndex;
         }
         BinaryExpressionState2.operator = operator;
-        function right(machine, stackIndex, stateStack, nodeStack, userStateStack, _resultHolder, _outerState) {
-          Debug.assertEqual(stateStack[stackIndex], right);
+        function right2(machine, stackIndex, stateStack, nodeStack, userStateStack, _resultHolder, _outerState) {
+          Debug.assertEqual(stateStack[stackIndex], right2);
           Debug.assertIsDefined(machine.onRight);
-          stateStack[stackIndex] = nextState(machine, right);
+          stateStack[stackIndex] = nextState(machine, right2);
           const nextNode = machine.onRight(nodeStack[stackIndex].right, userStateStack[stackIndex], nodeStack[stackIndex]);
           if (nextNode) {
             checkCircularity(stackIndex, nodeStack, nextNode);
@@ -33744,7 +33744,7 @@ ${lanes.join("\n")}
           }
           return stackIndex;
         }
-        BinaryExpressionState2.right = right;
+        BinaryExpressionState2.right = right2;
         function exit(machine, stackIndex, stateStack, nodeStack, userStateStack, resultHolder, _outerState) {
           Debug.assertEqual(stateStack[stackIndex], exit);
           stateStack[stackIndex] = nextState(machine, exit);
@@ -33775,9 +33775,9 @@ ${lanes.join("\n")}
               if (machine.onOperator) return operator;
             // falls through
             case operator:
-              if (machine.onRight) return right;
+              if (machine.onRight) return right2;
             // falls through
-            case right:
+            case right2:
               return exit;
             case exit:
               return done;
@@ -38846,14 +38846,14 @@ ${lanes.join("\n")}
           }
           return getBinaryOperatorPrecedence(token()) > 0;
         }
-        function makeSatisfiesExpression(left, right) {
-          return finishNode(factory22.createSatisfiesExpression(left, right), left.pos);
+        function makeSatisfiesExpression(left, right2) {
+          return finishNode(factory22.createSatisfiesExpression(left, right2), left.pos);
         }
-        function makeBinaryExpression(left, operatorToken, right, pos) {
-          return finishNode(factory22.createBinaryExpression(left, operatorToken, right), pos);
+        function makeBinaryExpression(left, operatorToken, right2, pos) {
+          return finishNode(factory22.createBinaryExpression(left, operatorToken, right2), pos);
         }
-        function makeAsExpression(left, right) {
-          return finishNode(factory22.createAsExpression(left, right), left.pos);
+        function makeAsExpression(left, right2) {
+          return finishNode(factory22.createAsExpression(left, right2), left.pos);
         }
         function parsePrefixUnaryExpression() {
           const pos = getNodePos();
@@ -50758,8 +50758,8 @@ ${lanes.join("\n")}
             case 37:
             case 38:
               const left = skipParentheses(expr.left);
-              const right = skipParentheses(expr.right);
-              return isNarrowableOperand(left) || isNarrowableOperand(right) || isNarrowingTypeofOperands(right, left) || isNarrowingTypeofOperands(left, right) || (isBooleanLiteral(right) && isNarrowingExpression(left) || isBooleanLiteral(left) && isNarrowingExpression(right));
+              const right2 = skipParentheses(expr.right);
+              return isNarrowableOperand(left) || isNarrowableOperand(right2) || isNarrowingTypeofOperands(right2, left) || isNarrowingTypeofOperands(left, right2) || (isBooleanLiteral(right2) && isNarrowingExpression(left) || isBooleanLiteral(left) && isNarrowingExpression(right2));
             case 104:
               return isNarrowableOperand(expr.left);
             case 103:
@@ -51310,11 +51310,11 @@ ${lanes.join("\n")}
               bind(operatorToken);
             }
           }
-          function onRight(right, state, node) {
+          function onRight(right2, state, node) {
             if (!state.skip) {
-              const maybeBound = maybeBind2(right);
+              const maybeBound = maybeBind2(right2);
               if (node.operatorToken.kind === 28) {
-                maybeBindExpressionFlowIfCall(right);
+                maybeBindExpressionFlowIfCall(right2);
               }
               return maybeBound;
             }
@@ -57726,7 +57726,7 @@ ${lanes.join("\n")}
             }
           } else if (name.kind === 167 || name.kind === 212) {
             const left = name.kind === 167 ? name.left : name.expression;
-            const right = name.kind === 167 ? name.right : name.name;
+            const right2 = name.kind === 167 ? name.right : name.name;
             let namespace = resolveEntityName(
               left,
               namespaceMeaning,
@@ -57735,7 +57735,7 @@ ${lanes.join("\n")}
               false,
               location
             );
-            if (!namespace || nodeIsMissing(right)) {
+            if (!namespace || nodeIsMissing(right2)) {
               return void 0;
             } else if (namespace === unknownSymbol) {
               return namespace;
@@ -57750,17 +57750,17 @@ ${lanes.join("\n")}
                 }
               }
             }
-            symbol2 = getMergedSymbol(getSymbol2(getExportsOfSymbol(namespace), right.escapedText, meaning));
+            symbol2 = getMergedSymbol(getSymbol2(getExportsOfSymbol(namespace), right2.escapedText, meaning));
             if (!symbol2 && namespace.flags & 2097152) {
-              symbol2 = getMergedSymbol(getSymbol2(getExportsOfSymbol(resolveAlias(namespace)), right.escapedText, meaning));
+              symbol2 = getMergedSymbol(getSymbol2(getExportsOfSymbol(resolveAlias(namespace)), right2.escapedText, meaning));
             }
             if (!symbol2) {
               if (!ignoreErrors) {
                 const namespaceName = getFullyQualifiedName(namespace);
-                const declarationName = declarationNameToString(right);
-                const suggestionForNonexistentModule = getSuggestedSymbolForNonexistentModule(right, namespace);
+                const declarationName = declarationNameToString(right2);
+                const suggestionForNonexistentModule = getSuggestedSymbolForNonexistentModule(right2, namespace);
                 if (suggestionForNonexistentModule) {
-                  error210(right, Diagnostics._0_has_no_exported_member_named_1_Did_you_mean_2, namespaceName, declarationName, symbolToString(suggestionForNonexistentModule));
+                  error210(right2, Diagnostics._0_has_no_exported_member_named_1_Did_you_mean_2, namespaceName, declarationName, symbolToString(suggestionForNonexistentModule));
                   return void 0;
                 }
                 const containingQualifiedName = isQualifiedName(name) && getContainingQualifiedNameNode(name);
@@ -57776,7 +57776,7 @@ ${lanes.join("\n")}
                 if (meaning & 1920 && isQualifiedName(name.parent)) {
                   const exportedTypeSymbol = getMergedSymbol(getSymbol2(
                     getExportsOfSymbol(namespace),
-                    right.escapedText,
+                    right2.escapedText,
                     788968
                     /* Type */
                   ));
@@ -57790,7 +57790,7 @@ ${lanes.join("\n")}
                     return void 0;
                   }
                 }
-                error210(right, Diagnostics.Namespace_0_has_no_exported_member_1, namespaceName, declarationName);
+                error210(right2, Diagnostics.Namespace_0_has_no_exported_member_1, namespaceName, declarationName);
               }
               return void 0;
             }
@@ -59214,12 +59214,12 @@ ${lanes.join("\n")}
           }
           return result;
         }
-        function getTypeNamesForErrorDisplay(left, right) {
+        function getTypeNamesForErrorDisplay(left, right2) {
           let leftStr = symbolValueDeclarationIsContextSensitive(left.symbol) ? typeToString(left, left.symbol.valueDeclaration) : typeToString(left);
-          let rightStr = symbolValueDeclarationIsContextSensitive(right.symbol) ? typeToString(right, right.symbol.valueDeclaration) : typeToString(right);
+          let rightStr = symbolValueDeclarationIsContextSensitive(right2.symbol) ? typeToString(right2, right2.symbol.valueDeclaration) : typeToString(right2);
           if (leftStr === rightStr) {
             leftStr = getTypeNameForErrorDisplay(left);
-            rightStr = getTypeNameForErrorDisplay(right);
+            rightStr = getTypeNameForErrorDisplay(right2);
           }
           return [leftStr, rightStr];
         }
@@ -67248,36 +67248,36 @@ ${lanes.join("\n")}
           }
           return true;
         }
-        function combineUnionThisParam(left, right, mapper) {
-          if (!left || !right) {
-            return left || right;
+        function combineUnionThisParam(left, right2, mapper) {
+          if (!left || !right2) {
+            return left || right2;
           }
-          const thisType = getIntersectionType([getTypeOfSymbol(left), instantiateType(getTypeOfSymbol(right), mapper)]);
+          const thisType = getIntersectionType([getTypeOfSymbol(left), instantiateType(getTypeOfSymbol(right2), mapper)]);
           return createSymbolWithType(left, thisType);
         }
-        function combineUnionParameters(left, right, mapper) {
+        function combineUnionParameters(left, right2, mapper) {
           const leftCount = getParameterCount(left);
-          const rightCount = getParameterCount(right);
-          const longest = leftCount >= rightCount ? left : right;
-          const shorter = longest === left ? right : left;
+          const rightCount = getParameterCount(right2);
+          const longest = leftCount >= rightCount ? left : right2;
+          const shorter = longest === left ? right2 : left;
           const longestCount = longest === left ? leftCount : rightCount;
-          const eitherHasEffectiveRest = hasEffectiveRestParameter(left) || hasEffectiveRestParameter(right);
+          const eitherHasEffectiveRest = hasEffectiveRestParameter(left) || hasEffectiveRestParameter(right2);
           const needsExtraRestElement = eitherHasEffectiveRest && !hasEffectiveRestParameter(longest);
           const params = new Array(longestCount + (needsExtraRestElement ? 1 : 0));
           for (let i = 0; i < longestCount; i++) {
             let longestParamType = tryGetTypeAtPosition(longest, i);
-            if (longest === right) {
+            if (longest === right2) {
               longestParamType = instantiateType(longestParamType, mapper);
             }
             let shorterParamType = tryGetTypeAtPosition(shorter, i) || unknownType;
-            if (shorter === right) {
+            if (shorter === right2) {
               shorterParamType = instantiateType(shorterParamType, mapper);
             }
             const unionParamType = getIntersectionType([longestParamType, shorterParamType]);
             const isRestParam = eitherHasEffectiveRest && !needsExtraRestElement && i === longestCount - 1;
             const isOptional = i >= getMinArgumentCount(longest) && i >= getMinArgumentCount(shorter);
             const leftName = i >= leftCount ? void 0 : getParameterNameAtPosition(left, i);
-            const rightName = i >= rightCount ? void 0 : getParameterNameAtPosition(right, i);
+            const rightName = i >= rightCount ? void 0 : getParameterNameAtPosition(right2, i);
             const paramName = leftName === rightName ? leftName : !leftName ? rightName : !rightName ? leftName : void 0;
             const paramSymbol = createSymbol(
               1 | (isOptional && !isRestParam ? 16777216 : 0),
@@ -67295,28 +67295,28 @@ ${lanes.join("\n")}
               /* RestParameter */
             );
             restParamSymbol.links.type = createArrayType(getTypeAtPosition(shorter, longestCount));
-            if (shorter === right) {
+            if (shorter === right2) {
               restParamSymbol.links.type = instantiateType(restParamSymbol.links.type, mapper);
             }
             params[longestCount] = restParamSymbol;
           }
           return params;
         }
-        function combineSignaturesOfUnionMembers(left, right) {
-          const typeParams = left.typeParameters || right.typeParameters;
+        function combineSignaturesOfUnionMembers(left, right2) {
+          const typeParams = left.typeParameters || right2.typeParameters;
           let paramMapper;
-          if (left.typeParameters && right.typeParameters) {
-            paramMapper = createTypeMapper(right.typeParameters, left.typeParameters);
+          if (left.typeParameters && right2.typeParameters) {
+            paramMapper = createTypeMapper(right2.typeParameters, left.typeParameters);
           }
-          let flags = (left.flags | right.flags) & (167 & ~1);
+          let flags = (left.flags | right2.flags) & (167 & ~1);
           const declaration = left.declaration;
-          const params = combineUnionParameters(left, right, paramMapper);
+          const params = combineUnionParameters(left, right2, paramMapper);
           const lastParam = lastOrUndefined(params);
           if (lastParam && getCheckFlags(lastParam) & 32768) {
             flags |= 1;
           }
-          const thisParam = combineUnionThisParam(left.thisParameter, right.thisParameter, paramMapper);
-          const minArgCount = Math.max(left.minArgumentCount, right.minArgumentCount);
+          const thisParam = combineUnionThisParam(left.thisParameter, right2.thisParameter, paramMapper);
+          const minArgCount = Math.max(left.minArgumentCount, right2.minArgumentCount);
           const result = createSignature(
             declaration,
             typeParams,
@@ -67330,7 +67330,7 @@ ${lanes.join("\n")}
             flags
           );
           result.compositeKind = 1048576;
-          result.compositeSignatures = concatenate(left.compositeKind !== 2097152 && left.compositeSignatures || [left], [right]);
+          result.compositeSignatures = concatenate(left.compositeKind !== 2097152 && left.compositeSignatures || [left], [right2]);
           if (paramMapper) {
             result.mapper = left.compositeKind !== 2097152 && left.mapper && left.compositeSignatures ? combineTypeMappers(left.mapper, paramMapper) : paramMapper;
           } else if (left.compositeKind !== 2097152 && left.mapper && left.compositeSignatures) {
@@ -72345,47 +72345,47 @@ ${lanes.join("\n")}
             return spread;
           }
         }
-        function getSpreadType(left, right, symbol2, objectFlags, readonly2) {
-          if (left.flags & 1 || right.flags & 1) {
+        function getSpreadType(left, right2, symbol2, objectFlags, readonly2) {
+          if (left.flags & 1 || right2.flags & 1) {
             return anyType;
           }
-          if (left.flags & 2 || right.flags & 2) {
+          if (left.flags & 2 || right2.flags & 2) {
             return unknownType;
           }
           if (left.flags & 131072) {
-            return right;
+            return right2;
           }
-          if (right.flags & 131072) {
+          if (right2.flags & 131072) {
             return left;
           }
           left = tryMergeUnionOfObjectTypeAndEmptyObject(left, readonly2);
           if (left.flags & 1048576) {
-            return checkCrossProductUnion([left, right]) ? mapType(left, (t) => getSpreadType(t, right, symbol2, objectFlags, readonly2)) : errorType;
+            return checkCrossProductUnion([left, right2]) ? mapType(left, (t) => getSpreadType(t, right2, symbol2, objectFlags, readonly2)) : errorType;
           }
-          right = tryMergeUnionOfObjectTypeAndEmptyObject(right, readonly2);
-          if (right.flags & 1048576) {
-            return checkCrossProductUnion([left, right]) ? mapType(right, (t) => getSpreadType(left, t, symbol2, objectFlags, readonly2)) : errorType;
+          right2 = tryMergeUnionOfObjectTypeAndEmptyObject(right2, readonly2);
+          if (right2.flags & 1048576) {
+            return checkCrossProductUnion([left, right2]) ? mapType(right2, (t) => getSpreadType(left, t, symbol2, objectFlags, readonly2)) : errorType;
           }
-          if (right.flags & (528 | 296 | 2112 | 402653316 | 1056 | 67108864 | 4194304)) {
+          if (right2.flags & (528 | 296 | 2112 | 402653316 | 1056 | 67108864 | 4194304)) {
             return left;
           }
-          if (isGenericObjectType(left) || isGenericObjectType(right)) {
+          if (isGenericObjectType(left) || isGenericObjectType(right2)) {
             if (isEmptyObjectType(left)) {
-              return right;
+              return right2;
             }
             if (left.flags & 2097152) {
               const types = left.types;
               const lastLeft = types[types.length - 1];
-              if (isNonGenericObjectType(lastLeft) && isNonGenericObjectType(right)) {
-                return getIntersectionType(concatenate(types.slice(0, types.length - 1), [getSpreadType(lastLeft, right, symbol2, objectFlags, readonly2)]));
+              if (isNonGenericObjectType(lastLeft) && isNonGenericObjectType(right2)) {
+                return getIntersectionType(concatenate(types.slice(0, types.length - 1), [getSpreadType(lastLeft, right2, symbol2, objectFlags, readonly2)]));
               }
             }
-            return getIntersectionType([left, right]);
+            return getIntersectionType([left, right2]);
           }
           const members = createSymbolTable();
           const skippedPrivateMembers = /* @__PURE__ */ new Set();
-          const indexInfos = left === emptyObjectType ? getIndexInfosOfType(right) : getUnionIndexInfos([left, right]);
-          for (const rightProp of getPropertiesOfType(right)) {
+          const indexInfos = left === emptyObjectType ? getIndexInfosOfType(right2) : getUnionIndexInfos([left, right2]);
+          for (const rightProp of getPropertiesOfType(right2)) {
             if (getDeclarationModifierFlagsFromSymbol(rightProp) & (2 | 4)) {
               skippedPrivateMembers.add(rightProp.escapedName);
             } else if (isSpreadableProperty(rightProp)) {
@@ -78726,7 +78726,7 @@ ${lanes.join("\n")}
                       )) {
                         allTypeFlags &= ~2112;
                       }
-                      const matchingType = reduceLeft(constraintTypes, (left, right) => !(right.flags & allTypeFlags) ? left : left.flags & 4 ? left : right.flags & 4 ? source2 : left.flags & 134217728 ? left : right.flags & 134217728 && isTypeMatchedByTemplateLiteralType(source2, right) ? source2 : left.flags & 268435456 ? left : right.flags & 268435456 && str === applyStringMapping(right.symbol, str) ? source2 : left.flags & 128 ? left : right.flags & 128 && right.value === str ? right : left.flags & 8 ? left : right.flags & 8 ? getNumberLiteralType(+str) : left.flags & 32 ? left : right.flags & 32 ? getNumberLiteralType(+str) : left.flags & 256 ? left : right.flags & 256 && right.value === +str ? right : left.flags & 64 ? left : right.flags & 64 ? parseBigIntLiteralType(str) : left.flags & 2048 ? left : right.flags & 2048 && pseudoBigIntToString(right.value) === str ? right : left.flags & 16 ? left : right.flags & 16 ? str === "true" ? trueType : str === "false" ? falseType : booleanType : left.flags & 512 ? left : right.flags & 512 && right.intrinsicName === str ? right : left.flags & 32768 ? left : right.flags & 32768 && right.intrinsicName === str ? right : left.flags & 65536 ? left : right.flags & 65536 && right.intrinsicName === str ? right : left, neverType);
+                      const matchingType = reduceLeft(constraintTypes, (left, right2) => !(right2.flags & allTypeFlags) ? left : left.flags & 4 ? left : right2.flags & 4 ? source2 : left.flags & 134217728 ? left : right2.flags & 134217728 && isTypeMatchedByTemplateLiteralType(source2, right2) ? source2 : left.flags & 268435456 ? left : right2.flags & 268435456 && str === applyStringMapping(right2.symbol, str) ? source2 : left.flags & 128 ? left : right2.flags & 128 && right2.value === str ? right2 : left.flags & 8 ? left : right2.flags & 8 ? getNumberLiteralType(+str) : left.flags & 32 ? left : right2.flags & 32 ? getNumberLiteralType(+str) : left.flags & 256 ? left : right2.flags & 256 && right2.value === +str ? right2 : left.flags & 64 ? left : right2.flags & 64 ? parseBigIntLiteralType(str) : left.flags & 2048 ? left : right2.flags & 2048 && pseudoBigIntToString(right2.value) === str ? right2 : left.flags & 16 ? left : right2.flags & 16 ? str === "true" ? trueType : str === "false" ? falseType : booleanType : left.flags & 512 ? left : right2.flags & 512 && right2.intrinsicName === str ? right2 : left.flags & 32768 ? left : right2.flags & 32768 && right2.intrinsicName === str ? right2 : left.flags & 65536 ? left : right2.flags & 65536 && right2.intrinsicName === str ? right2 : left, neverType);
                       if (!(matchingType.flags & 131072)) {
                         inferFromTypes(matchingType, target2);
                         continue;
@@ -80701,45 +80701,45 @@ ${lanes.join("\n")}
               case 38:
                 const operator = expr.operatorToken.kind;
                 const left = getReferenceCandidate(expr.left);
-                const right = getReferenceCandidate(expr.right);
-                if (left.kind === 222 && isStringLiteralLike(right)) {
-                  return narrowTypeByTypeof(type, left, operator, right, assumeTrue);
+                const right2 = getReferenceCandidate(expr.right);
+                if (left.kind === 222 && isStringLiteralLike(right2)) {
+                  return narrowTypeByTypeof(type, left, operator, right2, assumeTrue);
                 }
-                if (right.kind === 222 && isStringLiteralLike(left)) {
-                  return narrowTypeByTypeof(type, right, operator, left, assumeTrue);
+                if (right2.kind === 222 && isStringLiteralLike(left)) {
+                  return narrowTypeByTypeof(type, right2, operator, left, assumeTrue);
                 }
                 if (isMatchingReference(reference, left)) {
-                  return narrowTypeByEquality(type, operator, right, assumeTrue);
+                  return narrowTypeByEquality(type, operator, right2, assumeTrue);
                 }
-                if (isMatchingReference(reference, right)) {
+                if (isMatchingReference(reference, right2)) {
                   return narrowTypeByEquality(type, operator, left, assumeTrue);
                 }
                 if (strictNullChecks) {
                   if (optionalChainContainsReference(left, reference)) {
-                    type = narrowTypeByOptionalChainContainment(type, operator, right, assumeTrue);
-                  } else if (optionalChainContainsReference(right, reference)) {
+                    type = narrowTypeByOptionalChainContainment(type, operator, right2, assumeTrue);
+                  } else if (optionalChainContainsReference(right2, reference)) {
                     type = narrowTypeByOptionalChainContainment(type, operator, left, assumeTrue);
                   }
                 }
                 const leftAccess = getDiscriminantPropertyAccess(left, type);
                 if (leftAccess) {
-                  return narrowTypeByDiscriminantProperty(type, leftAccess, operator, right, assumeTrue);
+                  return narrowTypeByDiscriminantProperty(type, leftAccess, operator, right2, assumeTrue);
                 }
-                const rightAccess = getDiscriminantPropertyAccess(right, type);
+                const rightAccess = getDiscriminantPropertyAccess(right2, type);
                 if (rightAccess) {
                   return narrowTypeByDiscriminantProperty(type, rightAccess, operator, left, assumeTrue);
                 }
                 if (isMatchingConstructorReference(left)) {
-                  return narrowTypeByConstructor(type, operator, right, assumeTrue);
+                  return narrowTypeByConstructor(type, operator, right2, assumeTrue);
                 }
-                if (isMatchingConstructorReference(right)) {
+                if (isMatchingConstructorReference(right2)) {
                   return narrowTypeByConstructor(type, operator, left, assumeTrue);
                 }
-                if (isBooleanLiteral(right) && !isAccessExpression(left)) {
-                  return narrowTypeByBooleanComparison(type, left, right, operator, assumeTrue);
+                if (isBooleanLiteral(right2) && !isAccessExpression(left)) {
+                  return narrowTypeByBooleanComparison(type, left, right2, operator, assumeTrue);
                 }
-                if (isBooleanLiteral(left) && !isAccessExpression(right)) {
-                  return narrowTypeByBooleanComparison(type, right, left, operator, assumeTrue);
+                if (isBooleanLiteral(left) && !isAccessExpression(right2)) {
+                  return narrowTypeByBooleanComparison(type, right2, left, operator, assumeTrue);
                 }
                 break;
               case 104:
@@ -81142,8 +81142,8 @@ ${lanes.join("\n")}
               }
               return type;
             }
-            const right = expr.right;
-            const rightType = getTypeOfExpression(right);
+            const right2 = expr.right;
+            const rightType = getTypeOfExpression(right2);
             if (!isTypeDerivedFrom(rightType, globalObjectType)) {
               return type;
             }
@@ -81694,11 +81694,11 @@ ${lanes.join("\n")}
           }
           let prop = propSymbol;
           if (!prop && !parentType) {
-            const right = isPropertyAccessExpression(location) ? location.name : location.right;
-            const lexicallyScopedSymbol = isPrivateIdentifier(right) && lookupSymbolForPrivateIdentifierDeclaration(right.escapedText, right);
+            const right2 = isPropertyAccessExpression(location) ? location.name : location.right;
+            const lexicallyScopedSymbol = isPrivateIdentifier(right2) && lookupSymbolForPrivateIdentifierDeclaration(right2.escapedText, right2);
             const assignmentKind = getAssignmentTargetKind(location);
             const apparentType = getApparentType(assignmentKind !== 0 || isMethodAccessForCall(location) ? getWidenedType(leftType) : leftType);
-            prop = isPrivateIdentifier(right) ? lexicallyScopedSymbol && getPrivateIdentifierPropertyOfType(apparentType, lexicallyScopedSymbol) || void 0 : getPropertyOfType(apparentType, right.escapedText);
+            prop = isPrivateIdentifier(right2) ? lexicallyScopedSymbol && getPrivateIdentifierPropertyOfType(apparentType, lexicallyScopedSymbol) || void 0 : getPropertyOfType(apparentType, right2.escapedText);
           }
           if (!(prop && (isConstEnumOrConstEnumOnlyModule(prop) || prop.flags & 8 && location.parent.kind === 307))) {
             markAliasReferenced(parentSymbol, location);
@@ -82919,20 +82919,20 @@ ${lanes.join("\n")}
         }
         function getContextualTypeForBinaryOperand(node, contextFlags) {
           const binaryExpression = node.parent;
-          const { left, operatorToken, right } = binaryExpression;
+          const { left, operatorToken, right: right2 } = binaryExpression;
           switch (operatorToken.kind) {
             case 64:
             case 77:
             case 76:
             case 78:
-              return node === right ? getContextualTypeForAssignmentDeclaration(binaryExpression) : void 0;
+              return node === right2 ? getContextualTypeForAssignmentDeclaration(binaryExpression) : void 0;
             case 57:
             case 61:
               const type = getContextualType2(binaryExpression, contextFlags);
-              return node === right && (type && type.pattern || !type && !isDefaultedExpandoInitializer(binaryExpression)) ? getTypeOfExpression(left) : type;
+              return node === right2 && (type && type.pattern || !type && !isDefaultedExpandoInitializer(binaryExpression)) ? getTypeOfExpression(left) : type;
             case 56:
             case 28:
-              return node === right ? getContextualType2(binaryExpression, contextFlags) : void 0;
+              return node === right2 ? getContextualType2(binaryExpression, contextFlags) : void 0;
             default:
               return void 0;
           }
@@ -83740,39 +83740,39 @@ ${lanes.join("\n")}
         function getIntersectedSignatures(signatures) {
           return getStrictOptionValue(compilerOptions, "noImplicitAny") ? reduceLeft(
             signatures,
-            (left, right) => left === right || !left ? left : compareTypeParametersIdentical(left.typeParameters, right.typeParameters) ? combineSignaturesOfIntersectionMembers(left, right) : void 0
+            (left, right2) => left === right2 || !left ? left : compareTypeParametersIdentical(left.typeParameters, right2.typeParameters) ? combineSignaturesOfIntersectionMembers(left, right2) : void 0
           ) : void 0;
         }
-        function combineIntersectionThisParam(left, right, mapper) {
-          if (!left || !right) {
-            return left || right;
+        function combineIntersectionThisParam(left, right2, mapper) {
+          if (!left || !right2) {
+            return left || right2;
           }
-          const thisType = getUnionType([getTypeOfSymbol(left), instantiateType(getTypeOfSymbol(right), mapper)]);
+          const thisType = getUnionType([getTypeOfSymbol(left), instantiateType(getTypeOfSymbol(right2), mapper)]);
           return createSymbolWithType(left, thisType);
         }
-        function combineIntersectionParameters(left, right, mapper) {
+        function combineIntersectionParameters(left, right2, mapper) {
           const leftCount = getParameterCount(left);
-          const rightCount = getParameterCount(right);
-          const longest = leftCount >= rightCount ? left : right;
-          const shorter = longest === left ? right : left;
+          const rightCount = getParameterCount(right2);
+          const longest = leftCount >= rightCount ? left : right2;
+          const shorter = longest === left ? right2 : left;
           const longestCount = longest === left ? leftCount : rightCount;
-          const eitherHasEffectiveRest = hasEffectiveRestParameter(left) || hasEffectiveRestParameter(right);
+          const eitherHasEffectiveRest = hasEffectiveRestParameter(left) || hasEffectiveRestParameter(right2);
           const needsExtraRestElement = eitherHasEffectiveRest && !hasEffectiveRestParameter(longest);
           const params = new Array(longestCount + (needsExtraRestElement ? 1 : 0));
           for (let i = 0; i < longestCount; i++) {
             let longestParamType = tryGetTypeAtPosition(longest, i);
-            if (longest === right) {
+            if (longest === right2) {
               longestParamType = instantiateType(longestParamType, mapper);
             }
             let shorterParamType = tryGetTypeAtPosition(shorter, i) || unknownType;
-            if (shorter === right) {
+            if (shorter === right2) {
               shorterParamType = instantiateType(shorterParamType, mapper);
             }
             const unionParamType = getUnionType([longestParamType, shorterParamType]);
             const isRestParam = eitherHasEffectiveRest && !needsExtraRestElement && i === longestCount - 1;
             const isOptional = i >= getMinArgumentCount(longest) && i >= getMinArgumentCount(shorter);
             const leftName = i >= leftCount ? void 0 : getParameterNameAtPosition(left, i);
-            const rightName = i >= rightCount ? void 0 : getParameterNameAtPosition(right, i);
+            const rightName = i >= rightCount ? void 0 : getParameterNameAtPosition(right2, i);
             const paramName = leftName === rightName ? leftName : !leftName ? rightName : !rightName ? leftName : void 0;
             const paramSymbol = createSymbol(
               1 | (isOptional && !isRestParam ? 16777216 : 0),
@@ -83790,28 +83790,28 @@ ${lanes.join("\n")}
               /* RestParameter */
             );
             restParamSymbol.links.type = createArrayType(getTypeAtPosition(shorter, longestCount));
-            if (shorter === right) {
+            if (shorter === right2) {
               restParamSymbol.links.type = instantiateType(restParamSymbol.links.type, mapper);
             }
             params[longestCount] = restParamSymbol;
           }
           return params;
         }
-        function combineSignaturesOfIntersectionMembers(left, right) {
-          const typeParams = left.typeParameters || right.typeParameters;
+        function combineSignaturesOfIntersectionMembers(left, right2) {
+          const typeParams = left.typeParameters || right2.typeParameters;
           let paramMapper;
-          if (left.typeParameters && right.typeParameters) {
-            paramMapper = createTypeMapper(right.typeParameters, left.typeParameters);
+          if (left.typeParameters && right2.typeParameters) {
+            paramMapper = createTypeMapper(right2.typeParameters, left.typeParameters);
           }
-          let flags = (left.flags | right.flags) & (167 & ~1);
+          let flags = (left.flags | right2.flags) & (167 & ~1);
           const declaration = left.declaration;
-          const params = combineIntersectionParameters(left, right, paramMapper);
+          const params = combineIntersectionParameters(left, right2, paramMapper);
           const lastParam = lastOrUndefined(params);
           if (lastParam && getCheckFlags(lastParam) & 32768) {
             flags |= 1;
           }
-          const thisParam = combineIntersectionThisParam(left.thisParameter, right.thisParameter, paramMapper);
-          const minArgCount = Math.max(left.minArgumentCount, right.minArgumentCount);
+          const thisParam = combineIntersectionThisParam(left.thisParameter, right2.thisParameter, paramMapper);
+          const minArgCount = Math.max(left.minArgumentCount, right2.minArgumentCount);
           const result = createSignature(
             declaration,
             typeParams,
@@ -83825,7 +83825,7 @@ ${lanes.join("\n")}
             flags
           );
           result.compositeKind = 2097152;
-          result.compositeSignatures = concatenate(left.compositeKind === 2097152 && left.compositeSignatures || [left], [right]);
+          result.compositeSignatures = concatenate(left.compositeKind === 2097152 && left.compositeSignatures || [left], [right2]);
           if (paramMapper) {
             result.mapper = left.compositeKind === 2097152 && left.mapper && left.compositeSignatures ? combineTypeMappers(left.mapper, paramMapper) : paramMapper;
           }
@@ -84591,9 +84591,9 @@ ${lanes.join("\n")}
           return childrenTypes;
         }
         function checkSpreadPropOverrides(type, props, spread) {
-          for (const right of getPropertiesOfType(type)) {
-            if (!(right.flags & 16777216)) {
-              const left = props.get(right.escapedName);
+          for (const right2 of getPropertiesOfType(type)) {
+            if (!(right2.flags & 16777216)) {
+              const left = props.get(right2.escapedName);
               if (left) {
                 const diagnostic = error210(left.valueDeclaration, Diagnostics._0_is_specified_more_than_once_so_this_usage_will_be_overwritten, unescapeLeadingUnderscores(left.escapedName));
                 addRelatedInfo(diagnostic, createDiagnosticForNode(spread, Diagnostics.This_spread_always_overwrites_this_property));
@@ -84831,12 +84831,12 @@ ${lanes.join("\n")}
             checkTypeRelatedTo(elemInstanceType, combined, assignableRelation, openingLikeElement.tagName, Diagnostics.Its_element_type_0_is_not_a_valid_JSX_element, generateInitialErrorChain);
           }
           function generateInitialErrorChain() {
-            const componentName2 = getTextOfNode(openingLikeElement.tagName);
+            const componentName = getTextOfNode(openingLikeElement.tagName);
             return chainDiagnosticMessages(
               /*details*/
               void 0,
               Diagnostics._0_cannot_be_used_as_a_JSX_component,
-              componentName2
+              componentName
             );
           }
         }
@@ -84925,12 +84925,12 @@ ${lanes.join("\n")}
               const tagName = jsxOpeningLikeNode.tagName;
               const tagType = isJsxIntrinsicTagName(tagName) ? getStringLiteralType(intrinsicTagNameToString(tagName)) : checkExpression(tagName);
               checkTypeRelatedTo(tagType, elementTypeConstraint, assignableRelation, tagName, Diagnostics.Its_type_0_is_not_a_valid_JSX_element_type, () => {
-                const componentName2 = getTextOfNode(tagName);
+                const componentName = getTextOfNode(tagName);
                 return chainDiagnosticMessages(
                   /*details*/
                   void 0,
                   Diagnostics._0_cannot_be_used_as_a_JSX_component,
-                  componentName2
+                  componentName
                 );
               });
             } else {
@@ -85259,19 +85259,19 @@ ${lanes.join("\n")}
         function getPrivateIdentifierPropertyOfType(leftType, lexicallyScopedIdentifier) {
           return getPropertyOfType(leftType, lexicallyScopedIdentifier.escapedName);
         }
-        function checkPrivateIdentifierPropertyAccess(leftType, right, lexicallyScopedIdentifier) {
+        function checkPrivateIdentifierPropertyAccess(leftType, right2, lexicallyScopedIdentifier) {
           let propertyOnType;
           const properties = getPropertiesOfType(leftType);
           if (properties) {
             forEach(properties, (symbol2) => {
               const decl = symbol2.valueDeclaration;
-              if (decl && isNamedDeclaration(decl) && isPrivateIdentifier(decl.name) && decl.name.escapedText === right.escapedText) {
+              if (decl && isNamedDeclaration(decl) && isPrivateIdentifier(decl.name) && decl.name.escapedText === right2.escapedText) {
                 propertyOnType = symbol2;
                 return true;
               }
             });
           }
-          const diagName = diagnosticName(right);
+          const diagName = diagnosticName(right2);
           if (propertyOnType) {
             const typeValueDecl = Debug.checkDefined(propertyOnType.valueDeclaration);
             const typeClass = Debug.checkDefined(getContainingClass(typeValueDecl));
@@ -85281,7 +85281,7 @@ ${lanes.join("\n")}
               Debug.assert(!!lexicalClass);
               if (findAncestor(lexicalClass, (n) => typeClass === n)) {
                 const diagnostic = error210(
-                  right,
+                  right2,
                   Diagnostics.The_property_0_cannot_be_accessed_on_type_1_within_this_class_because_it_is_shadowed_by_another_private_identifier_with_the_same_spelling,
                   diagName,
                   typeToString(leftType)
@@ -85303,7 +85303,7 @@ ${lanes.join("\n")}
               }
             }
             error210(
-              right,
+              right2,
               Diagnostics.Property_0_is_not_accessible_outside_class_1_because_it_has_a_private_identifier,
               diagName,
               diagnosticName(typeClass.name || anon)
@@ -85321,13 +85321,13 @@ ${lanes.join("\n")}
             false
           ) === getDeclaringConstructor(prop);
         }
-        function checkPropertyAccessExpressionOrQualifiedName(node, left, leftType, right, checkMode, writeOnly) {
+        function checkPropertyAccessExpressionOrQualifiedName(node, left, leftType, right2, checkMode, writeOnly) {
           const parentSymbol = getNodeLinks(left).resolvedSymbol;
           const assignmentKind = getAssignmentTargetKind(node);
           const apparentType = getApparentType(assignmentKind !== 0 || isMethodAccessForCall(node) ? getWidenedType(leftType) : leftType);
           const isAnyLike = isTypeAny(apparentType) || apparentType === silentNeverType;
           let prop;
-          if (isPrivateIdentifier(right)) {
+          if (isPrivateIdentifier(right2)) {
             if (languageVersion < LanguageFeatureMinimumTarget.PrivateNamesAndClassStaticBlocks || languageVersion < LanguageFeatureMinimumTarget.ClassAndClassElementDecorators || !useDefineForClassFields) {
               if (assignmentKind !== 0) {
                 checkExternalEmitHelpers(
@@ -85344,27 +85344,27 @@ ${lanes.join("\n")}
                 );
               }
             }
-            const lexicallyScopedSymbol = lookupSymbolForPrivateIdentifierDeclaration(right.escapedText, right);
+            const lexicallyScopedSymbol = lookupSymbolForPrivateIdentifierDeclaration(right2.escapedText, right2);
             if (assignmentKind && lexicallyScopedSymbol && lexicallyScopedSymbol.valueDeclaration && isMethodDeclaration(lexicallyScopedSymbol.valueDeclaration)) {
-              grammarErrorOnNode(right, Diagnostics.Cannot_assign_to_private_method_0_Private_methods_are_not_writable, idText(right));
+              grammarErrorOnNode(right2, Diagnostics.Cannot_assign_to_private_method_0_Private_methods_are_not_writable, idText(right2));
             }
             if (isAnyLike) {
               if (lexicallyScopedSymbol) {
                 return isErrorType(apparentType) ? errorType : apparentType;
               }
-              if (getContainingClassExcludingClassDecorators(right) === void 0) {
-                grammarErrorOnNode(right, Diagnostics.Private_identifiers_are_not_allowed_outside_class_bodies);
+              if (getContainingClassExcludingClassDecorators(right2) === void 0) {
+                grammarErrorOnNode(right2, Diagnostics.Private_identifiers_are_not_allowed_outside_class_bodies);
                 return anyType;
               }
             }
             prop = lexicallyScopedSymbol && getPrivateIdentifierPropertyOfType(leftType, lexicallyScopedSymbol);
             if (prop === void 0) {
-              if (checkPrivateIdentifierPropertyAccess(leftType, right, lexicallyScopedSymbol)) {
+              if (checkPrivateIdentifierPropertyAccess(leftType, right2, lexicallyScopedSymbol)) {
                 return errorType;
               }
-              const containingClass = getContainingClassExcludingClassDecorators(right);
+              const containingClass = getContainingClassExcludingClassDecorators(right2);
               if (containingClass && isPlainJsFile(getSourceFileOfNode(containingClass), compilerOptions.checkJs)) {
-                grammarErrorOnNode(right, Diagnostics.Private_field_0_must_be_declared_in_an_enclosing_class, idText(right));
+                grammarErrorOnNode(right2, Diagnostics.Private_field_0_must_be_declared_in_an_enclosing_class, idText(right2));
               }
             } else {
               const isSetonlyAccessor = prop.flags & 65536 && !(prop.flags & 32768);
@@ -85387,7 +85387,7 @@ ${lanes.join("\n")}
             }
             prop = getPropertyOfType(
               apparentType,
-              right.escapedText,
+              right2.escapedText,
               /*skipObjectFunctionPropertyAugment*/
               isConstEnumObjectType(apparentType),
               /*includeTypeOnlyMembers*/
@@ -85398,7 +85398,7 @@ ${lanes.join("\n")}
           markLinkedReferences(node, 2, prop, leftType);
           let propType;
           if (!prop) {
-            const indexInfo = !isPrivateIdentifier(right) && (assignmentKind === 0 || !isGenericObjectType(leftType) || isThisTypeParameter(leftType)) ? getApplicableIndexInfoForName(apparentType, right.escapedText) : void 0;
+            const indexInfo = !isPrivateIdentifier(right2) && (assignmentKind === 0 || !isGenericObjectType(leftType) || isThisTypeParameter(leftType)) ? getApplicableIndexInfoForName(apparentType, right2.escapedText) : void 0;
             if (!(indexInfo && indexInfo.type)) {
               const isUncheckedJS = isUncheckedJSSuggestion(
                 node,
@@ -85410,15 +85410,15 @@ ${lanes.join("\n")}
                 return anyType;
               }
               if (leftType.symbol === globalThisSymbol) {
-                if (globalThisSymbol.exports.has(right.escapedText) && globalThisSymbol.exports.get(right.escapedText).flags & 418) {
-                  error210(right, Diagnostics.Property_0_does_not_exist_on_type_1, unescapeLeadingUnderscores(right.escapedText), typeToString(leftType));
+                if (globalThisSymbol.exports.has(right2.escapedText) && globalThisSymbol.exports.get(right2.escapedText).flags & 418) {
+                  error210(right2, Diagnostics.Property_0_does_not_exist_on_type_1, unescapeLeadingUnderscores(right2.escapedText), typeToString(leftType));
                 } else if (noImplicitAny) {
-                  error210(right, Diagnostics.Element_implicitly_has_an_any_type_because_type_0_has_no_index_signature, typeToString(leftType));
+                  error210(right2, Diagnostics.Element_implicitly_has_an_any_type_because_type_0_has_no_index_signature, typeToString(leftType));
                 }
                 return anyType;
               }
-              if (right.escapedText && !checkAndReportErrorForExtendingInterface(node)) {
-                reportNonexistentProperty(right, isThisTypeParameter(leftType) ? apparentType : leftType, isUncheckedJS);
+              if (right2.escapedText && !checkAndReportErrorForExtendingInterface(node)) {
+                reportNonexistentProperty(right2, isThisTypeParameter(leftType) ? apparentType : leftType, isUncheckedJS);
               }
               return errorType;
             }
@@ -85430,27 +85430,27 @@ ${lanes.join("\n")}
               propType = getUnionType([propType, missingType]);
             }
             if (compilerOptions.noPropertyAccessFromIndexSignature && isPropertyAccessExpression(node)) {
-              error210(right, Diagnostics.Property_0_comes_from_an_index_signature_so_it_must_be_accessed_with_0, unescapeLeadingUnderscores(right.escapedText));
+              error210(right2, Diagnostics.Property_0_comes_from_an_index_signature_so_it_must_be_accessed_with_0, unescapeLeadingUnderscores(right2.escapedText));
             }
             if (indexInfo.declaration && isDeprecatedDeclaration2(indexInfo.declaration)) {
-              addDeprecatedSuggestion(right, [indexInfo.declaration], right.escapedText);
+              addDeprecatedSuggestion(right2, [indexInfo.declaration], right2.escapedText);
             }
           } else {
-            const targetPropSymbol = resolveAliasWithDeprecationCheck(prop, right);
+            const targetPropSymbol = resolveAliasWithDeprecationCheck(prop, right2);
             if (isDeprecatedSymbol(targetPropSymbol) && isUncalledFunctionReference(node, targetPropSymbol) && targetPropSymbol.declarations) {
-              addDeprecatedSuggestion(right, targetPropSymbol.declarations, right.escapedText);
+              addDeprecatedSuggestion(right2, targetPropSymbol.declarations, right2.escapedText);
             }
-            checkPropertyNotUsedBeforeDeclaration(prop, node, right);
+            checkPropertyNotUsedBeforeDeclaration(prop, node, right2);
             markPropertyAsReferenced(prop, node, isSelfTypeAccess(left, parentSymbol));
             getNodeLinks(node).resolvedSymbol = prop;
             checkPropertyAccessibility(node, left.kind === 108, isWriteAccess(node), apparentType, prop);
             if (isAssignmentToReadonlyEntity(node, prop, assignmentKind)) {
-              error210(right, Diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, idText(right));
+              error210(right2, Diagnostics.Cannot_assign_to_0_because_it_is_a_read_only_property, idText(right2));
               return errorType;
             }
             propType = isThisPropertyAccessInConstructor(node, prop) ? autoType : writeOnly || isWriteOnlyAccess(node) ? getWriteTypeOfSymbol(prop) : getTypeOfSymbol(prop);
           }
-          return getFlowTypeOfAccessExpression(node, prop, propType, right, checkMode);
+          return getFlowTypeOfAccessExpression(node, prop, propType, right2, checkMode);
         }
         function isUncheckedJSSuggestion(node, suggestion, excludeClasses) {
           var _a2;
@@ -85501,17 +85501,17 @@ ${lanes.join("\n")}
           }
           return assignmentKind ? getBaseTypeOfLiteralType(flowType) : flowType;
         }
-        function checkPropertyNotUsedBeforeDeclaration(prop, node, right) {
+        function checkPropertyNotUsedBeforeDeclaration(prop, node, right2) {
           const { valueDeclaration } = prop;
           if (!valueDeclaration || getSourceFileOfNode(node).isDeclarationFile) {
             return;
           }
           let diagnosticMessage;
-          const declarationName = idText(right);
-          if (isInPropertyInitializerOrClassStaticBlock(node) && !isOptionalPropertyDeclaration(valueDeclaration) && !(isAccessExpression(node) && isAccessExpression(node.expression)) && !isBlockScopedNameDeclaredBeforeUse(valueDeclaration, right) && !(isMethodDeclaration(valueDeclaration) && getCombinedModifierFlagsCached(valueDeclaration) & 256) && (useDefineForClassFields || !isPropertyDeclaredInAncestorClass(prop))) {
-            diagnosticMessage = error210(right, Diagnostics.Property_0_is_used_before_its_initialization, declarationName);
-          } else if (valueDeclaration.kind === 264 && node.parent.kind !== 184 && !(valueDeclaration.flags & 33554432) && !isBlockScopedNameDeclaredBeforeUse(valueDeclaration, right)) {
-            diagnosticMessage = error210(right, Diagnostics.Class_0_used_before_its_declaration, declarationName);
+          const declarationName = idText(right2);
+          if (isInPropertyInitializerOrClassStaticBlock(node) && !isOptionalPropertyDeclaration(valueDeclaration) && !(isAccessExpression(node) && isAccessExpression(node.expression)) && !isBlockScopedNameDeclaredBeforeUse(valueDeclaration, right2) && !(isMethodDeclaration(valueDeclaration) && getCombinedModifierFlagsCached(valueDeclaration) & 256) && (useDefineForClassFields || !isPropertyDeclaredInAncestorClass(prop))) {
+            diagnosticMessage = error210(right2, Diagnostics.Property_0_is_used_before_its_initialization, declarationName);
+          } else if (valueDeclaration.kind === 264 && node.parent.kind !== 184 && !(valueDeclaration.flags & 33554432) && !isBlockScopedNameDeclaredBeforeUse(valueDeclaration, right2)) {
+            diagnosticMessage = error210(right2, Diagnostics.Class_0_used_before_its_declaration, declarationName);
           }
           if (diagnosticMessage) {
             addRelatedInfo(diagnosticMessage, createDiagnosticForNode(valueDeclaration, Diagnostics._0_is_declared_here, declarationName));
@@ -87976,8 +87976,8 @@ ${lanes.join("\n")}
             parent2 = parent2.parent;
           }
           if (parent2 && isBinaryExpression(parent2) && isPrototypeAccess(parent2.left) && parent2.operatorToken.kind === 64) {
-            const right = getInitializerOfBinaryExpression(parent2);
-            return isObjectLiteralExpression(right) && right;
+            const right2 = getInitializerOfBinaryExpression(parent2);
+            return isObjectLiteralExpression(right2) && right2;
           }
         }
         function checkCallExpression(node, checkMode) {
@@ -90047,7 +90047,7 @@ ${lanes.join("\n")}
             }
           }
         }
-        function checkInstanceOfExpression(left, right, leftType, rightType, checkMode) {
+        function checkInstanceOfExpression(left, right2, leftType, rightType, checkMode) {
           if (leftType === silentNeverType || rightType === silentNeverType) {
             return silentNeverType;
           }
@@ -90069,13 +90069,13 @@ ${lanes.join("\n")}
             return silentNeverType;
           }
           const returnType = getReturnTypeOfSignature(signature);
-          checkTypeAssignableTo(returnType, booleanType, right, Diagnostics.An_object_s_Symbol_hasInstance_method_must_return_a_boolean_value_for_it_to_be_used_on_the_right_hand_side_of_an_instanceof_expression);
+          checkTypeAssignableTo(returnType, booleanType, right2, Diagnostics.An_object_s_Symbol_hasInstance_method_must_return_a_boolean_value_for_it_to_be_used_on_the_right_hand_side_of_an_instanceof_expression);
           return booleanType;
         }
         function hasEmptyObjectIntersection(type) {
           return someType(type, (t) => t === unknownEmptyObjectType || !!(t.flags & 2097152) && isEmptyAnonymousObjectType(getBaseConstraintOrType(t)));
         }
-        function checkInExpression(left, right, leftType, rightType) {
+        function checkInExpression(left, right2, leftType, rightType) {
           if (leftType === silentNeverType || rightType === silentNeverType) {
             return silentNeverType;
           }
@@ -90099,9 +90099,9 @@ ${lanes.join("\n")}
           } else {
             checkTypeAssignableTo(checkNonNullType(leftType, left), stringNumberSymbolType, left);
           }
-          if (checkTypeAssignableTo(checkNonNullType(rightType, right), nonPrimitiveType, right)) {
+          if (checkTypeAssignableTo(checkNonNullType(rightType, right2), nonPrimitiveType, right2)) {
             if (hasEmptyObjectIntersection(rightType)) {
-              error210(right, Diagnostics.Type_0_may_represent_a_primitive_value_which_is_not_permitted_as_the_right_operand_of_the_in_operator, typeToString(rightType));
+              error210(right2, Diagnostics.Type_0_may_represent_a_primitive_value_which_is_not_permitted_as_the_right_operand_of_the_in_operator, typeToString(rightType));
             }
           }
           return booleanType;
@@ -90414,9 +90414,9 @@ ${lanes.join("\n")}
               }
             }
           }
-          function onRight(right, state, _node) {
+          function onRight(right2, state, _node) {
             if (!state.skip) {
-              return maybeCheckExpression(state, right);
+              return maybeCheckExpression(state, right2);
             }
           }
           function onExit(node, state) {
@@ -90572,14 +90572,14 @@ ${lanes.join("\n")}
           }
           return 2;
         }
-        function checkBinaryLikeExpression(left, operatorToken, right, checkMode, errorNode) {
+        function checkBinaryLikeExpression(left, operatorToken, right2, checkMode, errorNode) {
           const operator = operatorToken.kind;
           if (operator === 64 && (left.kind === 211 || left.kind === 210)) {
             return checkDestructuringAssignment(
               left,
-              checkExpression(right, checkMode),
+              checkExpression(right2, checkMode),
               checkMode,
-              right.kind === 110
+              right2.kind === 110
               /* ThisKeyword */
             );
           }
@@ -90589,10 +90589,10 @@ ${lanes.join("\n")}
           } else {
             leftType = checkExpression(left, checkMode);
           }
-          const rightType = checkExpression(right, checkMode);
-          return checkBinaryLikeExpressionWorker(left, operatorToken, right, leftType, rightType, checkMode, errorNode);
+          const rightType = checkExpression(right2, checkMode);
+          return checkBinaryLikeExpressionWorker(left, operatorToken, right2, leftType, rightType, checkMode, errorNode);
         }
-        function checkBinaryLikeExpressionWorker(left, operatorToken, right, leftType, rightType, checkMode, errorNode) {
+        function checkBinaryLikeExpressionWorker(left, operatorToken, right2, leftType, rightType, checkMode, errorNode) {
           const operator = operatorToken.kind;
           switch (operator) {
             case 42:
@@ -90621,7 +90621,7 @@ ${lanes.join("\n")}
                 return silentNeverType;
               }
               leftType = checkNonNullType(leftType, left);
-              rightType = checkNonNullType(rightType, right);
+              rightType = checkNonNullType(rightType, right2);
               let suggestedOperator;
               if (leftType.flags & 528 && rightType.flags & 528 && (suggestedOperator = getSuggestedBooleanOperator(operatorToken.kind)) !== void 0) {
                 error210(errorNode || operatorToken, Diagnostics.The_0_operator_is_not_allowed_for_boolean_types_Consider_using_1_instead, tokenToString(operatorToken.kind), tokenToString(suggestedOperator));
@@ -90635,7 +90635,7 @@ ${lanes.join("\n")}
                   true
                 );
                 const rightOk = checkArithmeticOperandType(
-                  right,
+                  right2,
                   rightType,
                   Diagnostics.The_right_hand_side_of_an_arithmetic_operation_must_be_of_type_any_number_bigint_or_an_enum_type,
                   /*isAwaitValid*/
@@ -90687,10 +90687,10 @@ ${lanes.join("\n")}
                     case 72:
                     case 50:
                     case 73:
-                      const rhsEval = evaluate(right);
+                      const rhsEval = evaluate(right2);
                       if (typeof rhsEval.value === "number" && Math.abs(rhsEval.value) >= 32) {
                         errorOrSuggestion(
-                          isEnumMember(walkUpParenthesizedExpressions(right.parent.parent)),
+                          isEnumMember(walkUpParenthesizedExpressions(right2.parent.parent)),
                           // elevate from suggestion to error within an enum member
                           errorNode || operatorToken,
                           Diagnostics.This_operation_can_be_simplified_This_shift_is_identical_to_0_1_2,
@@ -90721,7 +90721,7 @@ ${lanes.join("\n")}
                 /* StringLike */
               )) {
                 leftType = checkNonNullType(leftType, left);
-                rightType = checkNonNullType(rightType, right);
+                rightType = checkNonNullType(rightType, right2);
               }
               let resultType;
               if (isTypeAssignableToKind(
@@ -90769,7 +90769,7 @@ ${lanes.join("\n")}
               if (!resultType) {
                 const closeEnoughKind = 296 | 2112 | 402653316 | 3;
                 reportOperatorError(
-                  (left2, right2) => isTypeAssignableToKind(left2, closeEnoughKind) && isTypeAssignableToKind(right2, closeEnoughKind)
+                  (left2, right22) => isTypeAssignableToKind(left2, closeEnoughKind) && isTypeAssignableToKind(right22, closeEnoughKind)
                 );
                 return anyType;
               }
@@ -90783,14 +90783,14 @@ ${lanes.join("\n")}
             case 34:
               if (checkForDisallowedESSymbolOperand(operator)) {
                 leftType = getBaseTypeOfLiteralTypeForComparison(checkNonNullType(leftType, left));
-                rightType = getBaseTypeOfLiteralTypeForComparison(checkNonNullType(rightType, right));
-                reportOperatorErrorUnless((left2, right2) => {
-                  if (isTypeAny(left2) || isTypeAny(right2)) {
+                rightType = getBaseTypeOfLiteralTypeForComparison(checkNonNullType(rightType, right2));
+                reportOperatorErrorUnless((left2, right22) => {
+                  if (isTypeAny(left2) || isTypeAny(right22)) {
                     return true;
                   }
                   const leftAssignableToNumber = isTypeAssignableTo(left2, numberOrBigIntType);
-                  const rightAssignableToNumber = isTypeAssignableTo(right2, numberOrBigIntType);
-                  return leftAssignableToNumber && rightAssignableToNumber || !leftAssignableToNumber && !rightAssignableToNumber && areTypesComparable(left2, right2);
+                  const rightAssignableToNumber = isTypeAssignableTo(right22, numberOrBigIntType);
+                  return leftAssignableToNumber && rightAssignableToNumber || !leftAssignableToNumber && !rightAssignableToNumber && areTypesComparable(left2, right22);
                 });
               }
               return booleanType;
@@ -90799,19 +90799,19 @@ ${lanes.join("\n")}
             case 37:
             case 38:
               if (!(checkMode && checkMode & 64)) {
-                if ((isLiteralExpressionOfObject(left) || isLiteralExpressionOfObject(right)) && // only report for === and !== in JS, not == or !=
+                if ((isLiteralExpressionOfObject(left) || isLiteralExpressionOfObject(right2)) && // only report for === and !== in JS, not == or !=
                 (!isInJSFile(left) || (operator === 37 || operator === 38))) {
                   const eqType = operator === 35 || operator === 37;
                   error210(errorNode, Diagnostics.This_condition_will_always_return_0_since_JavaScript_compares_objects_by_reference_not_value, eqType ? "false" : "true");
                 }
-                checkNaNEquality(errorNode, operator, left, right);
-                reportOperatorErrorUnless((left2, right2) => isTypeEqualityComparableTo(left2, right2) || isTypeEqualityComparableTo(right2, left2));
+                checkNaNEquality(errorNode, operator, left, right2);
+                reportOperatorErrorUnless((left2, right22) => isTypeEqualityComparableTo(left2, right22) || isTypeEqualityComparableTo(right22, left2));
               }
               return booleanType;
             case 104:
-              return checkInstanceOfExpression(left, right, leftType, rightType, checkMode);
+              return checkInstanceOfExpression(left, right2, leftType, rightType, checkMode);
             case 103:
-              return checkInExpression(left, right, leftType, rightType);
+              return checkInExpression(left, right2, leftType, rightType);
             case 56:
             case 77: {
               const resultType2 = hasTypeFacts(
@@ -90883,13 +90883,13 @@ ${lanes.join("\n")}
             default:
               return Debug.fail();
           }
-          function bothAreBigIntLike(left2, right2) {
+          function bothAreBigIntLike(left2, right22) {
             return isTypeAssignableToKind(
               left2,
               2112
               /* BigIntLike */
             ) && isTypeAssignableToKind(
-              right2,
+              right22,
               2112
               /* BigIntLike */
             );
@@ -90930,7 +90930,7 @@ ${lanes.join("\n")}
               rightType,
               12288
               /* ESSymbolLike */
-            ) ? right : void 0;
+            ) ? right2 : void 0;
             if (offendingSymbolOperand) {
               error210(offendingSymbolOperand, Diagnostics.The_0_operator_cannot_be_applied_to_type_symbol, tokenToString(operator2));
               return false;
@@ -90979,7 +90979,7 @@ ${lanes.join("\n")}
                     headMessage = Diagnostics.Type_0_is_not_assignable_to_type_1_with_exactOptionalPropertyTypes_Colon_true_Consider_adding_undefined_to_the_type_of_the_target;
                   }
                 }
-                checkTypeAssignableToAndOptionallyElaborate(valueType, assigneeType, left, right, headMessage);
+                checkTypeAssignableToAndOptionallyElaborate(valueType, assigneeType, left, right2, headMessage);
               }
             }
           }
@@ -90994,7 +90994,7 @@ ${lanes.join("\n")}
               case 3:
               case 4:
                 const symbol2 = getSymbolOfNode(left);
-                const init = getAssignedExpandoInitializer(right);
+                const init = getAssignedExpandoInitializer(right2);
                 return !!init && isObjectLiteralExpression(init) && !!((_a2 = symbol2 == null ? void 0 : symbol2.exports) == null ? void 0 : _a2.size);
               default:
                 return false;
@@ -91049,9 +91049,9 @@ ${lanes.join("\n")}
                 return void 0;
             }
           }
-          function checkNaNEquality(errorNode2, operator2, left2, right2) {
+          function checkNaNEquality(errorNode2, operator2, left2, right22) {
             const isLeftNaN = isGlobalNaN(skipParentheses(left2));
-            const isRightNaN = isGlobalNaN(skipParentheses(right2));
+            const isRightNaN = isGlobalNaN(skipParentheses(right22));
             if (isLeftNaN || isRightNaN) {
               const err = error210(errorNode2, Diagnostics.This_condition_will_always_return_0, tokenToString(
                 operator2 === 37 || operator2 === 35 ? 97 : 112
@@ -91062,7 +91062,7 @@ ${lanes.join("\n")}
                 54
                 /* ExclamationToken */
               ) : "";
-              const location = isLeftNaN ? right2 : left2;
+              const location = isLeftNaN ? right22 : left2;
               const expression = skipParentheses(location);
               addRelatedInfo(err, createDiagnosticForNode(location, Diagnostics.Did_you_mean_0, `${operatorString}Number.isNaN(${isEntityNameExpression(expression) ? entityNameToString(expression) : "..."})`));
             }
@@ -94424,15 +94424,15 @@ ${lanes.join("\n")}
             addRelatedInfo(err, createDiagnosticForNode(firstDeclaration, Diagnostics._0_was_also_declared_here, declName));
           }
         }
-        function areDeclarationFlagsIdentical(left, right) {
-          if (left.kind === 170 && right.kind === 261 || left.kind === 261 && right.kind === 170) {
+        function areDeclarationFlagsIdentical(left, right2) {
+          if (left.kind === 170 && right2.kind === 261 || left.kind === 261 && right2.kind === 170) {
             return true;
           }
-          if (hasQuestionToken(left) !== hasQuestionToken(right)) {
+          if (hasQuestionToken(left) !== hasQuestionToken(right2)) {
             return false;
           }
           const interestingFlags = 2 | 4 | 1024 | 64 | 8 | 256;
-          return getSelectedEffectiveModifierFlags(left, interestingFlags) === getSelectedEffectiveModifierFlags(right, interestingFlags);
+          return getSelectedEffectiveModifierFlags(left, interestingFlags) === getSelectedEffectiveModifierFlags(right2, interestingFlags);
         }
         function checkVariableDeclaration(node) {
           var _a2, _b;
@@ -98506,11 +98506,11 @@ ${lanes.join("\n")}
             }
           }
           const left = isIdentifier(name) ? container : resolveJSDocMemberName(name.left, ignoreErrors, container);
-          const right = isIdentifier(name) ? name.escapedText : name.right.escapedText;
+          const right2 = isIdentifier(name) ? name.escapedText : name.right.escapedText;
           if (left) {
             const proto = left.flags & 111551 && getPropertyOfType(getTypeOfSymbol(left), "prototype");
             const t = proto ? getTypeOfSymbol(proto) : getDeclaredTypeOfSymbol(left);
-            return getPropertyOfType(t, right);
+            return getPropertyOfType(t, right2);
           }
         }
         function getSymbolAtLocation(node, ignoreErrors) {
@@ -104011,8 +104011,8 @@ ${lanes.join("\n")}
           return value;
         }
       }
-      function sameMapping(left, right) {
-        return left === right || left.generatedLine === right.generatedLine && left.generatedCharacter === right.generatedCharacter && left.sourceIndex === right.sourceIndex && left.sourceLine === right.sourceLine && left.sourceCharacter === right.sourceCharacter && left.nameIndex === right.nameIndex;
+      function sameMapping(left, right2) {
+        return left === right2 || left.generatedLine === right2.generatedLine && left.generatedCharacter === right2.generatedCharacter && left.sourceIndex === right2.sourceIndex && left.sourceLine === right2.sourceLine && left.sourceCharacter === right2.sourceCharacter && left.nameIndex === right2.nameIndex;
       }
       function isSourceMapping(mapping) {
         return mapping.sourceIndex !== void 0 && mapping.sourceLine !== void 0 && mapping.sourceCharacter !== void 0;
@@ -104026,15 +104026,15 @@ ${lanes.join("\n")}
       function isSourceMappedPosition(value) {
         return value.sourceIndex !== void 0 && value.sourcePosition !== void 0;
       }
-      function sameMappedPosition(left, right) {
-        return left.generatedPosition === right.generatedPosition && left.sourceIndex === right.sourceIndex && left.sourcePosition === right.sourcePosition;
+      function sameMappedPosition(left, right2) {
+        return left.generatedPosition === right2.generatedPosition && left.sourceIndex === right2.sourceIndex && left.sourcePosition === right2.sourcePosition;
       }
-      function compareSourcePositions(left, right) {
-        Debug.assert(left.sourceIndex === right.sourceIndex);
-        return compareValues(left.sourcePosition, right.sourcePosition);
+      function compareSourcePositions(left, right2) {
+        Debug.assert(left.sourceIndex === right2.sourceIndex);
+        return compareValues(left.sourcePosition, right2.sourcePosition);
       }
-      function compareGeneratedPositions(left, right) {
-        return compareValues(left.generatedPosition, right.generatedPosition);
+      function compareGeneratedPositions(left, right2) {
+        return compareValues(left.generatedPosition, right2.generatedPosition);
       }
       function getSourcePositionOfMapping(value) {
         return value.sourcePosition;
@@ -105376,12 +105376,12 @@ ${lanes.join("\n")}
       function transformNamedEvaluationOfAssignmentExpression(context, node, ignoreEmptyStringLiteral, assignedNameText) {
         const { factory: factory22 } = context;
         const assignedName = assignedNameText !== void 0 ? factory22.createStringLiteral(assignedNameText) : getAssignedNameOfIdentifier(factory22, node.left, node.right);
-        const right = finishTransformNamedEvaluation(context, node.right, assignedName, ignoreEmptyStringLiteral);
+        const right2 = finishTransformNamedEvaluation(context, node.right, assignedName, ignoreEmptyStringLiteral);
         return factory22.updateBinaryExpression(
           node,
           node.left,
           node.operatorToken,
-          right
+          right2
         );
       }
       function transformNamedEvaluationOfExportAssignment(context, node, ignoreEmptyStringLiteral, assignedNameText) {
@@ -108369,17 +108369,17 @@ ${lanes.join("\n")}
           const expression = visitNode(node.expression, visitorFunc, isExpression);
           return factory22.updateParenthesizedExpression(node, expression);
         }
-        function createPrivateIdentifierAssignment(info, receiver, right, operator) {
+        function createPrivateIdentifierAssignment(info, receiver, right2, operator) {
           receiver = visitNode(receiver, visitor, isExpression);
-          right = visitNode(right, visitor, isExpression);
+          right2 = visitNode(right2, visitor, isExpression);
           ensureDynamicThisIfNeeded(receiver);
           if (isCompoundAssignment(operator)) {
             const { readExpression, initializeExpression } = createCopiableReceiverExpr(receiver);
             receiver = initializeExpression || readExpression;
-            right = factory22.createBinaryExpression(
+            right2 = factory22.createBinaryExpression(
               createPrivateIdentifierAccessHelper(info, readExpression),
               getNonAssignmentOperatorForCompoundAssignment(operator),
-              right
+              right2
             );
           }
           setCommentRange(receiver, moveRangePos(receiver, -1));
@@ -108388,7 +108388,7 @@ ${lanes.join("\n")}
               return emitHelpers().createClassPrivateFieldSetHelper(
                 receiver,
                 info.brandCheckIdentifier,
-                right,
+                right2,
                 info.kind,
                 info.setterName
               );
@@ -108396,7 +108396,7 @@ ${lanes.join("\n")}
               return emitHelpers().createClassPrivateFieldSetHelper(
                 receiver,
                 info.brandCheckIdentifier,
-                right,
+                right2,
                 info.kind,
                 /*f*/
                 void 0
@@ -108405,7 +108405,7 @@ ${lanes.join("\n")}
               return emitHelpers().createClassPrivateFieldSetHelper(
                 receiver,
                 info.brandCheckIdentifier,
-                right,
+                right2,
                 info.kind,
                 info.isStatic ? info.variableName : void 0
               );
@@ -109537,8 +109537,8 @@ ${lanes.join("\n")}
             true
           )) {
             const left = visitDestructuringAssignmentTarget(node.left);
-            const right = visitNode(node.right, visitor, isExpression);
-            return factory22.updateBinaryExpression(node, left, node.operatorToken, right);
+            const right2 = visitNode(node.right, visitor, isExpression);
+            return factory22.updateBinaryExpression(node, left, node.operatorToken, right2);
           }
           return visitDestructuringAssignmentTarget(node);
         }
@@ -109991,24 +109991,24 @@ ${lanes.join("\n")}
           }
           return serializedType ?? factory22.createVoidZero();
         }
-        function equateSerializedTypeNodes(left, right) {
+        function equateSerializedTypeNodes(left, right2) {
           return (
             // temp vars used in fallback
-            isGeneratedIdentifier(left) ? isGeneratedIdentifier(right) : (
+            isGeneratedIdentifier(left) ? isGeneratedIdentifier(right2) : (
               // entity names
-              isIdentifier(left) ? isIdentifier(right) && left.escapedText === right.escapedText : isPropertyAccessExpression(left) ? isPropertyAccessExpression(right) && equateSerializedTypeNodes(left.expression, right.expression) && equateSerializedTypeNodes(left.name, right.name) : (
+              isIdentifier(left) ? isIdentifier(right2) && left.escapedText === right2.escapedText : isPropertyAccessExpression(left) ? isPropertyAccessExpression(right2) && equateSerializedTypeNodes(left.expression, right2.expression) && equateSerializedTypeNodes(left.name, right2.name) : (
                 // `void 0`
-                isVoidExpression(left) ? isVoidExpression(right) && isNumericLiteral(left.expression) && left.expression.text === "0" && isNumericLiteral(right.expression) && right.expression.text === "0" : (
+                isVoidExpression(left) ? isVoidExpression(right2) && isNumericLiteral(left.expression) && left.expression.text === "0" && isNumericLiteral(right2.expression) && right2.expression.text === "0" : (
                   // `"undefined"` or `"function"` in `typeof` checks
-                  isStringLiteral(left) ? isStringLiteral(right) && left.text === right.text : (
+                  isStringLiteral(left) ? isStringLiteral(right2) && left.text === right2.text : (
                     // used in `typeof` checks for fallback
-                    isTypeOfExpression(left) ? isTypeOfExpression(right) && equateSerializedTypeNodes(left.expression, right.expression) : (
+                    isTypeOfExpression(left) ? isTypeOfExpression(right2) && equateSerializedTypeNodes(left.expression, right2.expression) : (
                       // parens in `typeof` checks with temps
-                      isParenthesizedExpression(left) ? isParenthesizedExpression(right) && equateSerializedTypeNodes(left.expression, right.expression) : (
+                      isParenthesizedExpression(left) ? isParenthesizedExpression(right2) && equateSerializedTypeNodes(left.expression, right2.expression) : (
                         // conditionals used in fallback
-                        isConditionalExpression(left) ? isConditionalExpression(right) && equateSerializedTypeNodes(left.condition, right.condition) && equateSerializedTypeNodes(left.whenTrue, right.whenTrue) && equateSerializedTypeNodes(left.whenFalse, right.whenFalse) : (
+                        isConditionalExpression(left) ? isConditionalExpression(right2) && equateSerializedTypeNodes(left.condition, right2.condition) && equateSerializedTypeNodes(left.whenTrue, right2.whenTrue) && equateSerializedTypeNodes(left.whenFalse, right2.whenFalse) : (
                           // logical binary and assignments used in fallback
-                          isBinaryExpression(left) ? isBinaryExpression(right) && left.operatorToken.kind === right.operatorToken.kind && equateSerializedTypeNodes(left.left, right.left) && equateSerializedTypeNodes(left.right, right.right) : false
+                          isBinaryExpression(left) ? isBinaryExpression(right2) && left.operatorToken.kind === right2.operatorToken.kind && equateSerializedTypeNodes(left.left, right2.left) && equateSerializedTypeNodes(left.right, right2.right) : false
                         )
                       )
                     )
@@ -110070,10 +110070,10 @@ ${lanes.join("\n")}
               return Debug.assertNever(kind);
           }
         }
-        function createCheckedValue(left, right) {
+        function createCheckedValue(left, right2) {
           return factory22.createLogicalAnd(
             factory22.createStrictInequality(factory22.createTypeOfExpression(left), factory22.createStringLiteral("undefined")),
-            right
+            right2
           );
         }
         function serializeEntityNameAsExpressionFallback(node) {
@@ -112095,8 +112095,8 @@ ${lanes.join("\n")}
         function visitBinaryExpression(node, discarded) {
           if (isDestructuringAssignment(node)) {
             const left = visitAssignmentPattern(node.left);
-            const right = visitNode(node.right, visitor, isExpression);
-            return factory22.updateBinaryExpression(node, left, node.operatorToken, right);
+            const right2 = visitNode(node.right, visitor, isExpression);
+            return factory22.updateBinaryExpression(node, left, node.operatorToken, right2);
           }
           if (isAssignmentExpression(node)) {
             if (isNamedEvaluation(node, isAnonymousClassNeedingAssignedName)) {
@@ -112150,8 +112150,8 @@ ${lanes.join("\n")}
           }
           if (node.operatorToken.kind === 28) {
             const left = visitNode(node.left, discardedValueVisitor, isExpression);
-            const right = visitNode(node.right, discarded ? discardedValueVisitor : visitor, isExpression);
-            return factory22.updateBinaryExpression(node, left, node.operatorToken, right);
+            const right2 = visitNode(node.right, discarded ? discardedValueVisitor : visitor, isExpression);
+            return factory22.updateBinaryExpression(node, left, node.operatorToken, right2);
           }
           return visitEachChild(node, visitor, context);
         }
@@ -115269,7 +115269,7 @@ ${lanes.join("\n")}
           setTextRange(target, node);
           return thisArg ? factory22.createSyntheticReferenceExpression(target, thisArg) : target;
         }
-        function createNotNullCondition(left, right, invert) {
+        function createNotNullCondition(left, right2, invert) {
           return factory22.createBinaryExpression(
             factory22.createBinaryExpression(
               left,
@@ -115284,7 +115284,7 @@ ${lanes.join("\n")}
               /* AmpersandAmpersandToken */
             ),
             factory22.createBinaryExpression(
-              right,
+              right2,
               factory22.createToken(
                 invert ? 37 : 38
                 /* ExclamationEqualsEqualsToken */
@@ -115295,17 +115295,17 @@ ${lanes.join("\n")}
         }
         function transformNullishCoalescingExpression(node) {
           let left = visitNode(node.left, visitor, isExpression);
-          let right = left;
+          let right2 = left;
           if (!isSimpleCopiableExpression(left)) {
-            right = factory22.createTempVariable(hoistVariableDeclaration);
-            left = factory22.createAssignment(right, left);
+            right2 = factory22.createTempVariable(hoistVariableDeclaration);
+            left = factory22.createAssignment(right2, left);
           }
           return setTextRange(
             factory22.createConditionalExpression(
-              createNotNullCondition(left, right),
+              createNotNullCondition(left, right2),
               /*questionToken*/
               void 0,
-              right,
+              right2,
               /*colonToken*/
               void 0,
               visitNode(node.right, visitor, isExpression)
@@ -115349,7 +115349,7 @@ ${lanes.join("\n")}
           const nonAssignmentOperator = getNonAssignmentOperatorForCompoundAssignment(operator.kind);
           let left = skipParentheses(visitNode(binaryExpression.left, visitor, isLeftHandSideExpression));
           let assignmentTarget = left;
-          const right = skipParentheses(visitNode(binaryExpression.right, visitor, isExpression));
+          const right2 = skipParentheses(visitNode(binaryExpression.right, visitor, isExpression));
           if (isAccessExpression(left)) {
             const propertyAccessTargetSimpleCopiable = isSimpleCopiableExpression(left.expression);
             const propertyAccessTarget = propertyAccessTargetSimpleCopiable ? left.expression : factory22.createTempVariable(hoistVariableDeclaration);
@@ -115388,7 +115388,7 @@ ${lanes.join("\n")}
             factory22.createParenthesizedExpression(
               factory22.createAssignment(
                 assignmentTarget,
-                right
+                right2
               )
             )
           );
@@ -116932,7 +116932,7 @@ ${lanes.join("\n")}
           let target;
           let value;
           const left = visitNode(node.left, visitor, isExpression);
-          const right = visitNode(node.right, visitor, isExpression);
+          const right2 = visitNode(node.right, visitor, isExpression);
           if (isElementAccessExpression(left)) {
             const expressionTemp = factory22.createTempVariable(hoistVariableDeclaration);
             const argumentExpressionTemp = factory22.createTempVariable(hoistVariableDeclaration);
@@ -116973,15 +116973,15 @@ ${lanes.join("\n")}
           return setTextRange(
             factory22.createAssignment(
               target,
-              setTextRange(factory22.createGlobalMethodCall("Math", "pow", [value, right]), node)
+              setTextRange(factory22.createGlobalMethodCall("Math", "pow", [value, right2]), node)
             ),
             node
           );
         }
         function visitExponentiationExpression(node) {
           const left = visitNode(node.left, visitor, isExpression);
-          const right = visitNode(node.right, visitor, isExpression);
-          return setTextRange(factory22.createGlobalMethodCall("Math", "pow", [left, right]), node);
+          const right2 = visitNode(node.right, visitor, isExpression);
+          return setTextRange(factory22.createGlobalMethodCall("Math", "pow", [left, right2]), node);
         }
       }
       function createSpreadSegment(kind, expression) {
@@ -121069,8 +121069,8 @@ ${lanes.join("\n")}
           }
         }
         function visitRightAssociativeBinaryExpression(node) {
-          const { left, right } = node;
-          if (containsYield(right)) {
+          const { left, right: right2 } = node;
+          if (containsYield(right2)) {
             let target;
             switch (left.kind) {
               case 212:
@@ -121096,7 +121096,7 @@ ${lanes.join("\n")}
                     factory22.createBinaryExpression(
                       cacheExpression(target),
                       getNonAssignmentOperatorForCompoundAssignment(operator),
-                      Debug.checkDefined(visitNode(right, visitor, isExpression))
+                      Debug.checkDefined(visitNode(right2, visitor, isExpression))
                     ),
                     node
                   )
@@ -121104,7 +121104,7 @@ ${lanes.join("\n")}
                 node
               );
             } else {
-              return factory22.updateBinaryExpression(node, target, node.operatorToken, Debug.checkDefined(visitNode(right, visitor, isExpression)));
+              return factory22.updateBinaryExpression(node, target, node.operatorToken, Debug.checkDefined(visitNode(right2, visitor, isExpression)));
             }
           }
           return visitEachChild(node, visitor, context);
@@ -122320,8 +122320,8 @@ ${lanes.join("\n")}
             emitNop();
           }
         }
-        function emitAssignment(left, right, location) {
-          emitWorker(2, [left, right], location);
+        function emitAssignment(left, right2, location) {
+          emitWorker(2, [left, right2], location);
         }
         function emitBreak(label, location) {
           emitWorker(3, [label], location);
@@ -122638,8 +122638,8 @@ ${lanes.join("\n")}
             }
           }
         }
-        function writeAssign(left, right, operationLocation) {
-          writeStatement(setTextRange(factory22.createExpressionStatement(factory22.createAssignment(left, right)), operationLocation));
+        function writeAssign(left, right2, operationLocation) {
+          writeStatement(setTextRange(factory22.createExpressionStatement(factory22.createAssignment(left, right2)), operationLocation));
         }
         function writeThrow(expression, operationLocation) {
           lastOperationWasAbrupt = true;
@@ -145982,10 +145982,10 @@ ${lanes.join("\n")}
           }
           return true;
         }
-        function getPrettyOutput(left, right, rightAlignOfLeft2, leftAlignOfRight2, terminalWidth2, colorLeft) {
+        function getPrettyOutput(left, right2, rightAlignOfLeft2, leftAlignOfRight2, terminalWidth2, colorLeft) {
           const res = [];
           let isFirstLine = true;
-          let remainRight = right;
+          let remainRight = right2;
           const rightCharacterNumber = terminalWidth2 - leftAlignOfRight2;
           while (remainRight.length > 0) {
             let curLeft = "";
@@ -149223,7 +149223,7 @@ ${lanes.join("\n")}
             return "alias";
           case 227:
             const kind = getAssignmentDeclarationKind(node);
-            const { right } = node;
+            const { right: right2 } = node;
             switch (kind) {
               case 7:
               case 8:
@@ -149232,15 +149232,15 @@ ${lanes.join("\n")}
                 return "";
               case 1:
               case 2:
-                const rightKind = getNodeKind(right);
+                const rightKind = getNodeKind(right2);
                 return rightKind === "" ? "const" : rightKind;
               case 3:
-                return isFunctionExpression(right) ? "method" : "property";
+                return isFunctionExpression(right2) ? "method" : "property";
               case 4:
                 return "property";
               // property
               case 5:
-                return isFunctionExpression(right) ? "method" : "property";
+                return isFunctionExpression(right2) ? "method" : "property";
               case 6:
                 return "local class";
               default: {
@@ -151044,8 +151044,8 @@ ${lanes.join("\n")}
           case 215:
             return checker.getContextualType(parent2, contextFlags);
           case 227: {
-            const { left, operatorToken, right } = parent2;
-            return isEqualityOperatorKind(operatorToken.kind) ? checker.getTypeAtLocation(node === right ? left : right) : checker.getContextualType(node, contextFlags);
+            const { left, operatorToken, right: right2 } = parent2;
+            return isEqualityOperatorKind(operatorToken.kind) ? checker.getTypeAtLocation(node === right2 ? left : right2) : checker.getContextualType(node, contextFlags);
           }
           case 297:
             return getSwitchedType(parent2, checker);
@@ -156176,8 +156176,8 @@ interface Symbol {
           return expr.text;
         } else if (isPropertyAccessExpression(expr)) {
           const left = getCalledExpressionName(expr.expression);
-          const right = expr.name.text;
-          return left === void 0 ? right : `${left}.${right}`;
+          const right2 = expr.name.text;
+          return left === void 0 ? right2 : `${left}.${right2}`;
         } else {
           return void 0;
         }
@@ -167546,24 +167546,24 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
         }
       }
       function convertAssignment(sourceFile2, checker, assignment, changes, exports2, useSitesToUnqualify) {
-        const { left, right } = assignment;
+        const { left, right: right2 } = assignment;
         if (!isPropertyAccessExpression(left)) {
           return false;
         }
         if (isExportsOrModuleExportsOrAlias(sourceFile2, left)) {
-          if (isExportsOrModuleExportsOrAlias(sourceFile2, right)) {
+          if (isExportsOrModuleExportsOrAlias(sourceFile2, right2)) {
             changes.delete(sourceFile2, assignment.parent);
           } else {
-            const replacement = isObjectLiteralExpression(right) ? tryChangeModuleExportsObject(right, useSitesToUnqualify) : isRequireCall(
-              right,
+            const replacement = isObjectLiteralExpression(right2) ? tryChangeModuleExportsObject(right2, useSitesToUnqualify) : isRequireCall(
+              right2,
               /*requireStringLiteralLikeArgument*/
               true
-            ) ? convertReExportAll(right.arguments[0], checker) : void 0;
+            ) ? convertReExportAll(right2.arguments[0], checker) : void 0;
             if (replacement) {
               changes.replaceNodeWithNodes(sourceFile2, assignment.parent, replacement[0]);
               return replacement[1];
             } else {
-              changes.replaceRangeWithText(sourceFile2, createRange(left.getStart(sourceFile2), right.pos), "export default");
+              changes.replaceRangeWithText(sourceFile2, createRange(left.getStart(sourceFile2), right2.pos), "export default");
               return true;
             }
           }
@@ -167649,14 +167649,14 @@ ${newComment.split("\n").map((c) => ` * ${c}`).join("\n")}
           "default"
         )], moduleSpecifier);
       }
-      function convertExportsPropertyAssignment({ left, right, parent: parent2 }, sourceFile2, changes) {
+      function convertExportsPropertyAssignment({ left, right: right2, parent: parent2 }, sourceFile2, changes) {
         const name = left.name.text;
-        if ((isFunctionExpression(right) || isArrowFunction(right) || isClassExpression(right)) && (!right.name || right.name.text === name)) {
-          changes.replaceRange(sourceFile2, { pos: left.getStart(sourceFile2), end: right.getStart(sourceFile2) }, factory2.createToken(
+        if ((isFunctionExpression(right2) || isArrowFunction(right2) || isClassExpression(right2)) && (!right2.name || right2.name.text === name)) {
+          changes.replaceRange(sourceFile2, { pos: left.getStart(sourceFile2), end: right2.getStart(sourceFile2) }, factory2.createToken(
             95
             /* ExportKeyword */
           ), { suffix: " " });
-          if (!right.name) changes.insertName(sourceFile2, right, name);
+          if (!right2.name) changes.insertName(sourceFile2, right2, name);
           const semi = findChildOfKind(parent2, 27, sourceFile2);
           if (semi) changes.delete(sourceFile2, semi);
         } else {
@@ -189305,8 +189305,8 @@ ${content}
           let signature;
           type ?? (type = isThisExpression ? typeChecker.getTypeAtLocation(location) : typeChecker.getTypeOfSymbolAtLocation(symbol2, location));
           if (location.parent && location.parent.kind === 212) {
-            const right = location.parent.name;
-            if (right === location || right && right.getFullWidth() === 0) {
+            const right2 = location.parent.name;
+            if (right2 === location || right2 && right2.getFullWidth() === 0) {
               location = location.parent;
             }
           }
@@ -193321,8 +193321,8 @@ ${options.prefix}` : "\n" : options.prefix
           ...lowPriorityCommonRules
         ];
       }
-      function rule(debugName, left, right, context, action2, flags = 0) {
-        return { leftTokenRange: toTokenRange(left), rightTokenRange: toTokenRange(right), rule: { debugName, context, action: action2, flags } };
+      function rule(debugName, left, right2, context, action2, flags = 0) {
+        return { leftTokenRange: toTokenRange(left), rightTokenRange: toTokenRange(right2), rule: { debugName, context, action: action2, flags } };
       }
       function tokenRangeFrom(tokens) {
         return { tokens, isSpecific: true };
@@ -193783,8 +193783,8 @@ ${options.prefix}` : "\n" : options.prefix
         for (const rule2 of rules) {
           const specificRule = rule2.leftTokenRange.isSpecific && rule2.rightTokenRange.isSpecific;
           for (const left of rule2.leftTokenRange.tokens) {
-            for (const right of rule2.rightTokenRange.tokens) {
-              const index = getRuleBucketIndex(left, right);
+            for (const right2 of rule2.rightTokenRange.tokens) {
+              const index = getRuleBucketIndex(left, right2);
               let rulesBucket = map22[index];
               if (rulesBucket === void 0) {
                 rulesBucket = map22[index] = [];
@@ -214059,14 +214059,14 @@ var $ZodIntersection = /* @__PURE__ */ $constructor("$ZodIntersection", (inst, d
   inst._zod.parse = (payload, ctx) => {
     const input = payload.value;
     const left = def.left._zod.run({ value: input, issues: [] }, ctx);
-    const right = def.right._zod.run({ value: input, issues: [] }, ctx);
-    const async = left instanceof Promise || right instanceof Promise;
+    const right2 = def.right._zod.run({ value: input, issues: [] }, ctx);
+    const async = left instanceof Promise || right2 instanceof Promise;
     if (async) {
-      return Promise.all([left, right]).then(([left2, right2]) => {
-        return handleIntersectionResults(payload, left2, right2);
+      return Promise.all([left, right2]).then(([left2, right3]) => {
+        return handleIntersectionResults(payload, left2, right3);
       });
     }
-    return handleIntersectionResults(payload, left, right);
+    return handleIntersectionResults(payload, left, right2);
   };
 });
 function mergeValues(a, b) {
@@ -214113,16 +214113,16 @@ function mergeValues(a, b) {
   }
   return { valid: false, mergeErrorPath: [] };
 }
-function handleIntersectionResults(result, left, right) {
+function handleIntersectionResults(result, left, right2) {
   if (left.issues.length) {
     result.issues.push(...left.issues);
   }
-  if (right.issues.length) {
-    result.issues.push(...right.issues);
+  if (right2.issues.length) {
+    result.issues.push(...right2.issues);
   }
   if (aborted(result))
     return result;
-  const merged = mergeValues(left.value, right.value);
+  const merged = mergeValues(left.value, right2.value);
   if (!merged.valid) {
     throw new Error(`Unmergable intersection. Error path: ${JSON.stringify(merged.mergeErrorPath)}`);
   }
@@ -214664,11 +214664,11 @@ var $ZodPipe = /* @__PURE__ */ $constructor("$ZodPipe", (inst, def) => {
   defineLazy(inst._zod, "propValues", () => def.in._zod.propValues);
   inst._zod.parse = (payload, ctx) => {
     if (ctx.direction === "backward") {
-      const right = def.out._zod.run(payload, ctx);
-      if (right instanceof Promise) {
-        return right.then((right2) => handlePipeResult(right2, def.in, ctx));
+      const right2 = def.out._zod.run(payload, ctx);
+      if (right2 instanceof Promise) {
+        return right2.then((right3) => handlePipeResult(right3, def.in, ctx));
       }
-      return handlePipeResult(right, def.in, ctx);
+      return handlePipeResult(right2, def.in, ctx);
     }
     const left = def.in._zod.run(payload, ctx);
     if (left instanceof Promise) {
@@ -214699,11 +214699,11 @@ var $ZodCodec = /* @__PURE__ */ $constructor("$ZodCodec", (inst, def) => {
       }
       return handleCodecAResult(left, def, ctx);
     } else {
-      const right = def.out._zod.run(payload, ctx);
-      if (right instanceof Promise) {
-        return right.then((right2) => handleCodecAResult(right2, def, ctx));
+      const right2 = def.out._zod.run(payload, ctx);
+      if (right2 instanceof Promise) {
+        return right2.then((right3) => handleCodecAResult(right3, def, ctx));
       }
-      return handleCodecAResult(right, def, ctx);
+      return handleCodecAResult(right2, def, ctx);
     }
   };
 });
@@ -221379,11 +221379,11 @@ function _discriminatedUnion(Class2, discriminator, options, params) {
     ...normalizeParams(params)
   });
 }
-function _intersection(Class2, left, right) {
+function _intersection(Class2, left, right2) {
   return new Class2({
     type: "intersection",
     left,
-    right
+    right: right2
   });
 }
 function _tuple(Class2, items, _paramsOrRest, _params) {
@@ -223261,11 +223261,11 @@ var ZodIntersection = /* @__PURE__ */ $constructor("ZodIntersection", (inst, def
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json2, params) => intersectionProcessor(inst, ctx, json2, params);
 });
-function intersection(left, right) {
+function intersection(left, right2) {
   return new ZodIntersection({
     type: "intersection",
     left,
-    right
+    right: right2
   });
 }
 var ZodTuple = /* @__PURE__ */ $constructor("ZodTuple", (inst, def) => {
@@ -233703,8 +233703,8 @@ var require_multipleOf = /* @__PURE__ */ __commonJSMin(((exports) => {
       const { gen, data, schemaCode, it } = cxt;
       const prec = it.opts.multipleOfPrecision;
       const res = gen.let("res");
-      const invalid6 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-      cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid6}))`);
+      const invalid7 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+      cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid7}))`);
     }
   };
   exports.default = def;
@@ -239364,8 +239364,8 @@ function* GenerateReduce(buffer) {
   if (buffer.length === 1)
     return yield* buffer[0];
   for (const left of buffer[0]) {
-    for (const right of GenerateReduce(buffer.slice(1))) {
-      yield `${left}${right}`;
+    for (const right2 of GenerateReduce(buffer.slice(1))) {
+      yield `${left}${right2}`;
     }
   }
 }
@@ -239993,67 +239993,67 @@ function IntoBooleanResult(result) {
 function Throw(message) {
   throw new ExtendsResolverError(message);
 }
-function IsStructuralRight(right) {
-  return type_exports.IsNever(right) || type_exports.IsIntersect(right) || type_exports.IsUnion(right) || type_exports.IsUnknown(right) || type_exports.IsAny(right);
+function IsStructuralRight(right2) {
+  return type_exports.IsNever(right2) || type_exports.IsIntersect(right2) || type_exports.IsUnion(right2) || type_exports.IsUnknown(right2) || type_exports.IsAny(right2);
 }
-function StructuralRight(left, right) {
-  return type_exports.IsNever(right) ? FromNeverRight(left, right) : type_exports.IsIntersect(right) ? FromIntersectRight(left, right) : type_exports.IsUnion(right) ? FromUnionRight(left, right) : type_exports.IsUnknown(right) ? FromUnknownRight(left, right) : type_exports.IsAny(right) ? FromAnyRight(left, right) : Throw("StructuralRight");
+function StructuralRight(left, right2) {
+  return type_exports.IsNever(right2) ? FromNeverRight(left, right2) : type_exports.IsIntersect(right2) ? FromIntersectRight(left, right2) : type_exports.IsUnion(right2) ? FromUnionRight(left, right2) : type_exports.IsUnknown(right2) ? FromUnknownRight(left, right2) : type_exports.IsAny(right2) ? FromAnyRight(left, right2) : Throw("StructuralRight");
 }
-function FromAnyRight(left, right) {
+function FromAnyRight(left, right2) {
   return ExtendsResult.True;
 }
-function FromAny(left, right) {
-  return type_exports.IsIntersect(right) ? FromIntersectRight(left, right) : type_exports.IsUnion(right) && right.anyOf.some((schema) => type_exports.IsAny(schema) || type_exports.IsUnknown(schema)) ? ExtendsResult.True : type_exports.IsUnion(right) ? ExtendsResult.Union : type_exports.IsUnknown(right) ? ExtendsResult.True : type_exports.IsAny(right) ? ExtendsResult.True : ExtendsResult.Union;
+function FromAny(left, right2) {
+  return type_exports.IsIntersect(right2) ? FromIntersectRight(left, right2) : type_exports.IsUnion(right2) && right2.anyOf.some((schema) => type_exports.IsAny(schema) || type_exports.IsUnknown(schema)) ? ExtendsResult.True : type_exports.IsUnion(right2) ? ExtendsResult.Union : type_exports.IsUnknown(right2) ? ExtendsResult.True : type_exports.IsAny(right2) ? ExtendsResult.True : ExtendsResult.Union;
 }
-function FromArrayRight(left, right) {
+function FromArrayRight(left, right2) {
   return type_exports.IsUnknown(left) ? ExtendsResult.False : type_exports.IsAny(left) ? ExtendsResult.Union : type_exports.IsNever(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromArray4(left, right) {
-  return type_exports.IsObject(right) && IsObjectArrayLike(right) ? ExtendsResult.True : IsStructuralRight(right) ? StructuralRight(left, right) : !type_exports.IsArray(right) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right.items));
+function FromArray4(left, right2) {
+  return type_exports.IsObject(right2) && IsObjectArrayLike(right2) ? ExtendsResult.True : IsStructuralRight(right2) ? StructuralRight(left, right2) : !type_exports.IsArray(right2) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right2.items));
 }
-function FromAsyncIterator(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : !type_exports.IsAsyncIterator(right) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right.items));
+function FromAsyncIterator(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : !type_exports.IsAsyncIterator(right2) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right2.items));
 }
-function FromBigInt(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsBigInt(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromBigInt(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsBigInt(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromBooleanRight(left, right) {
+function FromBooleanRight(left, right2) {
   return type_exports.IsLiteralBoolean(left) ? ExtendsResult.True : type_exports.IsBoolean(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromBoolean(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsBoolean(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromBoolean(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsBoolean(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromConstructor(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : !type_exports.IsConstructor(right) ? ExtendsResult.False : left.parameters.length > right.parameters.length ? ExtendsResult.False : !left.parameters.every((schema, index) => IntoBooleanResult(Visit3(right.parameters[index], schema)) === ExtendsResult.True) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.returns, right.returns));
+function FromConstructor(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : !type_exports.IsConstructor(right2) ? ExtendsResult.False : left.parameters.length > right2.parameters.length ? ExtendsResult.False : !left.parameters.every((schema, index) => IntoBooleanResult(Visit3(right2.parameters[index], schema)) === ExtendsResult.True) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.returns, right2.returns));
 }
-function FromDate(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsDate(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromDate(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsDate(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromFunction(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : !type_exports.IsFunction(right) ? ExtendsResult.False : left.parameters.length > right.parameters.length ? ExtendsResult.False : !left.parameters.every((schema, index) => IntoBooleanResult(Visit3(right.parameters[index], schema)) === ExtendsResult.True) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.returns, right.returns));
+function FromFunction(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : !type_exports.IsFunction(right2) ? ExtendsResult.False : left.parameters.length > right2.parameters.length ? ExtendsResult.False : !left.parameters.every((schema, index) => IntoBooleanResult(Visit3(right2.parameters[index], schema)) === ExtendsResult.True) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.returns, right2.returns));
 }
-function FromIntegerRight(left, right) {
+function FromIntegerRight(left, right2) {
   return type_exports.IsLiteral(left) && value_exports.IsNumber(left.const) ? ExtendsResult.True : type_exports.IsNumber(left) || type_exports.IsInteger(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromInteger(left, right) {
-  return type_exports.IsInteger(right) || type_exports.IsNumber(right) ? ExtendsResult.True : IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : ExtendsResult.False;
+function FromInteger(left, right2) {
+  return type_exports.IsInteger(right2) || type_exports.IsNumber(right2) ? ExtendsResult.True : IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : ExtendsResult.False;
 }
-function FromIntersectRight(left, right) {
-  return right.allOf.every((schema) => Visit3(left, schema) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
+function FromIntersectRight(left, right2) {
+  return right2.allOf.every((schema) => Visit3(left, schema) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromIntersect4(left, right) {
-  return left.allOf.some((schema) => Visit3(schema, right) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
+function FromIntersect4(left, right2) {
+  return left.allOf.some((schema) => Visit3(schema, right2) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromIterator(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : !type_exports.IsIterator(right) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right.items));
+function FromIterator(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : !type_exports.IsIterator(right2) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.items, right2.items));
 }
-function FromLiteral2(left, right) {
-  return type_exports.IsLiteral(right) && right.const === left.const ? ExtendsResult.True : IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsString(right) ? FromStringRight(left, right) : type_exports.IsNumber(right) ? FromNumberRight(left, right) : type_exports.IsInteger(right) ? FromIntegerRight(left, right) : type_exports.IsBoolean(right) ? FromBooleanRight(left, right) : ExtendsResult.False;
+function FromLiteral2(left, right2) {
+  return type_exports.IsLiteral(right2) && right2.const === left.const ? ExtendsResult.True : IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsString(right2) ? FromStringRight(left, right2) : type_exports.IsNumber(right2) ? FromNumberRight(left, right2) : type_exports.IsInteger(right2) ? FromIntegerRight(left, right2) : type_exports.IsBoolean(right2) ? FromBooleanRight(left, right2) : ExtendsResult.False;
 }
-function FromNeverRight(left, right) {
+function FromNeverRight(left, right2) {
   return ExtendsResult.False;
 }
-function FromNever(left, right) {
+function FromNever(left, right2) {
   return ExtendsResult.True;
 }
 function UnwrapTNot(schema) {
@@ -240066,17 +240066,17 @@ function UnwrapTNot(schema) {
   }
   return depth % 2 === 0 ? current : Unknown();
 }
-function FromNot(left, right) {
-  return type_exports.IsNot(left) ? Visit3(UnwrapTNot(left), right) : type_exports.IsNot(right) ? Visit3(left, UnwrapTNot(right)) : Throw("Invalid fallthrough for Not");
+function FromNot(left, right2) {
+  return type_exports.IsNot(left) ? Visit3(UnwrapTNot(left), right2) : type_exports.IsNot(right2) ? Visit3(left, UnwrapTNot(right2)) : Throw("Invalid fallthrough for Not");
 }
-function FromNull(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsNull(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromNull(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsNull(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromNumberRight(left, right) {
+function FromNumberRight(left, right2) {
   return type_exports.IsLiteralNumber(left) ? ExtendsResult.True : type_exports.IsNumber(left) || type_exports.IsInteger(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromNumber(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsInteger(right) || type_exports.IsNumber(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromNumber(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsInteger(right2) || type_exports.IsNumber(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
 function IsObjectPropertyCount(schema, count2) {
   return Object.getOwnPropertyNames(schema.properties).length === count2;
@@ -240117,34 +240117,34 @@ function IsObjectPromiseLike(schema) {
   const then = Function2([Any()], Any());
   return IsObjectPropertyCount(schema, 0) || IsObjectPropertyCount(schema, 1) && "then" in schema.properties && IntoBooleanResult(Visit3(schema.properties["then"], then)) === ExtendsResult.True;
 }
-function Property(left, right) {
-  return Visit3(left, right) === ExtendsResult.False ? ExtendsResult.False : type_exports.IsOptional(left) && !type_exports.IsOptional(right) ? ExtendsResult.False : ExtendsResult.True;
+function Property(left, right2) {
+  return Visit3(left, right2) === ExtendsResult.False ? ExtendsResult.False : type_exports.IsOptional(left) && !type_exports.IsOptional(right2) ? ExtendsResult.False : ExtendsResult.True;
 }
-function FromObjectRight(left, right) {
-  return type_exports.IsUnknown(left) ? ExtendsResult.False : type_exports.IsAny(left) ? ExtendsResult.Union : type_exports.IsNever(left) || type_exports.IsLiteralString(left) && IsObjectStringLike(right) || type_exports.IsLiteralNumber(left) && IsObjectNumberLike(right) || type_exports.IsLiteralBoolean(left) && IsObjectBooleanLike(right) || type_exports.IsSymbol(left) && IsObjectSymbolLike(right) || type_exports.IsBigInt(left) && IsObjectBigIntLike(right) || type_exports.IsString(left) && IsObjectStringLike(right) || type_exports.IsSymbol(left) && IsObjectSymbolLike(right) || type_exports.IsNumber(left) && IsObjectNumberLike(right) || type_exports.IsInteger(left) && IsObjectNumberLike(right) || type_exports.IsBoolean(left) && IsObjectBooleanLike(right) || type_exports.IsUint8Array(left) && IsObjectUint8ArrayLike(right) || type_exports.IsDate(left) && IsObjectDateLike(right) || type_exports.IsConstructor(left) && IsObjectConstructorLike(right) || type_exports.IsFunction(left) && IsObjectFunctionLike(right) ? ExtendsResult.True : type_exports.IsRecord(left) && type_exports.IsString(RecordKey(left)) ? (() => {
-    return right[Hint] === "Record" ? ExtendsResult.True : ExtendsResult.False;
+function FromObjectRight(left, right2) {
+  return type_exports.IsUnknown(left) ? ExtendsResult.False : type_exports.IsAny(left) ? ExtendsResult.Union : type_exports.IsNever(left) || type_exports.IsLiteralString(left) && IsObjectStringLike(right2) || type_exports.IsLiteralNumber(left) && IsObjectNumberLike(right2) || type_exports.IsLiteralBoolean(left) && IsObjectBooleanLike(right2) || type_exports.IsSymbol(left) && IsObjectSymbolLike(right2) || type_exports.IsBigInt(left) && IsObjectBigIntLike(right2) || type_exports.IsString(left) && IsObjectStringLike(right2) || type_exports.IsSymbol(left) && IsObjectSymbolLike(right2) || type_exports.IsNumber(left) && IsObjectNumberLike(right2) || type_exports.IsInteger(left) && IsObjectNumberLike(right2) || type_exports.IsBoolean(left) && IsObjectBooleanLike(right2) || type_exports.IsUint8Array(left) && IsObjectUint8ArrayLike(right2) || type_exports.IsDate(left) && IsObjectDateLike(right2) || type_exports.IsConstructor(left) && IsObjectConstructorLike(right2) || type_exports.IsFunction(left) && IsObjectFunctionLike(right2) ? ExtendsResult.True : type_exports.IsRecord(left) && type_exports.IsString(RecordKey(left)) ? (() => {
+    return right2[Hint] === "Record" ? ExtendsResult.True : ExtendsResult.False;
   })() : type_exports.IsRecord(left) && type_exports.IsNumber(RecordKey(left)) ? (() => {
-    return IsObjectPropertyCount(right, 0) ? ExtendsResult.True : ExtendsResult.False;
+    return IsObjectPropertyCount(right2, 0) ? ExtendsResult.True : ExtendsResult.False;
   })() : ExtendsResult.False;
 }
-function FromObject(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : !type_exports.IsObject(right) ? ExtendsResult.False : (() => {
-    for (const key of Object.getOwnPropertyNames(right.properties)) {
-      if (!(key in left.properties) && !type_exports.IsOptional(right.properties[key])) {
+function FromObject(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : !type_exports.IsObject(right2) ? ExtendsResult.False : (() => {
+    for (const key of Object.getOwnPropertyNames(right2.properties)) {
+      if (!(key in left.properties) && !type_exports.IsOptional(right2.properties[key])) {
         return ExtendsResult.False;
       }
-      if (type_exports.IsOptional(right.properties[key])) {
+      if (type_exports.IsOptional(right2.properties[key])) {
         return ExtendsResult.True;
       }
-      if (Property(left.properties[key], right.properties[key]) === ExtendsResult.False) {
+      if (Property(left.properties[key], right2.properties[key]) === ExtendsResult.False) {
         return ExtendsResult.False;
       }
     }
     return ExtendsResult.True;
   })();
 }
-function FromPromise2(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) && IsObjectPromiseLike(right) ? ExtendsResult.True : !type_exports.IsPromise(right) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.item, right.item));
+function FromPromise2(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) && IsObjectPromiseLike(right2) ? ExtendsResult.True : !type_exports.IsPromise(right2) ? ExtendsResult.False : IntoBooleanResult(Visit3(left.item, right2.item));
 }
 function RecordKey(schema) {
   return PatternNumberExact in schema.patternProperties ? Number2() : PatternStringExact in schema.patternProperties ? String2() : Throw("Unknown record key pattern");
@@ -240152,8 +240152,8 @@ function RecordKey(schema) {
 function RecordValue(schema) {
   return PatternNumberExact in schema.patternProperties ? schema.patternProperties[PatternNumberExact] : PatternStringExact in schema.patternProperties ? schema.patternProperties[PatternStringExact] : Throw("Unable to get record value schema");
 }
-function FromRecordRight(left, right) {
-  const [Key, Value] = [RecordKey(right), RecordValue(right)];
+function FromRecordRight(left, right2) {
+  const [Key, Value] = [RecordKey(right2), RecordValue(right2)];
   return type_exports.IsLiteralString(left) && type_exports.IsNumber(Key) && IntoBooleanResult(Visit3(left, Value)) === ExtendsResult.True ? ExtendsResult.True : type_exports.IsUint8Array(left) && type_exports.IsNumber(Key) ? Visit3(left, Value) : type_exports.IsString(left) && type_exports.IsNumber(Key) ? Visit3(left, Value) : type_exports.IsArray(left) && type_exports.IsNumber(Key) ? Visit3(left, Value) : type_exports.IsObject(left) ? (() => {
     for (const key of Object.getOwnPropertyNames(left.properties)) {
       if (Property(Value, left.properties[key]) === ExtendsResult.False) {
@@ -240163,70 +240163,70 @@ function FromRecordRight(left, right) {
     return ExtendsResult.True;
   })() : ExtendsResult.False;
 }
-function FromRecord(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : !type_exports.IsRecord(right) ? ExtendsResult.False : Visit3(RecordValue(left), RecordValue(right));
+function FromRecord(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : !type_exports.IsRecord(right2) ? ExtendsResult.False : Visit3(RecordValue(left), RecordValue(right2));
 }
-function FromRegExp(left, right) {
+function FromRegExp(left, right2) {
   const L = type_exports.IsRegExp(left) ? String2() : left;
-  const R = type_exports.IsRegExp(right) ? String2() : right;
+  const R = type_exports.IsRegExp(right2) ? String2() : right2;
   return Visit3(L, R);
 }
-function FromStringRight(left, right) {
+function FromStringRight(left, right2) {
   return type_exports.IsLiteral(left) && value_exports.IsString(left.const) ? ExtendsResult.True : type_exports.IsString(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromString(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsString(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromString(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsString(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromSymbol(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsSymbol(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromSymbol(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsSymbol(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromTemplateLiteral2(left, right) {
-  return type_exports.IsTemplateLiteral(left) ? Visit3(TemplateLiteralToUnion(left), right) : type_exports.IsTemplateLiteral(right) ? Visit3(left, TemplateLiteralToUnion(right)) : Throw("Invalid fallthrough for TemplateLiteral");
+function FromTemplateLiteral2(left, right2) {
+  return type_exports.IsTemplateLiteral(left) ? Visit3(TemplateLiteralToUnion(left), right2) : type_exports.IsTemplateLiteral(right2) ? Visit3(left, TemplateLiteralToUnion(right2)) : Throw("Invalid fallthrough for TemplateLiteral");
 }
-function IsArrayOfTuple(left, right) {
-  return type_exports.IsArray(right) && left.items !== void 0 && left.items.every((schema) => Visit3(schema, right.items) === ExtendsResult.True);
+function IsArrayOfTuple(left, right2) {
+  return type_exports.IsArray(right2) && left.items !== void 0 && left.items.every((schema) => Visit3(schema, right2.items) === ExtendsResult.True);
 }
-function FromTupleRight(left, right) {
+function FromTupleRight(left, right2) {
   return type_exports.IsNever(left) ? ExtendsResult.True : type_exports.IsUnknown(left) ? ExtendsResult.False : type_exports.IsAny(left) ? ExtendsResult.Union : ExtendsResult.False;
 }
-function FromTuple3(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) && IsObjectArrayLike(right) ? ExtendsResult.True : type_exports.IsArray(right) && IsArrayOfTuple(left, right) ? ExtendsResult.True : !type_exports.IsTuple(right) ? ExtendsResult.False : value_exports.IsUndefined(left.items) && !value_exports.IsUndefined(right.items) || !value_exports.IsUndefined(left.items) && value_exports.IsUndefined(right.items) ? ExtendsResult.False : value_exports.IsUndefined(left.items) && !value_exports.IsUndefined(right.items) ? ExtendsResult.True : left.items.every((schema, index) => Visit3(schema, right.items[index]) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
+function FromTuple3(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) && IsObjectArrayLike(right2) ? ExtendsResult.True : type_exports.IsArray(right2) && IsArrayOfTuple(left, right2) ? ExtendsResult.True : !type_exports.IsTuple(right2) ? ExtendsResult.False : value_exports.IsUndefined(left.items) && !value_exports.IsUndefined(right2.items) || !value_exports.IsUndefined(left.items) && value_exports.IsUndefined(right2.items) ? ExtendsResult.False : value_exports.IsUndefined(left.items) && !value_exports.IsUndefined(right2.items) ? ExtendsResult.True : left.items.every((schema, index) => Visit3(schema, right2.items[index]) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromUint8Array(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsUint8Array(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromUint8Array(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsUint8Array(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromUndefined(left, right) {
-  return IsStructuralRight(right) ? StructuralRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsRecord(right) ? FromRecordRight(left, right) : type_exports.IsVoid(right) ? FromVoidRight(left, right) : type_exports.IsUndefined(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromUndefined(left, right2) {
+  return IsStructuralRight(right2) ? StructuralRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsRecord(right2) ? FromRecordRight(left, right2) : type_exports.IsVoid(right2) ? FromVoidRight(left, right2) : type_exports.IsUndefined(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromUnionRight(left, right) {
-  return right.anyOf.some((schema) => Visit3(left, schema) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
+function FromUnionRight(left, right2) {
+  return right2.anyOf.some((schema) => Visit3(left, schema) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromUnion6(left, right) {
-  return left.anyOf.every((schema) => Visit3(schema, right) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
+function FromUnion6(left, right2) {
+  return left.anyOf.every((schema) => Visit3(schema, right2) === ExtendsResult.True) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromUnknownRight(left, right) {
+function FromUnknownRight(left, right2) {
   return ExtendsResult.True;
 }
-function FromUnknown(left, right) {
-  return type_exports.IsNever(right) ? FromNeverRight(left, right) : type_exports.IsIntersect(right) ? FromIntersectRight(left, right) : type_exports.IsUnion(right) ? FromUnionRight(left, right) : type_exports.IsAny(right) ? FromAnyRight(left, right) : type_exports.IsString(right) ? FromStringRight(left, right) : type_exports.IsNumber(right) ? FromNumberRight(left, right) : type_exports.IsInteger(right) ? FromIntegerRight(left, right) : type_exports.IsBoolean(right) ? FromBooleanRight(left, right) : type_exports.IsArray(right) ? FromArrayRight(left, right) : type_exports.IsTuple(right) ? FromTupleRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsUnknown(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromUnknown(left, right2) {
+  return type_exports.IsNever(right2) ? FromNeverRight(left, right2) : type_exports.IsIntersect(right2) ? FromIntersectRight(left, right2) : type_exports.IsUnion(right2) ? FromUnionRight(left, right2) : type_exports.IsAny(right2) ? FromAnyRight(left, right2) : type_exports.IsString(right2) ? FromStringRight(left, right2) : type_exports.IsNumber(right2) ? FromNumberRight(left, right2) : type_exports.IsInteger(right2) ? FromIntegerRight(left, right2) : type_exports.IsBoolean(right2) ? FromBooleanRight(left, right2) : type_exports.IsArray(right2) ? FromArrayRight(left, right2) : type_exports.IsTuple(right2) ? FromTupleRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsUnknown(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromVoidRight(left, right) {
+function FromVoidRight(left, right2) {
   return type_exports.IsUndefined(left) ? ExtendsResult.True : type_exports.IsUndefined(left) ? ExtendsResult.True : ExtendsResult.False;
 }
-function FromVoid(left, right) {
-  return type_exports.IsIntersect(right) ? FromIntersectRight(left, right) : type_exports.IsUnion(right) ? FromUnionRight(left, right) : type_exports.IsUnknown(right) ? FromUnknownRight(left, right) : type_exports.IsAny(right) ? FromAnyRight(left, right) : type_exports.IsObject(right) ? FromObjectRight(left, right) : type_exports.IsVoid(right) ? ExtendsResult.True : ExtendsResult.False;
+function FromVoid(left, right2) {
+  return type_exports.IsIntersect(right2) ? FromIntersectRight(left, right2) : type_exports.IsUnion(right2) ? FromUnionRight(left, right2) : type_exports.IsUnknown(right2) ? FromUnknownRight(left, right2) : type_exports.IsAny(right2) ? FromAnyRight(left, right2) : type_exports.IsObject(right2) ? FromObjectRight(left, right2) : type_exports.IsVoid(right2) ? ExtendsResult.True : ExtendsResult.False;
 }
-function Visit3(left, right) {
+function Visit3(left, right2) {
   return (
     // resolvable
-    type_exports.IsTemplateLiteral(left) || type_exports.IsTemplateLiteral(right) ? FromTemplateLiteral2(left, right) : type_exports.IsRegExp(left) || type_exports.IsRegExp(right) ? FromRegExp(left, right) : type_exports.IsNot(left) || type_exports.IsNot(right) ? FromNot(left, right) : (
+    type_exports.IsTemplateLiteral(left) || type_exports.IsTemplateLiteral(right2) ? FromTemplateLiteral2(left, right2) : type_exports.IsRegExp(left) || type_exports.IsRegExp(right2) ? FromRegExp(left, right2) : type_exports.IsNot(left) || type_exports.IsNot(right2) ? FromNot(left, right2) : (
       // standard
-      type_exports.IsAny(left) ? FromAny(left, right) : type_exports.IsArray(left) ? FromArray4(left, right) : type_exports.IsBigInt(left) ? FromBigInt(left, right) : type_exports.IsBoolean(left) ? FromBoolean(left, right) : type_exports.IsAsyncIterator(left) ? FromAsyncIterator(left, right) : type_exports.IsConstructor(left) ? FromConstructor(left, right) : type_exports.IsDate(left) ? FromDate(left, right) : type_exports.IsFunction(left) ? FromFunction(left, right) : type_exports.IsInteger(left) ? FromInteger(left, right) : type_exports.IsIntersect(left) ? FromIntersect4(left, right) : type_exports.IsIterator(left) ? FromIterator(left, right) : type_exports.IsLiteral(left) ? FromLiteral2(left, right) : type_exports.IsNever(left) ? FromNever(left, right) : type_exports.IsNull(left) ? FromNull(left, right) : type_exports.IsNumber(left) ? FromNumber(left, right) : type_exports.IsObject(left) ? FromObject(left, right) : type_exports.IsRecord(left) ? FromRecord(left, right) : type_exports.IsString(left) ? FromString(left, right) : type_exports.IsSymbol(left) ? FromSymbol(left, right) : type_exports.IsTuple(left) ? FromTuple3(left, right) : type_exports.IsPromise(left) ? FromPromise2(left, right) : type_exports.IsUint8Array(left) ? FromUint8Array(left, right) : type_exports.IsUndefined(left) ? FromUndefined(left, right) : type_exports.IsUnion(left) ? FromUnion6(left, right) : type_exports.IsUnknown(left) ? FromUnknown(left, right) : type_exports.IsVoid(left) ? FromVoid(left, right) : Throw(`Unknown left type operand '${left[Kind]}'`)
+      type_exports.IsAny(left) ? FromAny(left, right2) : type_exports.IsArray(left) ? FromArray4(left, right2) : type_exports.IsBigInt(left) ? FromBigInt(left, right2) : type_exports.IsBoolean(left) ? FromBoolean(left, right2) : type_exports.IsAsyncIterator(left) ? FromAsyncIterator(left, right2) : type_exports.IsConstructor(left) ? FromConstructor(left, right2) : type_exports.IsDate(left) ? FromDate(left, right2) : type_exports.IsFunction(left) ? FromFunction(left, right2) : type_exports.IsInteger(left) ? FromInteger(left, right2) : type_exports.IsIntersect(left) ? FromIntersect4(left, right2) : type_exports.IsIterator(left) ? FromIterator(left, right2) : type_exports.IsLiteral(left) ? FromLiteral2(left, right2) : type_exports.IsNever(left) ? FromNever(left, right2) : type_exports.IsNull(left) ? FromNull(left, right2) : type_exports.IsNumber(left) ? FromNumber(left, right2) : type_exports.IsObject(left) ? FromObject(left, right2) : type_exports.IsRecord(left) ? FromRecord(left, right2) : type_exports.IsString(left) ? FromString(left, right2) : type_exports.IsSymbol(left) ? FromSymbol(left, right2) : type_exports.IsTuple(left) ? FromTuple3(left, right2) : type_exports.IsPromise(left) ? FromPromise2(left, right2) : type_exports.IsUint8Array(left) ? FromUint8Array(left, right2) : type_exports.IsUndefined(left) ? FromUndefined(left, right2) : type_exports.IsUnion(left) ? FromUnion6(left, right2) : type_exports.IsUnknown(left) ? FromUnknown(left, right2) : type_exports.IsVoid(left) ? FromVoid(left, right2) : Throw(`Unknown left type operand '${left[Kind]}'`)
     )
   );
 }
-function ExtendsCheck(left, right) {
-  return Visit3(left, right);
+function ExtendsCheck(left, right2) {
+  return Visit3(left, right2);
 }
 
 // node_modules/.pnpm/@sinclair+typebox@0.34.52/node_modules/@sinclair/typebox/build/esm/type/extends/extends-from-mapped-result.mjs
@@ -240245,8 +240245,8 @@ function ExtendsFromMappedResult(Left, Right, True, False, options) {
 }
 
 // node_modules/.pnpm/@sinclair+typebox@0.34.52/node_modules/@sinclair/typebox/build/esm/type/extends/extends.mjs
-function ExtendsResolve(left, right, trueType, falseType) {
-  const R = ExtendsCheck(left, right);
+function ExtendsResolve(left, right2, trueType, falseType) {
+  const R = ExtendsCheck(left, right2);
   return R === ExtendsResult.Union ? Union([trueType, falseType]) : R === ExtendsResult.True ? trueType : falseType;
 }
 function Extends(L, R, T, F, options) {
@@ -244089,42 +244089,42 @@ function Get3(value, pointer) {
 }
 
 // node_modules/.pnpm/@sinclair+typebox@0.34.52/node_modules/@sinclair/typebox/build/esm/value/equal/equal.mjs
-function ObjectType3(left, right) {
-  if (!IsObject2(right))
+function ObjectType3(left, right2) {
+  if (!IsObject2(right2))
     return false;
   const leftKeys = [...Object.keys(left), ...Object.getOwnPropertySymbols(left)];
-  const rightKeys = [...Object.keys(right), ...Object.getOwnPropertySymbols(right)];
+  const rightKeys = [...Object.keys(right2), ...Object.getOwnPropertySymbols(right2)];
   if (leftKeys.length !== rightKeys.length)
     return false;
-  return leftKeys.every((key) => Equal(left[key], right[key]));
+  return leftKeys.every((key) => Equal(left[key], right2[key]));
 }
-function DateType3(left, right) {
-  return IsDate2(right) && left.getTime() === right.getTime();
+function DateType3(left, right2) {
+  return IsDate2(right2) && left.getTime() === right2.getTime();
 }
-function ArrayType3(left, right) {
-  if (!IsArray2(right) || left.length !== right.length)
+function ArrayType3(left, right2) {
+  if (!IsArray2(right2) || left.length !== right2.length)
     return false;
-  return left.every((value, index) => Equal(value, right[index]));
+  return left.every((value, index) => Equal(value, right2[index]));
 }
-function TypedArrayType(left, right) {
-  if (!IsTypedArray(right) || left.length !== right.length || Object.getPrototypeOf(left).constructor.name !== Object.getPrototypeOf(right).constructor.name)
+function TypedArrayType(left, right2) {
+  if (!IsTypedArray(right2) || left.length !== right2.length || Object.getPrototypeOf(left).constructor.name !== Object.getPrototypeOf(right2).constructor.name)
     return false;
-  return left.every((value, index) => Equal(value, right[index]));
+  return left.every((value, index) => Equal(value, right2[index]));
 }
-function ValueType(left, right) {
-  return left === right;
+function ValueType(left, right2) {
+  return left === right2;
 }
-function Equal(left, right) {
+function Equal(left, right2) {
   if (IsDate2(left))
-    return DateType3(left, right);
+    return DateType3(left, right2);
   if (IsTypedArray(left))
-    return TypedArrayType(left, right);
+    return TypedArrayType(left, right2);
   if (IsArray2(left))
-    return ArrayType3(left, right);
+    return ArrayType3(left, right2);
   if (IsObject2(left))
-    return ObjectType3(left, right);
+    return ObjectType3(left, right2);
   if (IsValueType(left))
-    return ValueType(left, right);
+    return ValueType(left, right2);
   throw new Error("ValueEquals: Unable to compare value");
 }
 
@@ -244612,6 +244612,9 @@ var LayoutPositionSchema = closedObject({
     })
   )
 });
+var AssetMetadataSchema = closedObject({
+  name: Type.String({ minLength: 1 })
+});
 var DesignNodeV2Schema = closedObject({
   id: Type.String({ minLength: 1 }),
   type: Type.String({ minLength: 1 }),
@@ -244624,6 +244627,7 @@ var DesignNodeV2Schema = closedObject({
   appearance: AppearanceSchema,
   text: Type.Optional(TextContentSchema2),
   component: Type.Optional(ComponentReferenceSchema),
+  asset: Type.Optional(AssetMetadataSchema),
   source: closedObject({
     provider: Type.Literal("pixso"),
     nodeId: Type.String({ minLength: 1 })
@@ -245203,6 +245207,37 @@ var ReactCompositionRecipeSchema = closedObject({
   slots: Type.Array(ReactCompositionSlotSchema),
   provenance: RecipeProvenanceSchema
 });
+var ReactSingleSelectionCollectionRecipeSchema = closedObject({
+  kind: Type.Literal("single-selection-collection"),
+  semanticRole: Type.Literal("choicePanel"),
+  rootComponentId: Type.String({ minLength: 1 }),
+  optionComponentId: Type.String({ minLength: 1 }),
+  layoutComponentId: Type.String({ minLength: 1 }),
+  titleComponentId: Type.String({ minLength: 1 }),
+  descriptionComponentId: Type.String({ minLength: 1 }),
+  leadingAssetComponentId: Type.Optional(Type.String({ minLength: 1 })),
+  trailingAssetComponentId: Type.Optional(Type.String({ minLength: 1 })),
+  sources: closedObject({
+    title: Type.Literal("content.title"),
+    sections: Type.Literal("content.sections"),
+    selectedValue: Type.Literal("state.selectedOptionId")
+  }),
+  rootProps: closedObject({
+    valueTarget: Type.String({ minLength: 1 }),
+    emptyValue: Type.Literal(""),
+    onChangeTarget: Type.String({ minLength: 1 }),
+    onChangeValue: Type.Literal("noop"),
+    directionTarget: Type.String({ minLength: 1 }),
+    directionValue: Type.Literal("column"),
+    groupNameTarget: Type.String({ minLength: 1 }),
+    groupNameSource: Type.Literal("content.title")
+  }),
+  optionProps: closedObject({
+    valueTarget: Type.String({ minLength: 1 }),
+    valueSource: Type.Literal("option.id")
+  }),
+  provenance: RecipeProvenanceSchema
+});
 var ReactRenderRecipesV1Schema = closedObject({
   schema: Type.Literal("react-render-recipes/v1"),
   components: Type.Array(ReactComponentRecipeV1Schema),
@@ -245211,7 +245246,10 @@ var ReactRenderRecipesV1Schema = closedObject({
 var ReactRenderRecipesV2Schema = closedObject({
   schema: Type.Literal("react-render-recipes/v2"),
   components: Type.Array(ReactComponentRecipeV2Schema),
-  compositions: Type.Array(ReactCompositionRecipeSchema)
+  compositions: Type.Array(ReactCompositionRecipeSchema),
+  singleSelectionCollections: Type.Optional(
+    Type.Array(ReactSingleSelectionCollectionRecipeSchema)
+  )
 });
 var ReactRenderRecipesSchema = Type.Union([
   ReactRenderRecipesV1Schema,
@@ -245484,6 +245522,44 @@ function stableStringify(value) {
 }
 
 // packages/contracts/src/ui-manifest-v2.ts
+var ChoicePanelIconHintSchema = closedObject({
+  hint: Type.String({ minLength: 1 }),
+  sourceNodeId: Type.String({ minLength: 1 })
+});
+var ChoicePanelOptionSchema = closedObject({
+  id: Type.String({ minLength: 1 }),
+  sourceNodeIds: Type.Array(Type.String({ minLength: 1 }), { minItems: 1 }),
+  label: Type.String({ minLength: 1 }),
+  labelSourceNodeId: Type.String({ minLength: 1 }),
+  description: Type.Optional(Type.String({ minLength: 1 })),
+  descriptionSourceNodeIds: Type.Optional(
+    Type.Array(Type.String({ minLength: 1 }), { minItems: 1 })
+  ),
+  info: Type.Optional(
+    closedObject({
+      present: Type.Literal(true),
+      hint: Type.String({ minLength: 1 }),
+      sourceNodeId: Type.String({ minLength: 1 })
+    })
+  ),
+  selected: Type.Boolean()
+});
+var ChoicePanelSectionSchema = closedObject({
+  id: Type.String({ minLength: 1 }),
+  label: Type.Optional(Type.String({ minLength: 1 })),
+  labelSourceNodeId: Type.Optional(Type.String({ minLength: 1 })),
+  options: Type.Array(ChoicePanelOptionSchema)
+});
+var ChoicePanelContentSchema = closedObject({
+  title: Type.String({ minLength: 1 }),
+  titleSourceNodeId: Type.String({ minLength: 1 }),
+  headerIcon: Type.Optional(ChoicePanelIconHintSchema),
+  sections: Type.Array(ChoicePanelSectionSchema, { minItems: 1 })
+});
+var ChoicePanelStateSchema = closedObject({
+  selectionMode: Type.Literal("single"),
+  selectedOptionId: Type.Union([Type.String({ minLength: 1 }), Type.Null()])
+});
 var UiInteractionSchema = closedObject({
   key: Type.String({ pattern: "^[A-Za-z0-9][A-Za-z0-9_-]*$" }),
   event: Type.Union([Type.Literal("activate"), Type.Literal("change")]),
@@ -245533,6 +245609,20 @@ function visitUiNode(node, ir) {
       `V2_CONTRACT_INTEGRITY: layout source "${node.layoutSourceNodeId}" for "${node.id}" is missing from DesignIR`
     );
   }
+  if (node.role === "choicePanel") {
+    try {
+      const content = validateWithSchema(
+        ChoicePanelContentSchema,
+        node.content
+      );
+      const state = validateWithSchema(ChoicePanelStateSchema, node.state);
+      assertChoicePanelIntegrity(node, ir, content, state);
+    } catch (error46) {
+      throw new Error(
+        `V2_CONTRACT_INTEGRITY: invalid choicePanel "${node.id}": ${error46 instanceof Error ? error46.message : String(error46)}`
+      );
+    }
+  }
   const interactionKeys = /* @__PURE__ */ new Set();
   for (const interaction of node.interactions ?? []) {
     if (interactionKeys.has(interaction.key)) {
@@ -245554,6 +245644,78 @@ function visitUiNode(node, ir) {
   }
   for (const child of node.children) {
     visitUiNode(child, ir);
+  }
+}
+function assertChoicePanelIntegrity(node, ir, content, state) {
+  const structuredSourceNodeIds = /* @__PURE__ */ new Set([content.titleSourceNodeId]);
+  const sectionIds = /* @__PURE__ */ new Set();
+  const optionIds = /* @__PURE__ */ new Set();
+  const options = [];
+  if (content.headerIcon) {
+    structuredSourceNodeIds.add(content.headerIcon.sourceNodeId);
+  }
+  for (const section of content.sections) {
+    if (sectionIds.has(section.id)) {
+      throw new Error(`duplicate section ID "${section.id}"`);
+    }
+    sectionIds.add(section.id);
+    if (Boolean(section.label) !== Boolean(section.labelSourceNodeId)) {
+      throw new Error(
+        `section "${section.id}" label and labelSourceNodeId must occur together`
+      );
+    }
+    if (section.labelSourceNodeId) {
+      structuredSourceNodeIds.add(section.labelSourceNodeId);
+    }
+    for (const option of section.options) {
+      if (optionIds.has(option.id)) {
+        throw new Error(`duplicate option ID "${option.id}"`);
+      }
+      optionIds.add(option.id);
+      options.push(option);
+      if (Boolean(option.description) !== Boolean(option.descriptionSourceNodeIds)) {
+        throw new Error(
+          `option "${option.id}" description and descriptionSourceNodeIds must occur together`
+        );
+      }
+      option.sourceNodeIds.forEach(
+        (sourceNodeId) => structuredSourceNodeIds.add(sourceNodeId)
+      );
+      structuredSourceNodeIds.add(option.labelSourceNodeId);
+      option.descriptionSourceNodeIds?.forEach(
+        (sourceNodeId) => structuredSourceNodeIds.add(sourceNodeId)
+      );
+      if (option.info) {
+        structuredSourceNodeIds.add(option.info.sourceNodeId);
+      }
+    }
+  }
+  if (options.length < 2) {
+    throw new Error("choicePanel must contain at least two options");
+  }
+  const selectedOptions = options.filter((option) => option.selected);
+  if (state.selectedOptionId === null) {
+    if (selectedOptions.length > 0) {
+      throw new Error(
+        "choicePanel selected flags must be false when selectedOptionId is null"
+      );
+    }
+  } else if (!optionIds.has(state.selectedOptionId) || selectedOptions.length !== 1 || selectedOptions[0]?.id !== state.selectedOptionId) {
+    throw new Error(
+      `choicePanel selectedOptionId "${state.selectedOptionId}" does not match exactly one selected option`
+    );
+  }
+  for (const sourceNodeId of structuredSourceNodeIds) {
+    if (!(sourceNodeId in ir.nodes)) {
+      throw new Error(
+        `structured source "${sourceNodeId}" is missing from DesignIR`
+      );
+    }
+    if (!node.sourceNodeIds.includes(sourceNodeId)) {
+      throw new Error(
+        `structured source "${sourceNodeId}" is not a source node of "${node.id}"`
+      );
+    }
   }
 }
 
@@ -246015,8 +246177,8 @@ function count(values) {
   }
   return counts;
 }
-function compareBindings(left, right) {
-  return left.package.localeCompare(right.package) || left.exportKind.localeCompare(right.exportKind) || left.export.localeCompare(right.export) || left.componentId.localeCompare(right.componentId);
+function compareBindings(left, right2) {
+  return left.package.localeCompare(right2.package) || left.exportKind.localeCompare(right2.exportKind) || left.export.localeCompare(right2.export) || left.componentId.localeCompare(right2.componentId);
 }
 function bindingKey(binding2) {
   return [
@@ -246139,13 +246301,13 @@ function buildPropsModel(node, resolution, recipe) {
   }
   return {
     elementProps: elementProps.sort(
-      (left, right) => left.name.localeCompare(right.name)
+      (left, right2) => left.name.localeCompare(right2.name)
     ),
     externalProps: [...generatedByName.values()].sort(
-      (left, right) => left.name.localeCompare(right.name)
+      (left, right2) => left.name.localeCompare(right2.name)
     ),
     renderOnlyPropNames: [...renderOnlyNames].sort(
-      (left, right) => left.localeCompare(right)
+      (left, right2) => left.localeCompare(right2)
     ),
     ...textChild ? { textChild } : {}
   };
@@ -246354,6 +246516,84 @@ function buildStyleModel(input) {
     requiresRelativeParent
   };
 }
+function buildSingleSelectionStyleModel(input) {
+  const root = buildStyleModel({
+    node: input.node,
+    designNode: input.designNode,
+    componentId: input.rootComponentId,
+    recipe: {
+      componentId: input.rootComponentId,
+      staticProps: [],
+      stateProps: [],
+      eventProps: [],
+      semanticChildrenPolicy: "required",
+      wrapper: "allowed",
+      provenance: {
+        kind: "generator",
+        source: "single-selection structural lowering"
+      }
+    },
+    policy: input.policy
+  });
+  const rootRules = root.rules.map((rule) => ({
+    ...rule,
+    className: input.classNames.root
+  }));
+  const fixedRules = [
+    {
+      className: input.classNames.header,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "row" },
+        { property: "alignItems", value: "center" },
+        { property: "gap", value: "12px" }
+      ]
+    },
+    {
+      className: input.classNames.section,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "column" },
+        { property: "gap", value: "12px" }
+      ]
+    },
+    {
+      className: input.classNames.sectionLabel,
+      declarations: [{ property: "width", value: "100%" }]
+    },
+    {
+      className: input.classNames.optionRow,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "row" },
+        { property: "alignItems", value: "flex-start" },
+        { property: "gap", value: "12px" }
+      ]
+    },
+    {
+      className: input.classNames.optionContent,
+      declarations: [
+        { property: "display", value: "flex" },
+        { property: "flexDirection", value: "column" },
+        { property: "gap", value: "4px" },
+        { property: "width", value: "100%" }
+      ]
+    },
+    {
+      className: input.classNames.description,
+      declarations: [{ property: "width", value: "100%" }]
+    },
+    {
+      className: input.classNames.trailingAsset,
+      declarations: [{ property: "alignSelf", value: "flex-start" }]
+    }
+  ];
+  return {
+    rules: [...rootRules, ...fixedRules],
+    diagnostics: root.diagnostics,
+    requiresRelativeParent: false
+  };
+}
 function allowedProperties(policy, componentId) {
   if (!componentId) return new Set(propertyOrder);
   const component = policy.components.find(
@@ -246443,8 +246683,8 @@ function forbiddenStyleDiagnostic(node, property) {
 }
 function sortDiagnostics(diagnostics) {
   return diagnostics.sort(
-    (left, right) => left.code.localeCompare(right.code) || String(left.evidence?.property ?? "").localeCompare(
-      String(right.evidence?.property ?? "")
+    (left, right2) => left.code.localeCompare(right2.code) || String(left.evidence?.property ?? "").localeCompare(
+      String(right2.evidence?.property ?? "")
     )
   );
 }
@@ -246481,6 +246721,118 @@ function buildFallbackModel(input) {
 function pascalIdentifier(value) {
   const normalized = value.split(/[^A-Za-z0-9]+/).filter(Boolean).map((part) => `${part[0]?.toUpperCase() ?? ""}${part.slice(1)}`).join("");
   return normalized || "GeneratedFallback";
+}
+
+// packages/generator-react/src/build-single-selection-model.ts
+function buildSingleSelectionModel(input) {
+  if (input.node.role !== input.recipe.semanticRole) {
+    invalid("Structured recipe role does not match the manifest node");
+  }
+  const content = input.node.content;
+  const state = input.node.state;
+  if (!content || !state || state.selectionMode !== "single") {
+    invalid("Choice panel content or state is incomplete");
+  }
+  const requiredIds = [
+    input.recipe.rootComponentId,
+    input.recipe.optionComponentId,
+    input.recipe.layoutComponentId,
+    input.recipe.titleComponentId,
+    input.recipe.descriptionComponentId
+  ];
+  const resolvedIds = new Set(
+    input.resolution.bindings.map((binding2) => binding2.componentId)
+  );
+  for (const componentId of requiredIds) {
+    if (!resolvedIds.has(componentId) || !input.localNames.has(componentId)) {
+      invalid(`Required structured binding ${componentId} is unavailable`);
+    }
+  }
+  const optionalLocalName = (componentId) => componentId && resolvedIds.has(componentId) ? input.localNames.get(componentId) : void 0;
+  const leadingAssetLocalName = optionalLocalName(
+    input.recipe.leadingAssetComponentId
+  );
+  const trailingAssetLocalName = optionalLocalName(
+    input.recipe.trailingAssetComponentId
+  );
+  const rootProps = [
+    {
+      name: input.recipe.rootProps.valueTarget,
+      value: {
+        kind: "literal",
+        value: state.selectedOptionId ?? input.recipe.rootProps.emptyValue
+      }
+    },
+    {
+      name: input.recipe.rootProps.onChangeTarget,
+      value: { kind: "noop" }
+    },
+    {
+      name: input.recipe.rootProps.directionTarget,
+      value: {
+        kind: "literal",
+        value: input.recipe.rootProps.directionValue
+      }
+    },
+    {
+      name: input.recipe.rootProps.groupNameTarget,
+      value: { kind: "literal", value: content.title }
+    }
+  ];
+  return {
+    kind: "single-selection-collection",
+    nodeId: input.node.id,
+    sourceNodeIds: input.node.sourceNodeIds,
+    rootComponentId: input.recipe.rootComponentId,
+    rootLocalName: input.localNames.get(input.recipe.rootComponentId),
+    localName: input.localNames.get(input.recipe.rootComponentId),
+    props: rootProps,
+    optionComponentId: input.recipe.optionComponentId,
+    optionLocalName: input.localNames.get(input.recipe.optionComponentId),
+    layoutComponentId: input.recipe.layoutComponentId,
+    layoutLocalName: input.localNames.get(input.recipe.layoutComponentId),
+    titleComponentId: input.recipe.titleComponentId,
+    titleLocalName: input.localNames.get(input.recipe.titleComponentId),
+    descriptionComponentId: input.recipe.descriptionComponentId,
+    descriptionLocalName: input.localNames.get(
+      input.recipe.descriptionComponentId
+    ),
+    ...leadingAssetLocalName ? { leadingAssetLocalName } : {},
+    ...trailingAssetLocalName ? { trailingAssetLocalName } : {},
+    title: content.title,
+    rootProps,
+    sections: content.sections.map((section) => ({
+      id: section.id,
+      ...section.label ? { label: section.label } : {},
+      options: section.options.map((option) => ({
+        id: option.id,
+        sourceNodeIds: option.sourceNodeIds,
+        label: option.label,
+        ...option.description ? { description: option.description } : {},
+        hasTrailingAsset: option.info?.present === true && optionalLocalName(input.recipe.trailingAssetComponentId) !== void 0,
+        props: [
+          {
+            name: input.recipe.optionProps.valueTarget,
+            value: { kind: "literal", value: option.id }
+          }
+        ]
+      }))
+    })),
+    classNames: {
+      root: "choicePanel",
+      header: "choicePanelHeader",
+      section: "choiceSection",
+      sectionLabel: "choiceSectionLabel",
+      optionRow: "choiceOptionRow",
+      optionContent: "choiceOptionContent",
+      description: "choiceDescription",
+      trailingAsset: "choiceTrailingAsset"
+    },
+    children: []
+  };
+}
+function invalid(message) {
+  throw new ReactGenerationError("GENERATION_INPUT_INVALID", message);
 }
 
 // packages/generator-react/src/place-composition-slots.ts
@@ -246560,6 +246912,35 @@ function buildReactGenerationModel(input) {
         "GENERATION_INPUT_INVALID",
         `Node ${node.id} has no usable resolution`
       );
+    }
+    const structuredRecipe = input.pack.reactRenderRecipes.singleSelectionCollections?.find(
+      (candidate2) => candidate2.semanticRole === node.role
+    );
+    if (structuredRecipe) {
+      if (resolution.decision !== "compose") {
+        throw new ReactGenerationError(
+          "GENERATION_INPUT_INVALID",
+          `Structured node ${node.id} must have a compose resolution`
+        );
+      }
+      const structured = buildSingleSelectionModel({
+        node,
+        resolution,
+        recipe: structuredRecipe,
+        localNames
+      });
+      mergeStyleResult(
+        styles,
+        diagnostics,
+        buildSingleSelectionStyleModel({
+          node,
+          designNode: requireDesignNode(input, node),
+          rootComponentId: structured.rootComponentId,
+          policy: input.pack.reactStylePolicy,
+          classNames: structured.classNames
+        })
+      );
+      return structured;
     }
     if (resolution.decision === "fallback") {
       const designNode = requireDesignNode(input, node);
@@ -246713,18 +247094,18 @@ function buildReactGenerationModel(input) {
   return {
     imports,
     externalProps: [...externalProps.values()].sort(
-      (left, right) => left.name.localeCompare(right.name)
+      (left, right2) => left.name.localeCompare(right2.name)
     ),
     renderOnlyProps: renderOnlyProps.sort(
-      (left, right) => left.manifestNodeId.localeCompare(right.manifestNodeId) || left.componentId.localeCompare(right.componentId)
+      (left, right2) => left.manifestNodeId.localeCompare(right2.manifestNodeId) || left.componentId.localeCompare(right2.componentId)
     ),
     styles: deduplicateStyles(styles),
     fallbacks: fallbacks.sort(
-      (left, right) => left.localComponentName.localeCompare(right.localComponentName) || left.nodeId.localeCompare(right.nodeId)
+      (left, right2) => left.localComponentName.localeCompare(right2.localComponentName) || left.nodeId.localeCompare(right2.nodeId)
     ),
     diagnostics: diagnostics.sort(
-      (left, right) => left.code.localeCompare(right.code) || String(left.evidence?.manifestNodeId ?? "").localeCompare(
-        String(right.evidence?.manifestNodeId ?? "")
+      (left, right2) => left.code.localeCompare(right2.code) || String(left.evidence?.manifestNodeId ?? "").localeCompare(
+        String(right2.evidence?.manifestNodeId ?? "")
       )
     ),
     root
@@ -246766,7 +247147,7 @@ function deduplicateStyles(styles) {
     stylesByClassName.set(style.className, existing ?? style);
   }
   return [...stylesByClassName.values()].sort(
-    (left, right) => left.className.localeCompare(right.className)
+    (left, right2) => left.className.localeCompare(right2.className)
   );
 }
 function findCompositionRoot(input, resolution) {
@@ -246909,7 +247290,7 @@ var cssProperties = {
 };
 var propertyOrder2 = Object.keys(cssProperties);
 function emitCssModule(styles) {
-  const rules = [...styles].map(validateRule).sort((left, right) => left.className.localeCompare(right.className));
+  const rules = [...styles].map(validateRule).sort((left, right2) => left.className.localeCompare(right2.className));
   return rules.map(
     (rule) => `.${rule.className} {
 ${rule.declarations.map(
@@ -246920,46 +247301,46 @@ ${rule.declarations.map(
 }
 function validateRule(rule) {
   if (!CLASS_NAME.test(rule.className)) {
-    invalid(`Unsafe CSS Module class name ${JSON.stringify(rule.className)}`);
+    invalid2(`Unsafe CSS Module class name ${JSON.stringify(rule.className)}`);
   }
   const seen = /* @__PURE__ */ new Set();
   const declarations = [...rule.declarations].map((declaration) => validateDeclaration(declaration, seen)).sort(
-    (left, right) => propertyOrder2.indexOf(left.property) - propertyOrder2.indexOf(right.property)
+    (left, right2) => propertyOrder2.indexOf(left.property) - propertyOrder2.indexOf(right2.property)
   );
   return { className: rule.className, declarations };
 }
 function validateDeclaration(declaration, seen) {
   if (!Object.hasOwn(cssProperties, declaration.property)) {
-    invalid(`Unsupported CSS property ${JSON.stringify(declaration.property)}`);
+    invalid2(`Unsupported CSS property ${JSON.stringify(declaration.property)}`);
   }
   if (seen.has(declaration.property)) {
-    invalid(`Duplicate CSS property ${declaration.property}`);
+    invalid2(`Duplicate CSS property ${declaration.property}`);
   }
   if (typeof declaration.value !== "string" || declaration.value.includes("!important") || /[;{}]|\/\*/.test(declaration.value)) {
-    invalid(`CSS declaration ${declaration.property} contains unsafe syntax`);
+    invalid2(`CSS declaration ${declaration.property} contains unsafe syntax`);
   }
   seen.add(declaration.property);
   return declaration;
 }
-function invalid(message) {
+function invalid2(message) {
   throw new ReactGenerationError("GENERATION_SOURCE_INVALID", message);
 }
 
 // packages/generator-react/src/emit-tsx.ts
 var import_typescript = __toESM(require_typescript(), 1);
 var factory = import_typescript.default.factory;
-function emitTsx(model, componentName2, generatedRelativeImports = []) {
+function emitTsx(model, componentName, generatedRelativeImports = []) {
   const needsStyles = containsClassName(model.root);
   const statements = [
-    ...emitImports(model, componentName2, needsStyles, generatedRelativeImports),
-    emitPropsInterface(componentName2, model.externalProps),
-    emitComponent(componentName2, model.externalProps, model.root)
+    ...emitImports(model, componentName, needsStyles, generatedRelativeImports),
+    emitPropsInterface(componentName, model.externalProps),
+    emitComponent(componentName, model.externalProps, model.root)
   ];
   return printStatements(statements);
 }
 function emitFallbackTsx(fallback) {
-  const componentName2 = fallback.localComponentName;
-  const propsName = `${componentName2}Props`;
+  const componentName = fallback.localComponentName;
+  const propsName = `${componentName}Props`;
   const statements = [
     factory.createImportDeclaration(
       void 0,
@@ -246984,7 +247365,7 @@ function emitFallbackTsx(fallback) {
         factory.createIdentifier("styles"),
         void 0
       ),
-      factory.createStringLiteral(`./${componentName2}.module.css`),
+      factory.createStringLiteral(`./${componentName}.module.css`),
       void 0
     ),
     factory.createInterfaceDeclaration(
@@ -247004,7 +247385,7 @@ function emitFallbackTsx(fallback) {
     factory.createFunctionDeclaration(
       [factory.createModifier(import_typescript.default.SyntaxKind.ExportKeyword)],
       void 0,
-      factory.createIdentifier(componentName2),
+      factory.createIdentifier(componentName),
       void 0,
       [
         factory.createParameterDeclaration(
@@ -247075,7 +247456,7 @@ function printStatements(statements) {
   );
   return import_typescript.default.createPrinter({ newLine: import_typescript.default.NewLineKind.LineFeed }).printFile(file2).trimEnd() + "\n";
 }
-function emitImports(model, componentName2, needsStyles, generatedRelativeImports) {
+function emitImports(model, componentName, needsStyles, generatedRelativeImports) {
   const imports = model.imports.map((item) => {
     const importClause = item.kind === "default" ? factory.createImportClause(
       false,
@@ -247103,8 +247484,8 @@ function emitImports(model, componentName2, needsStyles, generatedRelativeImport
   });
   imports.push(
     ...[...generatedRelativeImports].sort(
-      (left, right) => left.path.localeCompare(right.path) || JSON.stringify(left.specifiers).localeCompare(
-        JSON.stringify(right.specifiers)
+      (left, right2) => left.path.localeCompare(right2.path) || JSON.stringify(left.specifiers).localeCompare(
+        JSON.stringify(right2.specifiers)
       )
     ).map(
       (item) => factory.createImportDeclaration(
@@ -247114,7 +247495,7 @@ function emitImports(model, componentName2, needsStyles, generatedRelativeImport
           void 0,
           factory.createNamedImports(
             [...item.specifiers].sort(
-              (left, right) => left.local.localeCompare(right.local) || left.imported.localeCompare(right.imported)
+              (left, right2) => left.local.localeCompare(right2.local) || left.imported.localeCompare(right2.imported)
             ).map(
               (specifier) => factory.createImportSpecifier(
                 false,
@@ -247138,17 +247519,17 @@ function emitImports(model, componentName2, needsStyles, generatedRelativeImport
           factory.createIdentifier("styles"),
           void 0
         ),
-        factory.createStringLiteral(`./${componentName2}.module.css`),
+        factory.createStringLiteral(`./${componentName}.module.css`),
         void 0
       )
     );
   }
   return imports;
 }
-function emitPropsInterface(componentName2, props) {
+function emitPropsInterface(componentName, props) {
   return factory.createInterfaceDeclaration(
     [factory.createModifier(import_typescript.default.SyntaxKind.ExportKeyword)],
-    factory.createIdentifier(`${componentName2}Props`),
+    factory.createIdentifier(`${componentName}Props`),
     void 0,
     void 0,
     props.map(
@@ -247180,11 +247561,11 @@ function callbackType(prop) {
     factory.createKeywordTypeNode(import_typescript.default.SyntaxKind.VoidKeyword)
   );
 }
-function emitComponent(componentName2, props, root) {
+function emitComponent(componentName, props, root) {
   return factory.createFunctionDeclaration(
     [factory.createModifier(import_typescript.default.SyntaxKind.ExportKeyword)],
     void 0,
-    factory.createIdentifier(componentName2),
+    factory.createIdentifier(componentName),
     void 0,
     [
       factory.createParameterDeclaration(
@@ -247201,7 +247582,7 @@ function emitComponent(componentName2, props, root) {
           )
         ),
         void 0,
-        factory.createTypeReferenceNode(`${componentName2}Props`, void 0),
+        factory.createTypeReferenceNode(`${componentName}Props`, void 0),
         void 0
       )
     ],
@@ -247217,6 +247598,9 @@ function emitComponent(componentName2, props, root) {
   );
 }
 function emitElement(element) {
+  if (element.kind === "single-selection-collection") {
+    return emitSingleSelectionCollection(element);
+  }
   const tagName = element.kind === "intrinsic-wrapper" ? factory.createIdentifier(element.tag) : factory.createIdentifier(
     element.kind === "fallback" ? element.localComponentName : element.localName
   );
@@ -247240,6 +247624,119 @@ function emitElement(element) {
     ) : element.children.map(emitElement)
   ];
   return jsxElement(tagName, props, children);
+}
+function emitSingleSelectionCollection(element) {
+  const classProp = (className) => ({
+    name: "className",
+    value: { kind: "class-name", className }
+  });
+  const textElement = (localName, value, props = []) => jsxElement(factory.createIdentifier(localName), props, [jsxText(value)]);
+  const headerChildren = [];
+  if (element.leadingAssetLocalName) {
+    headerChildren.push(
+      jsxElement(
+        factory.createIdentifier(element.leadingAssetLocalName),
+        [],
+        []
+      )
+    );
+  }
+  headerChildren.push(textElement(element.titleLocalName, element.title));
+  const header = jsxElement(
+    factory.createIdentifier(element.layoutLocalName),
+    [classProp(element.classNames.header)],
+    headerChildren
+  );
+  const sections = element.sections.map((section) => {
+    const children = [];
+    if (section.label) {
+      children.push(
+        textElement(element.titleLocalName, section.label, [
+          classProp(element.classNames.sectionLabel)
+        ])
+      );
+    }
+    for (const option of section.options) {
+      const optionContent = [
+        textElement(element.titleLocalName, option.label)
+      ];
+      if (option.description) {
+        optionContent.push(
+          textElement(element.descriptionLocalName, option.description, [
+            classProp(element.classNames.description)
+          ])
+        );
+      }
+      const optionElement = jsxElement(
+        factory.createIdentifier(element.optionLocalName),
+        option.props,
+        [
+          jsxElement(
+            factory.createIdentifier(element.layoutLocalName),
+            [classProp(element.classNames.optionContent)],
+            optionContent
+          )
+        ]
+      );
+      const rowChildren = [optionElement];
+      if (option.hasTrailingAsset && element.trailingAssetLocalName) {
+        rowChildren.push(
+          jsxElement(
+            factory.createIdentifier(element.trailingAssetLocalName),
+            [classProp(element.classNames.trailingAsset)],
+            []
+          )
+        );
+      }
+      children.push(
+        jsxElement(
+          factory.createIdentifier(element.layoutLocalName),
+          [classProp(element.classNames.optionRow)],
+          rowChildren
+        )
+      );
+    }
+    return jsxElement(
+      factory.createIdentifier("section"),
+      [classProp(element.classNames.section)],
+      children
+    );
+  });
+  const group = jsxStructuredElement(
+    factory.createIdentifier(element.rootLocalName),
+    element.rootProps,
+    sections
+  );
+  return jsxElement(
+    factory.createIdentifier("section"),
+    [classProp(element.classNames.root)],
+    [header, group]
+  );
+}
+function jsxStructuredElement(tagName, props, children) {
+  const attributes = factory.createJsxAttributes(
+    props.map(
+      (prop) => prop.value.kind === "noop" ? factory.createJsxAttribute(
+        factory.createIdentifier(prop.name),
+        factory.createJsxExpression(
+          void 0,
+          factory.createArrowFunction(
+            void 0,
+            void 0,
+            [],
+            void 0,
+            factory.createToken(import_typescript.default.SyntaxKind.EqualsGreaterThanToken),
+            factory.createBlock([], false)
+          )
+        )
+      ) : emitProp(prop)
+    )
+  );
+  return factory.createJsxElement(
+    factory.createJsxOpeningElement(tagName, void 0, attributes),
+    children,
+    factory.createJsxClosingElement(tagName)
+  );
 }
 function jsxElement(tagName, props, children) {
   const attributes = factory.createJsxAttributes(props.map(emitProp));
@@ -247307,6 +247804,9 @@ function jsxText(value) {
   );
 }
 function containsClassName(element) {
+  if (element.kind === "single-selection-collection") {
+    return true;
+  }
   const props = element.kind === "reuse" || element.kind === "compose" ? element.props : [];
   return element.kind === "intrinsic-wrapper" || props.some((prop) => prop.value.kind === "class-name") || element.kind === "compose" && element.slots.some((slot) => slot.children.some(containsClassName)) || element.children.some(containsClassName);
 }
@@ -247562,7 +248062,7 @@ function pascal3(value) {
 function resolveUiManifestV2(input) {
   const semanticNodes = flatten2(input.manifest.root);
   const results = semanticNodes.map(
-    (node) => resolveNode({ node, pack: input.pack })
+    (node) => resolveSingleSelectionCollection(node, input.pack) ?? resolveNode({ node, pack: input.pack })
   );
   const nodes = results.map((result) => result.resolution);
   const diagnostics = [
@@ -247607,6 +248107,133 @@ function resolveUiManifestV2(input) {
   assertResolutionPlanV2Integrity(plan);
   return plan;
 }
+function resolveSingleSelectionCollection(node, pack) {
+  if (node.role !== "choicePanel") {
+    return void 0;
+  }
+  const recipe = pack.reactRenderRecipes.singleSelectionCollections?.find(
+    (candidate2) => candidate2.semanticRole === node.role
+  );
+  const policy = pack.semanticPolicy.roles[node.role];
+  if (!recipe || !policy || !policy.allowedDecisions.includes("compose") || !policy.candidateComponentIds.includes(recipe.rootComponentId)) {
+    return blockedChoice(
+      node,
+      "CHOICE_CONTROL_RESOLUTION_BLOCKED",
+      "No complete structured choice control recipe is permitted"
+    );
+  }
+  const requiredIds = [
+    recipe.rootComponentId,
+    recipe.optionComponentId,
+    recipe.layoutComponentId,
+    recipe.titleComponentId,
+    recipe.descriptionComponentId
+  ];
+  const requiredBindings = [];
+  for (const componentId of requiredIds) {
+    const component = pack.componentsById.get(componentId);
+    if (!component || !isVerified2(componentId, pack)) {
+      const descriptionMissing = componentId === recipe.descriptionComponentId;
+      return blockedChoice(
+        node,
+        descriptionMissing ? "CHOICE_DESCRIPTION_COMPANION_BLOCKED" : "CHOICE_CONTROL_RESOLUTION_BLOCKED",
+        `Required structured choice component ${componentId} is unavailable`
+      );
+    }
+    requiredBindings.push(toBinding(component));
+  }
+  const diagnostics = [];
+  const optionalBindings = [];
+  const content = node.content;
+  const requestedOptional = [
+    {
+      requested: content.headerIcon !== void 0,
+      componentId: recipe.leadingAssetComponentId,
+      slot: "leading"
+    },
+    {
+      requested: content.sections.some(
+        (section) => section.options.some((option) => option.info?.present === true)
+      ),
+      componentId: recipe.trailingAssetComponentId,
+      slot: "trailing"
+    }
+  ];
+  for (const optional2 of requestedOptional) {
+    if (!optional2.requested) {
+      continue;
+    }
+    const component = optional2.componentId ? pack.componentsById.get(optional2.componentId) : void 0;
+    if (!optional2.componentId || !component || !isVerified2(optional2.componentId, pack)) {
+      diagnostics.push({
+        severity: "warning",
+        blocking: false,
+        stage: "component-resolution",
+        code: "CHOICE_ICON_UNRESOLVED",
+        message: `Optional ${optional2.slot} choice icon is unavailable`,
+        source: { manifestNodeId: node.id },
+        evidence: {
+          semanticRole: node.role,
+          slot: optional2.slot,
+          componentId: optional2.componentId ?? "none"
+        }
+      });
+      continue;
+    }
+    optionalBindings.push(toBinding(component));
+  }
+  return {
+    resolution: {
+      ...resolutionBase(node),
+      decision: "compose",
+      bindings: [...requiredBindings, ...optionalBindings],
+      props: pack.componentsById.get(recipe.rootComponentId).defaultProps
+    },
+    diagnostics
+  };
+}
+function blockedChoice(node, code, message) {
+  return {
+    resolution: {
+      ...resolutionBase(node),
+      decision: "blocked",
+      diagnosticCodes: [code]
+    },
+    diagnostics: [
+      {
+        severity: "error",
+        blocking: true,
+        stage: "component-resolution",
+        code,
+        message,
+        source: { manifestNodeId: node.id },
+        evidence: { semanticRole: node.role }
+      }
+    ]
+  };
+}
+function resolutionBase(node) {
+  return {
+    manifestNodeId: node.id,
+    semanticRole: node.role,
+    confidence: node.confidence,
+    evidence: [...node.evidence, { kind: "semantic-role", value: node.role }],
+    diagnosticCodes: []
+  };
+}
+function isVerified2(componentId, pack) {
+  return pack.componentsById.get(componentId)?.verified === true && pack.verification.components.some(
+    (entry) => entry.componentId === componentId && entry.status === "verified"
+  );
+}
+function toBinding(component) {
+  return {
+    componentId: component.id,
+    package: component.package,
+    export: component.export,
+    exportKind: component.exportKind
+  };
+}
 function flatten2(root) {
   return [root, ...root.children.flatMap(flatten2)];
 }
@@ -247621,7 +248248,7 @@ function validateGenerationInput(input) {
     assertUiManifestV2Integrity(input.uiManifest, input.designIr);
     assertResolutionPlanV2Integrity(input.resolutionPlan);
   } catch (error46) {
-    invalid2("Generation artifacts do not satisfy the v2 contracts", error46);
+    invalid3("Generation artifacts do not satisfy the v2 contracts", error46);
   }
   assertSourceProofs(input);
   assertPackProof(input);
@@ -247636,7 +248263,7 @@ function validateGenerationInput(input) {
   for (const node of manifestNodes) {
     const resolution = resolutionsByManifestNodeId.get(node.id);
     if (node.role === "unresolved" || resolution.semanticRole !== node.role) {
-      invalid2(`Resolution does not match semantic node ${node.id}`);
+      invalid3(`Resolution does not match semantic node ${node.id}`);
     }
   }
   const common = {
@@ -247662,7 +248289,7 @@ function assertResolutionAuthorization(input) {
       pack: input.pack
     });
   } catch (error46) {
-    invalid2("Canonical component resolution failed", error46);
+    invalid3("Canonical component resolution failed", error46);
   }
   const storedAuthorization = {
     nodes: input.resolutionPlan.nodes,
@@ -247673,7 +248300,7 @@ function assertResolutionAuthorization(input) {
     summary: canonical.summary
   };
   if (stableStringify(storedAuthorization) !== stableStringify(canonicalAuthorization)) {
-    invalid2(
+    invalid3(
       "Resolution decisions are not authorized by the loaded design-system pack"
     );
   }
@@ -247682,20 +248309,20 @@ function assertResolutionAuthorization(input) {
 function assertSourceProofs(input) {
   const { source } = input.resolutionPlan;
   if (source.designIr.artifactId !== input.designIr.sourceArtifactId || source.designIr.sha256 !== sha256(stableStringify(input.designIr)) || source.uiManifest.artifactId !== input.uiManifest.sourceArtifactId || source.uiManifest.sha256 !== sha256(stableStringify(input.uiManifest)) || input.designIr.sourceArtifactId !== input.uiManifest.sourceArtifactId) {
-    invalid2("Generation source hashes or artifact IDs do not match");
+    invalid3("Generation source hashes or artifact IDs do not match");
   }
 }
 function assertPackProof(input) {
   const target = input.resolutionPlan.target;
   if (target.designSystem !== input.pack.manifest.id || target.designSystemVersion !== input.pack.manifest.version || target.packSha256 !== input.pack.sha256) {
-    invalid2("Resolution target does not match the loaded design-system pack");
+    invalid3("Resolution target does not match the loaded design-system pack");
   }
 }
 function indexResolutions(input) {
   const indexed = /* @__PURE__ */ new Map();
   for (const resolution of input.resolutionPlan.nodes) {
     if (indexed.has(resolution.manifestNodeId)) {
-      invalid2(`Duplicate resolution for ${resolution.manifestNodeId}`);
+      invalid3(`Duplicate resolution for ${resolution.manifestNodeId}`);
     }
     indexed.set(resolution.manifestNodeId, resolution);
   }
@@ -247705,12 +248332,12 @@ function assertExactResolutionJoin(manifestNodes, resolutions) {
   const manifestIds = new Set(manifestNodes.map((node) => node.id));
   for (const node of manifestNodes) {
     if (!resolutions.has(node.id)) {
-      invalid2(`Missing resolution for ${node.id}`);
+      invalid3(`Missing resolution for ${node.id}`);
     }
   }
   for (const resolutionId of resolutions.keys()) {
     if (!manifestIds.has(resolutionId)) {
-      invalid2(`Resolution references unknown node ${resolutionId}`);
+      invalid3(`Resolution references unknown node ${resolutionId}`);
     }
   }
 }
@@ -247728,7 +248355,7 @@ function mergeDiagnostics(canonical, stored) {
       diagnosticsByIdentity.set(identity, diagnostic);
     }
   }
-  return [...diagnosticsByIdentity.entries()].sort(([left], [right]) => left.localeCompare(right)).map(([, diagnostic]) => diagnostic);
+  return [...diagnosticsByIdentity.entries()].sort(([left], [right2]) => left.localeCompare(right2)).map(([, diagnostic]) => diagnostic);
 }
 function blockedDiagnostics(input, effectiveDiagnostics) {
   return [
@@ -247748,7 +248375,7 @@ function blockedDiagnostics(input, effectiveDiagnostics) {
 function flatten3(root) {
   return [root, ...root.children.flatMap(flatten3)];
 }
-function invalid2(message, cause) {
+function invalid3(message, cause) {
   throw new ReactGenerationError("GENERATION_INPUT_INVALID", message, {
     cause
   });
@@ -247766,7 +248393,7 @@ function validateGeneratedTsx(source, expectation) {
   );
   const parseDiagnostics = file2.parseDiagnostics;
   if (parseDiagnostics.length > 0) {
-    invalid3(
+    invalid4(
       `TSX parse failure: ${parseDiagnostics.map(
         (diagnostic) => import_typescript2.default.flattenDiagnosticMessageText(diagnostic.messageText, " ")
       ).join("; ")}`
@@ -247790,13 +248417,13 @@ function validateGeneratedTsx(source, expectation) {
     if (import_typescript2.default.isImportDeclaration(node)) {
       const packageName = import_typescript2.default.isStringLiteral(node.moduleSpecifier) ? node.moduleSpecifier.text : void 0;
       if (!packageName) {
-        invalid3("Import module specifier must be a string literal");
+        invalid4("Import module specifier must be a string literal");
       }
       const localNames = importedLocalNames(node.importClause).sort();
       const specifiers = importedSpecifiers(node.importClause);
       if (packageName === expectation.cssModuleImport?.source) {
         if (localNames.length !== 1 || localNames[0] !== expectation.cssModuleImport.localName || node.importClause?.name?.text !== expectation.cssModuleImport.localName || node.importClause.namedBindings) {
-          invalid3("CSS Module import does not match expectation");
+          invalid4("CSS Module import does not match expectation");
         }
         cssModuleImport = {
           source: packageName,
@@ -247804,7 +248431,7 @@ function validateGeneratedTsx(source, expectation) {
         };
       } else if (expectedGeneratedSources.has(packageName)) {
         if (node.importClause?.isTypeOnly) {
-          invalid3(
+          invalid4(
             `Generated relative import ${packageName} cannot be type-only`
           );
         }
@@ -247819,7 +248446,7 @@ function validateGeneratedTsx(source, expectation) {
           typeOnly: node.importClause?.isTypeOnly ?? false
         });
       } else {
-        invalid3(`Unexpected import source ${JSON.stringify(packageName)}`);
+        invalid4(`Unexpected import source ${JSON.stringify(packageName)}`);
       }
     }
     const localComponentName = declaredLocalComponentName(
@@ -247839,33 +248466,33 @@ function validateGeneratedTsx(source, expectation) {
   };
   visit2(file2);
   if (JSON.stringify(sortExternalImports(externalImports)) !== JSON.stringify(sortExternalImports(expectation.externalImports))) {
-    invalid3(
+    invalid4(
       `External imports do not match expectation: received ${JSON.stringify(
         sortExternalImports(externalImports)
       )}`
     );
   }
   if (JSON.stringify(sortGeneratedImports(generatedRelativeImports)) !== JSON.stringify(sortGeneratedImports(expectation.generatedRelativeImports))) {
-    invalid3(
+    invalid4(
       `Generated relative imports do not match expectation: received ${JSON.stringify(
         sortGeneratedImports(generatedRelativeImports)
       )}`
     );
   }
   if (JSON.stringify(cssModuleImport) !== JSON.stringify(expectation.cssModuleImport)) {
-    invalid3(
+    invalid4(
       `CSS Module import does not match expectation: received ${JSON.stringify(
         cssModuleImport
       )}`
     );
   }
   if (!sameSet(jsxNames2, expectedJsxNames)) {
-    invalid3(
+    invalid4(
       `JSX identifiers do not match expectation: received ${[...jsxNames2].sort().join(", ")}`
     );
   }
   if (!sameSet(localComponentNames, expectedLocalComponentNames)) {
-    invalid3(
+    invalid4(
       `Local component declarations do not match expectation: received ${[...localComponentNames].sort().join(", ")}`
     );
   }
@@ -247885,7 +248512,7 @@ function validateExportedDeclarations(file2, expected) {
       (candidate2) => candidate2.name === declaration.name
     );
     if (matches.length !== 1 || matches[0].kind !== declaration.kind || !matches[0].exported || matches[0].defaultExport) {
-      invalid3(
+      invalid4(
         `Expected exactly one named exported ${declaration.kind} ${declaration.name}`
       );
     }
@@ -247893,14 +248520,14 @@ function validateExportedDeclarations(file2, expected) {
   const actualExports = topLevelDeclarations.filter((declaration) => declaration.exported).map(({ kind, name }) => ({ kind, name })).sort(compareDeclarations);
   const expectedExports = [...expected].sort(compareDeclarations);
   if (JSON.stringify(actualExports) !== JSON.stringify(expectedExports)) {
-    invalid3(
+    invalid4(
       `Exported declarations do not match expectation: received ${JSON.stringify(actualExports)}`
     );
   }
 }
 function topLevelDeclarationRecords(statement) {
   if (import_typescript2.default.isExportDeclaration(statement) || import_typescript2.default.isExportAssignment(statement)) {
-    invalid3("Generated TSX contains an unsupported export declaration");
+    invalid4("Generated TSX contains an unsupported export declaration");
   }
   if (import_typescript2.default.isVariableStatement(statement)) {
     return statement.declarationList.declarations.flatMap(
@@ -247914,7 +248541,7 @@ function topLevelDeclarationRecords(statement) {
   }
   const records = bindingDeclarationRecords(statement);
   if (records.length === 0 && hasModifier(statement, import_typescript2.default.SyntaxKind.ExportKeyword)) {
-    invalid3("Generated TSX contains an unsupported export declaration");
+    invalid4("Generated TSX contains an unsupported export declaration");
   }
   return records;
 }
@@ -247966,17 +248593,17 @@ function importedBindingNames(clause) {
 function hasModifier(node, kind) {
   return import_typescript2.default.canHaveModifiers(node) ? import_typescript2.default.getModifiers(node)?.some((modifier) => modifier.kind === kind) ?? false : false;
 }
-function compareDeclarations(left, right) {
-  return left.kind.localeCompare(right.kind) || left.name.localeCompare(right.name);
+function compareDeclarations(left, right2) {
+  return left.kind.localeCompare(right2.kind) || left.name.localeCompare(right2.name);
 }
 function sortExternalImports(imports) {
   return imports.map((item) => ({
     ...item,
     specifiers: sortImportSpecifiers(item.specifiers)
   })).sort(
-    (left, right) => left.source.localeCompare(right.source) || JSON.stringify(left.specifiers).localeCompare(
-      JSON.stringify(right.specifiers)
-    ) || Number(left.typeOnly) - Number(right.typeOnly)
+    (left, right2) => left.source.localeCompare(right2.source) || JSON.stringify(left.specifiers).localeCompare(
+      JSON.stringify(right2.specifiers)
+    ) || Number(left.typeOnly) - Number(right2.typeOnly)
   );
 }
 function sortGeneratedImports(imports) {
@@ -247984,14 +248611,14 @@ function sortGeneratedImports(imports) {
     ...item,
     specifiers: sortImportSpecifiers(item.specifiers)
   })).sort(
-    (left, right) => left.source.localeCompare(right.source) || JSON.stringify(left.specifiers).localeCompare(
-      JSON.stringify(right.specifiers)
+    (left, right2) => left.source.localeCompare(right2.source) || JSON.stringify(left.specifiers).localeCompare(
+      JSON.stringify(right2.specifiers)
     )
   );
 }
 function sortImportSpecifiers(specifiers) {
   return [...specifiers].sort(
-    (left, right) => left.kind.localeCompare(right.kind) || left.imported.localeCompare(right.imported) || left.local.localeCompare(right.local)
+    (left, right2) => left.kind.localeCompare(right2.kind) || left.imported.localeCompare(right2.imported) || left.local.localeCompare(right2.local)
   );
 }
 function importedSpecifiers(importClause) {
@@ -248007,7 +248634,7 @@ function importedSpecifiers(importClause) {
   ] : [];
   const bindings = importClause.namedBindings;
   if (bindings && import_typescript2.default.isNamespaceImport(bindings)) {
-    invalid3("Namespace imports are not supported in generated TSX");
+    invalid4("Namespace imports are not supported in generated TSX");
   }
   if (bindings && import_typescript2.default.isNamedImports(bindings)) {
     specifiers.push(
@@ -248041,15 +248668,14 @@ function declaredLocalComponentName(node, rootComponentName) {
   const name = import_typescript2.default.isFunctionDeclaration(node) || import_typescript2.default.isClassDeclaration(node) ? node.name?.text : import_typescript2.default.isVariableDeclaration(node) && import_typescript2.default.isIdentifier(node.name) ? node.name.text : void 0;
   return name && name !== rootComponentName && /^[A-Z]/.test(name) ? name : void 0;
 }
-function sameSet(left, right) {
-  return left.size === right.size && [...left].every((value) => right.has(value));
+function sameSet(left, right2) {
+  return left.size === right2.size && [...left].every((value) => right2.has(value));
 }
-function invalid3(message) {
+function invalid4(message) {
   throw new ReactGenerationError("GENERATION_SOURCE_INVALID", message);
 }
 
 // packages/generator-react/src/generate-react-bundle.ts
-var componentName = "GeneratedModal";
 var encoder = new TextEncoder2();
 function generateReactBundle(input) {
   const validated = validateGenerationInput(input);
@@ -248065,6 +248691,7 @@ function generateReactBundle(input) {
     assertReactGenerationBundleIntegrity(bundle2);
     return bundle2;
   }
+  const componentName = input.uiManifest.root.role === "choicePanel" ? "GeneratedChoicePanel" : "GeneratedModal";
   const model = reserveFallbackComponentNames(
     buildReactGenerationModel(validated),
     componentName
@@ -248169,7 +248796,7 @@ function generateReactBundle(input) {
       )
     );
   }
-  const report = reportForGenerated(input, model, files);
+  const report = reportForGenerated(input, model, files, componentName);
   const bundle = {
     schema: "react-generation-bundle/v2",
     status: "generated",
@@ -248231,7 +248858,7 @@ function reportForBlocked(input, diagnostics) {
     diagnostics: sortDiagnostics2(diagnostics)
   });
 }
-function reportForGenerated(input, model, files) {
+function reportForGenerated(input, model, files, componentName) {
   const fileReports = files.map((file2) => ({
     path: file2.path,
     kind: file2.kind,
@@ -248264,8 +248891,8 @@ function reportForGenerated(input, model, files) {
       )
     },
     renderOnlyProps: [...model.renderOnlyProps].sort(
-      (left, right) => left.manifestNodeId.localeCompare(right.manifestNodeId) || left.componentId.localeCompare(right.componentId) || stableStringify(left.propNames).localeCompare(
-        stableStringify(right.propNames)
+      (left, right2) => left.manifestNodeId.localeCompare(right2.manifestNodeId) || left.componentId.localeCompare(right2.componentId) || stableStringify(left.propNames).localeCompare(
+        stableStringify(right2.propNames)
       )
     ),
     validation: {
@@ -248302,6 +248929,20 @@ function sourceFile(path, kind, source) {
 function jsxNames(root) {
   const names = /* @__PURE__ */ new Set();
   const visit2 = (element) => {
+    if (element.kind === "single-selection-collection") {
+      [
+        element.rootLocalName,
+        element.optionLocalName,
+        element.layoutLocalName,
+        element.titleLocalName,
+        element.descriptionLocalName,
+        element.leadingAssetLocalName,
+        element.trailingAssetLocalName
+      ].forEach((name) => {
+        if (name) names.add(name);
+      });
+      return;
+    }
     if (element.kind !== "intrinsic-wrapper") {
       names.add(
         element.kind === "fallback" ? element.localComponentName : element.localName
@@ -248319,6 +248960,9 @@ function jsxNames(root) {
   return [...names].sort();
 }
 function rootUsesStyles(root) {
+  if (root.kind === "single-selection-collection") {
+    return true;
+  }
   const props = root.kind === "reuse" || root.kind === "compose" ? root.props : [];
   return root.kind === "intrinsic-wrapper" || props.some((prop) => prop.value.kind === "class-name") || root.kind === "compose" && root.slots.some((slot) => slot.children.some(rootUsesStyles)) || root.children.some(rootUsesStyles);
 }
@@ -248379,7 +249023,7 @@ function reserveFallbackComponentNames(model, rootComponentName) {
   const namesByNodeId = /* @__PURE__ */ new Map();
   for (const baseName of [...fallbacksByBaseName.keys()].sort()) {
     const group = [...fallbacksByBaseName.get(baseName)].sort(
-      (left, right) => left.nodeId < right.nodeId ? -1 : left.nodeId > right.nodeId ? 1 : 0
+      (left, right2) => left.nodeId < right2.nodeId ? -1 : left.nodeId > right2.nodeId ? 1 : 0
     );
     const requiresAlias = group.length > 1 || reserved.has(baseName);
     for (const fallback of group) {
@@ -248447,8 +249091,8 @@ function emptyStatistics(manifestNodes) {
 }
 function sortDiagnostics2(diagnostics) {
   return [...diagnostics].sort(
-    (left, right) => left.stage.localeCompare(right.stage) || left.code.localeCompare(right.code) || stableStringify(left.evidence ?? {}).localeCompare(
-      stableStringify(right.evidence ?? {})
+    (left, right2) => left.stage.localeCompare(right2.stage) || left.code.localeCompare(right2.code) || stableStringify(left.evidence ?? {}).localeCompare(
+      stableStringify(right2.evidence ?? {})
     )
   );
 }
@@ -248476,7 +249120,7 @@ var require2 = createRequire(import.meta.url);
 async function generateFromRun(input) {
   try {
     if (!runIdPattern.test(input.runId)) {
-      invalid4(`Unsafe run ID ${JSON.stringify(input.runId)}`);
+      invalid5(`Unsafe run ID ${JSON.stringify(input.runId)}`);
     }
     const uigDir = resolve2(input.workspaceDir, ".uig");
     const runsDir = join2(uigDir, "runs");
@@ -248513,20 +249157,20 @@ async function generateFromRun(input) {
 async function selectPinnedRun(runDir) {
   const selected = await lstat2(runDir, { bigint: true });
   if (!selected.isDirectory() || selected.isSymbolicLink()) {
-    invalid4("Generation run path must be an ordinary directory");
+    invalid5("Generation run path must be an ordinary directory");
   }
   const canonical = await realpath2(runDir);
   const canonicalMetadata = await lstat2(canonical, { bigint: true });
   const identity = identityOf(canonicalMetadata);
   if (!sameIdentity(identity, identityOf(selected))) {
-    invalid4("Generation run changed while it was selected");
+    invalid5("Generation run changed while it was selected");
   }
   return { canonical, identity };
 }
 async function assertOrdinaryDirectory(directory, label) {
   const metadata = await lstat2(directory);
   if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
-    invalid4(`${label} path must be an ordinary directory`);
+    invalid5(`${label} path must be an ordinary directory`);
   }
 }
 async function runPinnedWorker(input) {
@@ -248628,10 +249272,10 @@ function identityOf(metadata) {
     ino: metadata.ino.toString()
   };
 }
-function sameIdentity(left, right) {
-  return left.dev === right.dev && left.ino === right.ino;
+function sameIdentity(left, right2) {
+  return left.dev === right2.dev && left.ino === right2.ino;
 }
-function invalid4(message) {
+function invalid5(message) {
   throw new ReactGenerationError("GENERATION_INPUT_INVALID", message);
 }
 
@@ -248680,7 +249324,7 @@ function buildCatalogIndexes(components, policy) {
       return component;
     });
     candidates.sort(
-      (left, right) => right.priority - left.priority || left.id.localeCompare(right.id)
+      (left, right2) => right2.priority - left.priority || left.id.localeCompare(right2.id)
     );
     if (candidates.length > 1 && candidates[0]?.priority === candidates[1]?.priority) {
       throw new DesignSystemPackError(
@@ -248719,7 +249363,12 @@ import { isAbsolute as isAbsolute3, relative as relative3, resolve as resolve3, 
 // packages/component-catalog/src/normalize-react-recipes.ts
 function normalizeReactRenderRecipes(input) {
   if (input.schema === "react-render-recipes/v2") {
-    return structuredClone(input);
+    return {
+      ...structuredClone(input),
+      singleSelectionCollections: structuredClone(
+        input.singleSelectionCollections ?? []
+      )
+    };
   }
   return {
     schema: "react-render-recipes/v2",
@@ -248727,7 +249376,8 @@ function normalizeReactRenderRecipes(input) {
       ...recipe,
       staticProps: []
     })),
-    compositions: structuredClone(input.compositions)
+    compositions: structuredClone(input.compositions),
+    singleSelectionCollections: []
   };
 }
 
@@ -248797,10 +249447,59 @@ function validateReactRecipes(input) {
     input.reactRenderRecipes.components,
     input.componentsById
   );
+  validateSingleSelectionCollections(input, recipesByComponentId);
   validateRecipeCoverage(input, recipesByComponentId);
   validatePropTargets(input.reactRenderRecipes.components);
   validateCompositionRecipes(input);
   validateStylePolicy(input);
+}
+function validateSingleSelectionCollections(input, recipesByComponentId) {
+  const roles = /* @__PURE__ */ new Set();
+  for (const recipe of input.reactRenderRecipes.singleSelectionCollections ?? []) {
+    if (roles.has(recipe.semanticRole)) {
+      structuredRecipeError(
+        `Duplicate structured recipe for ${recipe.semanticRole}`
+      );
+    }
+    roles.add(recipe.semanticRole);
+    if (recipe.rootComponentId === recipe.optionComponentId) {
+      structuredRecipeError(
+        `Structured recipe ${recipe.semanticRole} uses one component as both root and option`
+      );
+    }
+    const componentIds = [
+      recipe.rootComponentId,
+      recipe.optionComponentId,
+      recipe.layoutComponentId,
+      recipe.titleComponentId,
+      recipe.descriptionComponentId,
+      ...recipe.leadingAssetComponentId ? [recipe.leadingAssetComponentId] : [],
+      ...recipe.trailingAssetComponentId ? [recipe.trailingAssetComponentId] : []
+    ];
+    for (const componentId of componentIds) {
+      if (!input.componentsById.has(componentId)) {
+        structuredRecipeError(
+          `Structured recipe ${recipe.semanticRole} references unknown component ${componentId}`
+        );
+      }
+      if (!recipesByComponentId.has(componentId)) {
+        structuredRecipeError(
+          `Structured recipe ${recipe.semanticRole} component ${componentId} has no scalar render recipe`
+        );
+      }
+    }
+    const rootTargets = [
+      recipe.rootProps.valueTarget,
+      recipe.rootProps.onChangeTarget,
+      recipe.rootProps.directionTarget,
+      recipe.rootProps.groupNameTarget
+    ];
+    if (new Set(rootTargets).size !== rootTargets.length) {
+      structuredRecipeError(
+        `Structured recipe ${recipe.semanticRole} maps multiple root values to one prop`
+      );
+    }
+  }
 }
 function indexComponentRecipes(recipes, componentsById) {
   const indexed = /* @__PURE__ */ new Map();
@@ -248973,6 +249672,9 @@ function recipeConflict(componentId, message) {
     "REACT_RECIPE_PROP_CONFLICT",
     `React recipe ${componentId} ${message}`
   );
+}
+function structuredRecipeError(message) {
+  throw new DesignSystemPackError("REACT_STRUCTURED_RECIPE_INVALID", message);
 }
 
 // packages/component-catalog/src/load-pack.ts
@@ -249388,9 +250090,9 @@ async function visitDirectory(root, directory, files) {
     files.set(relative4(root, path).split(sep4).join("/"), await readFile3(path));
   }
 }
-function sameByteMap(left, right) {
-  return left.size === right.size && [...left].every(
-    ([path, bytes]) => right.has(path) && bytes.equals(right.get(path))
+function sameByteMap(left, right2) {
+  return left.size === right2.size && [...left].every(
+    ([path, bytes]) => right2.has(path) && bytes.equals(right2.get(path))
   );
 }
 function hasCode(error46, code) {
@@ -249408,14 +250110,14 @@ async function runGenerateWorker() {
     directoryHandle = await open(".", constants.O_RDONLY);
     const actualIdentity = await identityOf2(directoryHandle);
     if (!sameIdentity2(actualIdentity, initialization.expectedIdentity)) {
-      invalid5("Pinned generation run identity does not match selection");
+      invalid6("Pinned generation run identity does not match selection");
     }
     const run = validateWithSchema(
       GenerationRunSchema,
       await readSafeJson2("run.json")
     );
     if (run.runId !== initialization.runId) {
-      invalid5(
+      invalid6(
         `Run metadata ID ${JSON.stringify(run.runId)} does not match ${JSON.stringify(initialization.runId)}`
       );
     }
@@ -249446,7 +250148,7 @@ async function runGenerateWorker() {
       await identityOf2(directoryHandle),
       initialization.expectedIdentity
     )) {
-      invalid5("Pinned generation run identity changed before publication");
+      invalid6("Pinned generation run identity changed before publication");
     }
     const writeStatus = await writeGeneratedBundleAtomically({
       destination: "generated",
@@ -249468,16 +250170,16 @@ async function runGenerateWorker() {
 }
 async function readSafeJson2(path) {
   if (path.length === 0 || path === "." || path === ".." || path.includes("/") || path.includes("\\")) {
-    invalid5(`Unsafe run artifact path ${JSON.stringify(path)}`);
+    invalid6(`Unsafe run artifact path ${JSON.stringify(path)}`);
   }
   if (typeof constants.O_NOFOLLOW !== "number") {
-    invalid5("This platform cannot safely open generation artifacts");
+    invalid6("This platform cannot safely open generation artifacts");
   }
   const handle = await open(path, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
     const metadata = await handle.stat();
     if (!metadata.isFile()) {
-      invalid5(`Generation artifact is not an ordinary file: ${path}`);
+      invalid6(`Generation artifact is not an ordinary file: ${path}`);
     }
     return JSON.parse(await handle.readFile("utf8"));
   } finally {
@@ -249487,15 +250189,15 @@ async function readSafeJson2(path) {
 async function identityOf2(handle) {
   const metadata = await handle.stat({ bigint: true });
   if (!metadata.isDirectory()) {
-    invalid5("Pinned generation run is not a directory");
+    invalid6("Pinned generation run is not a directory");
   }
   return {
     dev: metadata.dev.toString(),
     ino: metadata.ino.toString()
   };
 }
-function sameIdentity2(left, right) {
-  return left.dev === right.dev && left.ino === right.ino;
+function sameIdentity2(left, right2) {
+  return left.dev === right2.dev && left.ino === right2.ino;
 }
 function nextMessage(type) {
   return new Promise((resolve6, reject) => {
@@ -249531,7 +250233,7 @@ function workerError(error46) {
     message: error46 instanceof Error ? error46.message : "Generation worker failed"
   };
 }
-function invalid5(message) {
+function invalid6(message) {
   throw new ReactGenerationError("GENERATION_INPUT_INVALID", message);
 }
 
@@ -258306,8 +259008,8 @@ var require_multipleOf2 = /* @__PURE__ */ __commonJSMin2(((exports) => {
       const { gen, data, schemaCode, it } = cxt;
       const prec = it.opts.multipleOfPrecision;
       const res = gen.let("res");
-      const invalid6 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
-      cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid6}))`);
+      const invalid7 = prec ? (0, codegen_1._)`Math.abs(Math.round(${res}) - ${res}) > 1e-${prec}` : (0, codegen_1._)`${res} !== parseInt(${res})`;
+      cxt.fail$data((0, codegen_1._)`(${schemaCode} === 0 || (${res} = ${data}/${schemaCode}, ${invalid7}))`);
     }
   };
   exports.default = def;
@@ -265121,7 +265823,7 @@ function collectNestedComponentInstances(root) {
   };
   visit2(root, true);
   return instances.sort(
-    (left, right) => rawNodeId(left, "").localeCompare(rawNodeId(right, ""))
+    (left, right2) => rawNodeId(left, "").localeCompare(rawNodeId(right2, ""))
   );
 }
 function resolveDefinition(instance, definitions) {
@@ -265155,7 +265857,7 @@ function resolveDefinition(instance, definitions) {
   if (candidates.length === 1) {
     return candidates[0];
   }
-  const candidateIds = candidates.map((candidate2) => rawNodeId(candidate2, "definition")).sort((left, right) => left.localeCompare(right));
+  const candidateIds = candidates.map((candidate2) => rawNodeId(candidate2, "definition")).sort((left, right2) => left.localeCompare(right2));
   throw new DesignNormalizationError(
     "PIXSO_COMPONENT_DEFINITION_AMBIGUOUS",
     `Pixso componentNormName ${identity.componentNormName} has ${candidates.length} keyless SYMBOL definitions: ${candidateIds.join(", ")}`
@@ -265165,16 +265867,17 @@ function materializeNode(source, definitions, origins) {
   const output = cloneOwnFields(source, origins);
   const componentKey = nonEmptyString(source.componentKey);
   const definition = resolveDefinition(source, definitions);
-  const defaults = definition ? collectDefinitionDefaults(definition) : /* @__PURE__ */ new Map();
+  const defaults = definition ? collectDefinitionDefaults(definition) : { byPath: /* @__PURE__ */ new Map(), byGuid: /* @__PURE__ */ new Map() };
   let propertyForest = [];
   if (Array.isArray(source.props)) {
     const effectiveProperties = source.props.flatMap((property) => {
       if (!isRecord(property)) {
         return [];
       }
-      const path = canonicalPropertyPath(property.pathString).path;
+      const canonicalPath = canonicalPropertyPath(property.pathString);
+      const fallback = defaults.byPath.get(canonicalPath.path) ?? resolveSingleSegmentGuidDefault(canonicalPath, defaults);
       return [
-        mergeEffectiveRecord(property, defaults.get(path), {
+        mergeEffectiveRecord(property, fallback, {
           origins,
           ...componentKey ? { componentKey } : {},
           ...definition ? { definition } : {}
@@ -265217,14 +265920,23 @@ function cloneOwnFields(source, origins) {
   return output;
 }
 function collectDefinitionDefaults(definition) {
-  const defaults = /* @__PURE__ */ new Map();
+  const byPath = /* @__PURE__ */ new Map();
+  const byGuid = /* @__PURE__ */ new Map();
+  const addGuidDefault = (node, fallback) => {
+    if (typeof node.guid !== "string" || node.guid.length === 0) {
+      return;
+    }
+    byGuid.set(node.guid, [...byGuid.get(node.guid) ?? [], fallback]);
+  };
   const visit2 = (node, prefix) => {
     if (prefix.length > 0) {
-      defaults.set(prefix, {
+      const fallback = {
         record: node,
         path: prefix,
         sourceNodeId: rawNodeId(node, prefix)
-      });
+      };
+      byPath.set(prefix, fallback);
+      addGuidDefault(node, fallback);
     }
     if (Array.isArray(node.props)) {
       for (const property of node.props) {
@@ -265233,11 +265945,13 @@ function collectDefinitionDefaults(definition) {
         }
         const ownerPath = node === definition ? "" : rawNodeId(node, prefix);
         const path = qualifyPath(ownerPath, property.pathString);
-        defaults.set(path, {
+        const fallback = {
           record: property,
           path,
           sourceNodeId: rawNodeId(property, path)
-        });
+        };
+        byPath.set(path, fallback);
+        addGuidDefault(property, fallback);
       }
     }
     if (Array.isArray(node.childNode)) {
@@ -265265,7 +265979,25 @@ function collectDefinitionDefaults(definition) {
       }
     }
   }
-  return defaults;
+  for (const values of byGuid.values()) {
+    values.sort(
+      (left, right2) => left.path.localeCompare(right2.path) || left.sourceNodeId.localeCompare(right2.sourceNodeId)
+    );
+  }
+  return { byPath, byGuid };
+}
+function resolveSingleSegmentGuidDefault(propertyPath, defaults) {
+  if (propertyPath.segments.length !== 1) {
+    return void 0;
+  }
+  const candidates = defaults.byGuid.get(propertyPath.path) ?? [];
+  if (candidates.length <= 1) {
+    return candidates[0];
+  }
+  throw new DesignNormalizationError(
+    "PIXSO_PROPERTY_DEFINITION_AMBIGUOUS",
+    `Pixso property path ${propertyPath.path} matches ${candidates.length} definition nodes: ${candidates.map((candidate2) => candidate2.path).join(", ")}`
+  );
 }
 function mergeEffectiveRecord(instance, fallback, context) {
   const output = {};
@@ -265347,7 +266079,7 @@ function buildPropertyForest(properties) {
   }
   const roots = [];
   for (const [path, property] of [...byPath.entries()].sort(
-    ([left], [right]) => left.localeCompare(right)
+    ([left], [right2]) => left.localeCompare(right2)
   )) {
     const segments = path.split("/");
     let parent;
@@ -265368,17 +266100,17 @@ function buildPropertyForest(properties) {
   }
   return roots.sort(compareVisualThenPath);
 }
-function compareVisualThenPath(left, right) {
-  const vertical = sortableNumber(left.top) - sortableNumber(right.top);
+function compareVisualThenPath(left, right2) {
+  const vertical = sortableNumber(left.top) - sortableNumber(right2.top);
   if (vertical !== 0) {
     return vertical;
   }
-  const horizontal = sortableNumber(left.left) - sortableNumber(right.left);
+  const horizontal = sortableNumber(left.left) - sortableNumber(right2.left);
   if (horizontal !== 0) {
     return horizontal;
   }
   const leftPath = typeof left.pathString === "string" ? left.pathString : rawNodeId(left, "");
-  const rightPath = typeof right.pathString === "string" ? right.pathString : rawNodeId(right, "");
+  const rightPath = typeof right2.pathString === "string" ? right2.pathString : rawNodeId(right2, "");
   return leftPath.localeCompare(rightPath);
 }
 function sortableNumber(value) {
@@ -265661,9 +266393,11 @@ function normalizePixsoNode(node, childIds, context) {
 function normalizePixsoNodeV2(node, childIds, context) {
   const normalized = normalizePixsoNode(node, childIds, context);
   const position = normalizePosition(node);
+  const assetName = typeof node.componentNormName === "string" ? node.componentNormName.trim() || void 0 : void 0;
   const result = {
     ...normalized,
-    ...position ? { position } : {}
+    ...position ? { position } : {},
+    ...assetName ? { asset: { name: assetName } } : {}
   };
   recordKnownOrigins(result, node, context);
   return result;
@@ -265721,7 +266455,7 @@ var normalizedTargetsByRawField = {
   autoLayout: ["/layout"],
   autoLayoutAbsolutePos: ["/position/mode"],
   componentKey: ["/component/key"],
-  componentNormName: ["/component/variant"],
+  componentNormName: ["/component/variant", "/asset/name"],
   props: ["/component/properties"]
 };
 function recordKnownOrigins(normalized, rawNode, context) {
@@ -265850,8 +266584,8 @@ function normalizePixsoDesignVersion(input, version2, provenance) {
     );
   }
 }
-function compareOrigins(left, right) {
-  return left.targetNodeId.localeCompare(right.targetNodeId) || left.targetPath.localeCompare(right.targetPath) || left.kind.localeCompare(right.kind) || left.sourceNodeId.localeCompare(right.sourceNodeId);
+function compareOrigins(left, right2) {
+  return left.targetNodeId.localeCompare(right2.targetNodeId) || left.targetPath.localeCompare(right2.targetPath) || left.kind.localeCompare(right2.kind) || left.sourceNodeId.localeCompare(right2.sourceNodeId);
 }
 function isVisualPropertyOverride(value) {
   return isRecord(value) && [value.left, value.top, value.width, value.height].every(
@@ -266056,7 +266790,7 @@ function recognizeStructure(node, ir) {
     decorative(node)
   ].filter((candidate2) => Boolean(candidate2));
   return candidates.sort(
-    (left, right) => right.confidence - left.confidence
+    (left, right2) => right2.confidence - left.confidence
   )[0];
 }
 function dialog(node, children) {
@@ -266303,6 +267037,562 @@ function normalizeInteractionKey(role) {
   ).join("");
 }
 
+// packages/semantic-planner/src/choice-panel-candidates.ts
+var geometryTolerance = 0.5;
+function extractChoicePanelCandidate(input) {
+  const boundary = input.ir.nodes[input.boundaryNodeId];
+  if (!boundary?.visible) {
+    return { status: "none", reasons: ["boundary is missing or hidden"] };
+  }
+  const directChildren = boundary.children.flatMap((id) => {
+    const child = input.ir.nodes[id];
+    return child?.visible ? [child] : [];
+  });
+  const rows = directChildren.flatMap((child) => {
+    const candidate2 = rowCandidate(child, input.ir, input.provenance);
+    return candidate2 ? [candidate2] : [];
+  });
+  if (rows.length < 2) {
+    return { status: "none", reasons: ["fewer than two option rows"] };
+  }
+  const trailingIndicators = repeatedTrailingIndicators(
+    directChildren,
+    input.ir
+  );
+  const acceptedRows = trailingIndicators.length >= 2 ? rows.filter(
+    (row) => right(row.boundary) <= trailingIndicators[0].geometry.x + geometryTolerance
+  ) : rows;
+  if (acceptedRows.length < 2) {
+    return {
+      status: "none",
+      reasons: ["fewer than two rows fit the repeated marker columns"]
+    };
+  }
+  if (trailingIndicators.length >= 2 && acceptedRows.length !== trailingIndicators.length) {
+    return {
+      status: "none",
+      reasons: ["option and trailing-indicator cardinalities differ"]
+    };
+  }
+  const selectedBoundaryIds = new Set(
+    acceptedRows.map((row) => row.boundary.id)
+  );
+  const orderedRows = directChildren.flatMap((child) => {
+    const row = acceptedRows.find(
+      (candidate2) => candidate2.boundary.id === child.id
+    );
+    return row ? [row] : [];
+  });
+  const titleResult = findTitle(directChildren, input.ir, boundary);
+  if (!titleResult) {
+    return { status: "none", reasons: ["unique header title is missing"] };
+  }
+  if (hasAmbiguousSectionLabel(directChildren, orderedRows, titleResult.title.id)) {
+    return {
+      status: "none",
+      reasons: ["more than one section label competes for one row boundary"]
+    };
+  }
+  const inferredSection = inferSectionLayout({
+    directChildren,
+    rows: orderedRows,
+    titleNodeId: titleResult.title.id,
+    ir: input.ir
+  });
+  const semanticRows = inferredSection ? [
+    ...orderedRows.filter(
+      (row) => !inferredSection.rowIds.has(row.boundary.id)
+    ),
+    ...orderedRows.filter(
+      (row) => inferredSection.rowIds.has(row.boundary.id)
+    )
+  ] : orderedRows;
+  const sections = buildSections({
+    directChildren,
+    rows: semanticRows,
+    titleNodeId: titleResult.title.id,
+    indicators: trailingIndicators,
+    ...inferredSection ? {
+      forcedSection: {
+        label: inferredSection.label,
+        nextRowId: semanticRows.find(
+          (row) => inferredSection.rowIds.has(row.boundary.id)
+        ).boundary.id
+      }
+    } : {}
+  });
+  const duplicateDiagnostics = semanticRows.flatMap(
+    (row, optionIndex) => row.duplicateDescriptionIds.length > 0 ? [
+      {
+        severity: "info",
+        blocking: false,
+        stage: "semantic-planning",
+        code: "DUPLICATE_MATERIALIZED_NODE_COLLAPSED",
+        message: "Collapsed overlapping materialized nodes in one choice option description slot",
+        source: {
+          artifactId: input.ir.sourceArtifactId,
+          nodeId: row.boundary.id
+        },
+        evidence: {
+          semanticSlot: `options[${optionIndex}].description`,
+          retainedNodeId: row.description.id,
+          collapsedNodeIds: row.duplicateDescriptionIds
+        }
+      }
+    ] : []
+  );
+  const semanticSourceIds = /* @__PURE__ */ new Set([
+    boundary.id,
+    titleResult.title.id,
+    ...descendantClosure(titleResult.headerAsset?.id, input.ir)
+  ]);
+  for (const section of sections) {
+    if (section.labelSourceNodeId) {
+      semanticSourceIds.add(section.labelSourceNodeId);
+    }
+    for (const option of section.options) {
+      option.sourceNodeIds.forEach((id) => semanticSourceIds.add(id));
+      if (option.info) {
+        descendantClosure(option.info.sourceNodeId, input.ir).forEach(
+          (id) => semanticSourceIds.add(id)
+        );
+      }
+    }
+  }
+  const alternativeImplementationNodeIds = rows.filter((row) => !selectedBoundaryIds.has(row.boundary.id)).filter(
+    (row) => sharesDefinitionProvenance(row, semanticRows, input.provenance)
+  ).flatMap((row) => descendantClosure(row.boundary.id, input.ir));
+  const hiddenImplementationNodeIds = boundary.children.filter((id) => input.ir.nodes[id]?.visible === false).flatMap((id) => descendantClosure(id, input.ir));
+  const emptyImplementationNodeIds = directChildren.filter((child) => !semanticSourceIds.has(child.id)).filter(
+    (child) => descendantClosure(child.id, input.ir).every((id) => {
+      const node = input.ir.nodes[id];
+      return (node.type === "frame" || node.type === "unknown") && !node.text && !node.component && !node.asset;
+    })
+  ).flatMap((child) => descendantClosure(child.id, input.ir));
+  const implementationNodeIds = [
+    .../* @__PURE__ */ new Set([
+      ...alternativeImplementationNodeIds,
+      ...hiddenImplementationNodeIds,
+      ...emptyImplementationNodeIds
+    ])
+  ];
+  const consumedNodeIds = [
+    .../* @__PURE__ */ new Set([...semanticSourceIds, ...implementationNodeIds])
+  ];
+  const unconsumedMeaningfulNodeIds = descendantClosure(boundary.id, input.ir).filter((id) => !consumedNodeIds.includes(id)).filter((id) => isMeaningful(input.ir.nodes[id]));
+  const content = {
+    title: titleResult.title.text.value,
+    titleSourceNodeId: titleResult.title.id,
+    ...titleResult.headerAsset?.asset?.name ? {
+      headerIcon: {
+        hint: titleResult.headerAsset.asset.name,
+        sourceNodeId: titleResult.headerAsset.id
+      }
+    } : {},
+    sections
+  };
+  const supporting = {
+    trailing: trailingIndicators.length === semanticRows.length,
+    descriptions: semanticRows.every((row) => Boolean(row.description)),
+    section: sections.length > 1,
+    outline: boundary.appearance.borders.length > 0 && Object.values(boundary.appearance.radii).some((value) => value > 0),
+    headerAsset: Boolean(titleResult.headerAsset)
+  };
+  const confidence = 0.8 + (supporting.trailing ? 0.05 : 0) + (supporting.descriptions ? 0.05 : 0) + (supporting.section ? 0.04 : 0) + (supporting.outline ? 0.03 : 0) + (supporting.headerAsset ? 0.03 : 0);
+  return {
+    status: "candidate",
+    candidate: {
+      boundaryNodeId: boundary.id,
+      confidence: Math.min(1, Math.round(confidence * 100) / 100),
+      content,
+      state: {
+        selectionMode: "single",
+        selectedOptionId: null
+      },
+      sourceNodeIds: [...semanticSourceIds],
+      consumedNodeIds,
+      implementationNodeIds,
+      unconsumedMeaningfulNodeIds,
+      evidence: [
+        {
+          kind: "repeated-option-rows",
+          value: String(semanticRows.length),
+          weight: 0.2
+        },
+        { kind: "unique-option-labels", value: "all", weight: 0.15 },
+        {
+          kind: "consistent-leading-marker-column",
+          value: "present",
+          weight: 0.15
+        },
+        { kind: "common-panel-boundary", value: boundary.id, weight: 0.15 },
+        {
+          kind: "unique-header-title",
+          value: titleResult.title.id,
+          weight: 0.15
+        }
+      ],
+      diagnostics: duplicateDiagnostics
+    }
+  };
+}
+function rowCandidate(boundary, ir, provenance) {
+  const descendants = descendantClosure(boundary.id, ir).slice(1).flatMap((id) => ir.nodes[id]?.visible ? [ir.nodes[id]] : []);
+  const markers = descendants.filter(
+    (node) => node.type === "ellipse" && node.geometry.width <= 24 && node.geometry.height <= 24
+  );
+  if (markers.length !== 1) {
+    return void 0;
+  }
+  const textNodes = descendants.filter(
+    (node) => node.text?.value.trim() && node.geometry.height > 0
+  );
+  const groups = collapseEquivalentText(textNodes, provenance);
+  if (groups.length < 1 || groups.length > 2) {
+    return void 0;
+  }
+  groups.sort(
+    (left, right2) => left.retained.geometry.y - right2.retained.geometry.y || left.retained.geometry.x - right2.retained.geometry.x || left.retained.id.localeCompare(right2.retained.id)
+  );
+  if (groups.length === 2 && Math.abs(groups[0].retained.geometry.y - groups[1].retained.geometry.y) <= geometryTolerance) {
+    return void 0;
+  }
+  const label = groups[0].retained;
+  const descriptionGroup = groups[1];
+  return {
+    boundary,
+    marker: markers[0],
+    label,
+    ...descriptionGroup ? { description: descriptionGroup.retained } : {},
+    duplicateDescriptionIds: descriptionGroup?.duplicates ?? [],
+    sourceNodeIds: descendantClosure(boundary.id, ir)
+  };
+}
+function collapseEquivalentText(nodes, provenance) {
+  const groups = [];
+  for (const node of [...nodes].sort(
+    (left, right2) => left.id.localeCompare(right2.id)
+  )) {
+    const match = groups.find(
+      (group) => normalizeText2(group.retained.text.value) === normalizeText2(node.text.value) && sameRectangle(group.retained, node) && (provenanceRelates(group.retained.id, node.id, provenance) || sameRectangle(group.retained, node))
+    );
+    if (match) {
+      match.duplicates.push(node.id);
+    } else {
+      groups.push({ retained: node, duplicates: [] });
+    }
+  }
+  return groups;
+}
+function buildSections(input) {
+  const rowIndex = new Map(
+    input.rows.map((row) => [
+      row.boundary.id,
+      input.directChildren.findIndex((child) => child.id === row.boundary.id)
+    ])
+  );
+  const sectionLabels = input.forcedSection ? [] : input.directChildren.filter(
+    (child) => child.id !== input.titleNodeId && Boolean(child.text?.value.trim()) && input.rows.some((row, index) => {
+      if (index === 0) {
+        return false;
+      }
+      const previous = rowIndex.get(input.rows[index - 1].boundary.id);
+      const current = rowIndex.get(row.boundary.id);
+      const candidate2 = input.directChildren.findIndex(
+        (entry) => entry.id === child.id
+      );
+      return candidate2 > previous && candidate2 < current;
+    })
+  );
+  const labelByNextRow = /* @__PURE__ */ new Map();
+  if (input.forcedSection) {
+    labelByNextRow.set(
+      input.forcedSection.nextRowId,
+      input.forcedSection.label
+    );
+  }
+  for (const label of sectionLabels) {
+    const labelIndex = input.directChildren.findIndex(
+      (child) => child.id === label.id
+    );
+    const nextRow = input.rows.find(
+      (row) => rowIndex.get(row.boundary.id) > labelIndex
+    );
+    if (nextRow) {
+      labelByNextRow.set(nextRow.boundary.id, label);
+    }
+  }
+  const sections = [];
+  input.rows.forEach((row, optionIndex) => {
+    const label = labelByNextRow.get(row.boundary.id);
+    if (sections.length === 0 || label) {
+      sections.push({
+        id: stableId("section", row.boundary.id),
+        ...label ? { label: label.text.value, labelSourceNodeId: label.id } : {},
+        options: []
+      });
+    }
+    const indicator = input.indicators[optionIndex];
+    const option = {
+      id: stableId("option", row.boundary.id),
+      sourceNodeIds: [...new Set(row.sourceNodeIds)],
+      label: row.label.text.value,
+      labelSourceNodeId: row.label.id,
+      ...row.description ? {
+        description: row.description.text.value,
+        descriptionSourceNodeIds: [
+          row.description.id,
+          ...row.duplicateDescriptionIds
+        ]
+      } : {},
+      ...indicator ? {
+        info: {
+          present: true,
+          hint: "information",
+          sourceNodeId: indicator.id
+        }
+      } : {},
+      selected: false
+    };
+    sections.at(-1).options.push(option);
+  });
+  return sections;
+}
+function inferSectionLayout(input) {
+  const rowIndexes = input.rows.map(
+    (row) => input.directChildren.findIndex((child) => child.id === row.boundary.id)
+  );
+  const labels = input.directChildren.filter((child) => {
+    if (child.id === input.titleNodeId || !child.text?.value.trim()) {
+      return false;
+    }
+    const index = input.directChildren.findIndex(
+      (candidate2) => candidate2.id === child.id
+    );
+    return rowIndexes.some(
+      (rowIndex, rowOffset) => rowOffset > 0 && index > rowIndexes[rowOffset - 1] && index < rowIndex
+    );
+  });
+  if (labels.length !== 1) {
+    return void 0;
+  }
+  const label = labels[0];
+  const emptyFrames = input.directChildren.filter(
+    (child) => (child.type === "frame" || child.type === "unknown") && descendantClosure(child.id, input.ir).every((id) => {
+      const node = input.ir.nodes[id];
+      return !node.text && !node.component && !node.asset;
+    })
+  );
+  const labelWrappers = emptyFrames.filter(
+    (frame) => frame.layout?.mode === "vertical" && frame.geometry.y > label.geometry.y + geometryTolerance && Math.abs(frame.geometry.width - label.geometry.width) <= geometryTolerance && Math.abs(frame.geometry.height - label.geometry.height) <= geometryTolerance
+  );
+  if (labelWrappers.length !== 1) {
+    return void 0;
+  }
+  const labelWrapper = labelWrappers[0];
+  const rowHeights = new Set(
+    input.rows.map((row) => Math.round(row.boundary.geometry.height))
+  );
+  const slots = emptyFrames.filter(
+    (frame) => frame.layout?.mode === "horizontal" && frame.geometry.y > labelWrapper.geometry.y + labelWrapper.geometry.height && Math.abs(frame.geometry.width - label.geometry.width) <= geometryTolerance && rowHeights.has(Math.round(frame.geometry.height))
+  ).sort(
+    (left, right2) => left.geometry.y - right2.geometry.y || left.id.localeCompare(right2.id)
+  );
+  const chains = slots.flatMap((first) => {
+    const gap = first.geometry.y - (labelWrapper.geometry.y + labelWrapper.geometry.height);
+    if (gap <= geometryTolerance) {
+      return [];
+    }
+    const chain = [first];
+    let expectedY = first.geometry.y + first.geometry.height + gap;
+    while (true) {
+      const next = slots.find(
+        (slot) => !chain.includes(slot) && Math.abs(slot.geometry.y - expectedY) <= geometryTolerance
+      );
+      if (!next) {
+        break;
+      }
+      chain.push(next);
+      expectedY = next.geometry.y + next.geometry.height + gap;
+    }
+    return chain.length >= 2 ? [chain] : [];
+  });
+  const longest = Math.max(0, ...chains.map((chain) => chain.length));
+  const best = chains.filter((chain) => chain.length === longest);
+  if (longest < 2 || best.length !== 1) {
+    return void 0;
+  }
+  const labelIndex = input.directChildren.findIndex(
+    (child) => child.id === label.id
+  );
+  const candidates = input.rows.filter(
+    (row) => input.directChildren.findIndex((child) => child.id === row.boundary.id) > labelIndex
+  );
+  const selected = [];
+  for (const slot of best[0]) {
+    const row = candidates.find(
+      (candidate2) => !selected.includes(candidate2) && Math.abs(candidate2.boundary.geometry.height - slot.geometry.height) <= geometryTolerance
+    );
+    if (!row) {
+      return void 0;
+    }
+    selected.push(row);
+  }
+  if (selected.length >= input.rows.length) {
+    return void 0;
+  }
+  return {
+    label,
+    rowIds: new Set(selected.map((row) => row.boundary.id))
+  };
+}
+function hasAmbiguousSectionLabel(directChildren, rows, titleNodeId) {
+  const indexes = rows.map(
+    (row) => directChildren.findIndex((child) => child.id === row.boundary.id)
+  );
+  return indexes.slice(1).some((current, index) => {
+    const previous = indexes[index];
+    return directChildren.slice(previous + 1, current).filter(
+      (child) => child.id !== titleNodeId && Boolean(child.text?.value.trim())
+    ).length > 1;
+  });
+}
+function findTitle(directChildren, ir, boundary) {
+  const left = boundary.geometry.x + (boundary.layout?.padding.left ?? 0) + 4;
+  const titleCandidates = directChildren.filter(
+    (child) => Boolean(child.text?.value.trim()) && child.geometry.x > left
+  );
+  const pairs = titleCandidates.flatMap((title) => {
+    const assets = directChildren.filter(
+      (candidate2) => !candidate2.text && candidate2.geometry.width <= 32 && candidate2.geometry.height <= 32 && right(candidate2) <= title.geometry.x + geometryTolerance && overlapsVertically(candidate2, title)
+    );
+    return assets.length === 1 ? [{ title, headerAsset: assets[0] }] : [];
+  });
+  if (pairs.length === 1) {
+    return pairs[0];
+  }
+  if (titleCandidates.length === 1) {
+    return { title: titleCandidates[0] };
+  }
+  return void 0;
+}
+function repeatedTrailingIndicators(children, ir) {
+  const candidates = children.filter(
+    (child) => !child.text && child.geometry.width <= 32 && child.geometry.height <= 32 && !descendantClosure(child.id, ir).some((id) => ir.nodes[id]?.text)
+  );
+  const groups = /* @__PURE__ */ new Map();
+  for (const candidate2 of candidates) {
+    const key = Math.round(candidate2.geometry.x);
+    groups.set(key, [...groups.get(key) ?? [], candidate2]);
+  }
+  return [...groups.values()].filter((group) => group.length >= 2).sort(
+    (left, right2) => right2.length - left.length || right2[0].geometry.x - left[0].geometry.x
+  )[0] ?? [];
+}
+function sharesDefinitionProvenance(candidate2, accepted, provenance) {
+  const candidateDefinitions = definitionIds(candidate2.boundary.id, provenance);
+  return accepted.some(
+    (row) => [...definitionIds(row.boundary.id, provenance)].some(
+      (id) => candidateDefinitions.has(id)
+    )
+  );
+}
+function definitionIds(nodeId, provenance) {
+  return new Set(
+    provenance.values.flatMap(
+      (origin) => origin.targetNodeId === nodeId && origin.componentDefinitionNodeId ? [origin.componentDefinitionNodeId] : []
+    )
+  );
+}
+function provenanceRelates(leftId, rightId, provenance) {
+  const left = definitionIds(leftId, provenance);
+  return [...definitionIds(rightId, provenance)].some((id) => left.has(id));
+}
+function descendantClosure(rootId, ir) {
+  if (!rootId) {
+    return [];
+  }
+  const result = [];
+  const visit2 = (id) => {
+    const node = ir.nodes[id];
+    if (!node || result.includes(id)) {
+      return;
+    }
+    result.push(id);
+    node.children.forEach(visit2);
+  };
+  visit2(rootId);
+  return result;
+}
+function normalizeText2(value) {
+  return value.replace(/\s+/g, " ").trim();
+}
+function isMeaningful(node) {
+  return Boolean(
+    node.visible && (node.text?.value.trim() || node.component || node.asset || node.type === "ellipse" || node.type === "symbol" || node.type === "instance")
+  );
+}
+function sameRectangle(left, rightNode) {
+  return Math.abs(left.geometry.x - rightNode.geometry.x) <= geometryTolerance && Math.abs(left.geometry.y - rightNode.geometry.y) <= geometryTolerance && Math.abs(left.geometry.width - rightNode.geometry.width) <= geometryTolerance && Math.abs(left.geometry.height - rightNode.geometry.height) <= geometryTolerance;
+}
+function overlapsVertically(left, rightNode) {
+  return left.geometry.y < rightNode.geometry.y + rightNode.geometry.height && rightNode.geometry.y < left.geometry.y + left.geometry.height;
+}
+function right(node) {
+  return node.geometry.x + node.geometry.width;
+}
+function stableId(prefix, sourceNodeId) {
+  return `${prefix}-${sourceNodeId.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "")}`;
+}
+
+// packages/semantic-planner/src/recognize-choice-panel.ts
+function recognizeChoicePanel(input) {
+  const extracted = extractChoicePanelCandidate(input);
+  if (extracted.status === "none") {
+    return { status: "not-recognized", diagnostics: [] };
+  }
+  const candidate2 = extracted.candidate;
+  if (candidate2.unconsumedMeaningfulNodeIds.length > 0) {
+    return {
+      status: "blocked",
+      diagnostic: {
+        severity: "error",
+        blocking: true,
+        stage: "semantic-planning",
+        code: "CHOICE_PANEL_STRUCTURE_INCOMPLETE",
+        message: "Choice panel recognition would hide meaningful unconsumed descendants",
+        source: {
+          artifactId: input.ir.sourceArtifactId,
+          nodeId: candidate2.boundaryNodeId
+        },
+        evidence: {
+          unconsumedMeaningfulNodeIds: candidate2.unconsumedMeaningfulNodeIds
+        }
+      }
+    };
+  }
+  return {
+    status: "recognized",
+    node: {
+      id: `ui_choicePanel_${sanitize(candidate2.boundaryNodeId)}`,
+      kind: "control",
+      role: "choicePanel",
+      sourceNodeIds: candidate2.consumedNodeIds,
+      layoutSourceNodeId: candidate2.boundaryNodeId,
+      confidence: candidate2.confidence,
+      evidence: candidate2.evidence,
+      content: candidate2.content,
+      state: candidate2.state,
+      children: []
+    },
+    consumedSourceNodeIds: candidate2.consumedNodeIds,
+    diagnostics: candidate2.diagnostics
+  };
+}
+function sanitize(value) {
+  return value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
 // packages/semantic-planner/src/project-compound-boundary.ts
 function projectCompoundBoundary(_input) {
   if (!("projection" in _input.mapping) || _input.mapping.projection === void 0) {
@@ -266349,7 +267639,7 @@ function projectCompoundBoundary(_input) {
             (candidate2) => candidate2.boundaryNodeId
           ),
           rejectedCandidates: rejectedCandidates.sort(
-            (left, right) => left.nodeId.localeCompare(right.nodeId)
+            (left, right2) => left.nodeId.localeCompare(right2.nodeId)
           )
         }
       }
@@ -266395,29 +267685,34 @@ function overlappingCandidateIds(candidates) {
   for (let leftIndex = 0; leftIndex < candidates.length; leftIndex += 1) {
     const left = candidates[leftIndex];
     for (let rightIndex = leftIndex + 1; rightIndex < candidates.length; rightIndex += 1) {
-      const right = candidates[rightIndex];
-      if (left.parentNodeId === right.parentNodeId && rectanglesOverlap(left.geometry, right.geometry)) {
+      const right2 = candidates[rightIndex];
+      if (left.parentNodeId === right2.parentNodeId && rectanglesOverlap(left.geometry, right2.geometry)) {
         overlapping.add(left.boundaryNodeId);
-        overlapping.add(right.boundaryNodeId);
+        overlapping.add(right2.boundaryNodeId);
       }
     }
   }
   return overlapping;
 }
-function rectanglesOverlap(left, right) {
-  return left.x < right.x + right.width && left.x + left.width > right.x && left.y < right.y + right.height && left.y + left.height > right.y;
+function rectanglesOverlap(left, right2) {
+  return left.x < right2.x + right2.width && left.x + left.width > right2.x && left.y < right2.y + right2.height && left.y + left.height > right2.y;
 }
-function compareCandidates(left, right) {
-  return left.geometry.y - right.geometry.y || left.geometry.x - right.geometry.x || left.boundaryNodeId.localeCompare(right.boundaryNodeId);
+function compareCandidates(left, right2) {
+  return left.geometry.y - right2.geometry.y || left.geometry.x - right2.geometry.x || left.boundaryNodeId.localeCompare(right2.boundaryNodeId);
 }
 
 // packages/semantic-planner/src/build-ui-manifest-v2.ts
 function buildUiManifestV2(input) {
+  if (input.provenance.sourceArtifactId !== input.ir.sourceArtifactId) {
+    throw new Error(
+      `V2_CONTRACT_INTEGRITY: normalization provenance artifact "${input.provenance.sourceArtifactId}" does not match DesignIR artifact "${input.ir.sourceArtifactId}"`
+    );
+  }
   const exact = createExactComponentRecognizer(input.exactMappings);
   const diagnostics = [];
   const ids = /* @__PURE__ */ new Map();
   const reserveUiId = (role, sourceNodeId) => {
-    const baseId = `ui_${role}_${sanitize(sourceNodeId)}`;
+    const baseId = `ui_${role}_${sanitize2(sourceNodeId)}`;
     const collision = (ids.get(baseId) ?? 0) + 1;
     ids.set(baseId, collision);
     return collision === 1 ? baseId : `${baseId}_${collision}`;
@@ -266447,6 +267742,21 @@ function buildUiManifestV2(input) {
     }
     const exactMatch = exact.match(node);
     const exactRecognition = exactMatch?.recognition;
+    const compoundRecognition = exactMatch ? { status: "not-recognized", diagnostics: [] } : recognizeChoicePanel({
+      ir: input.ir,
+      provenance: input.provenance,
+      boundaryNodeId: node.id
+    });
+    if (compoundRecognition.status === "recognized") {
+      diagnostics.push(...compoundRecognition.diagnostics);
+      return {
+        ...compoundRecognition.node,
+        id: reserveUiId("choicePanel", node.id)
+      };
+    }
+    if (compoundRecognition.status === "blocked") {
+      diagnostics.push(compoundRecognition.diagnostic);
+    }
     const recognized = exactRecognition ?? recognizeStructure(node, input.ir);
     const accepted = recognized && recognized.confidence >= confidencePolicy.warning;
     const role = accepted ? recognized.role : "unresolved";
@@ -266542,7 +267852,7 @@ function buildUiManifestV2(input) {
   assertUiManifestV2Integrity(manifest, input.ir);
   return manifest;
 }
-function sanitize(value) {
+function sanitize2(value) {
   return value.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
 }
 function onlyVisibleDirectText(childIds, ir, role) {
@@ -266660,6 +267970,7 @@ async function planFromSnapshot(input) {
   });
   const uiManifest = buildUiManifestV2({
     ir: designIr,
+    provenance: normalized.provenance,
     exactMappings: [...pack.exactPixsoMappings]
   });
   const resolutionPlan = resolveUiManifestV2({
@@ -266919,7 +268230,7 @@ function buildGenerateResult(input) {
       path: "generation-report.json",
       sha256: input.reportSha256
     }
-  ].sort((left, right) => compareText(left.path, right.path));
+  ].sort((left, right2) => compareText(left.path, right2.path));
   const importsByPackage = /* @__PURE__ */ new Map();
   for (const node of input.resolutionPlan.nodes) {
     const bindings = node.decision === "reuse" ? [node.binding] : node.decision === "compose" ? node.bindings : [];
@@ -266929,7 +268240,7 @@ function buildGenerateResult(input) {
       importsByPackage.set(binding2.package, exports);
     }
   }
-  const imports = [...importsByPackage].sort(([left], [right]) => compareText(left, right)).map(([packageName, exports]) => ({
+  const imports = [...importsByPackage].sort(([left], [right2]) => compareText(left, right2)).map(([packageName, exports]) => ({
     package: packageName,
     exports: [...exports].sort(compareText)
   }));
@@ -266937,7 +268248,7 @@ function buildGenerateResult(input) {
     manifestNodeId: entry.manifestNodeId,
     targets: [...entry.propNames].sort(compareText)
   })).sort(
-    (left, right) => compareText(left.manifestNodeId, right.manifestNodeId)
+    (left, right2) => compareText(left.manifestNodeId, right2.manifestNodeId)
   ) : [];
   return UigGenerateResultSchema.parse({
     schema: "uig-qwen-generate-result/v1",
@@ -266954,8 +268265,8 @@ function buildGenerateResult(input) {
     )
   });
 }
-function compareText(left, right) {
-  return left < right ? -1 : left > right ? 1 : 0;
+function compareText(left, right2) {
+  return left < right2 ? -1 : left > right2 ? 1 : 0;
 }
 
 // extensions/qwen-cli/src/tools.ts
