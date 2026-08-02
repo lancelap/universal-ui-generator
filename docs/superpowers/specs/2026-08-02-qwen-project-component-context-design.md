@@ -1,7 +1,7 @@
 # Qwen Project Component Context Design
 
 **Date:** 2026-08-02  
-**Status:** approved design, awaiting written-spec review  
+**Status:** approved
 **Repository:** `https://github.com/lancelap/universal-ui-generator`  
 **Extends:**
 
@@ -250,8 +250,10 @@ Every root is a public-facade contract, not merely a search directory:
 `designSystemPacks` lists every bundled pack whose verified catalog, semantic
 vocabulary, recipes, icons, and hash may contribute to the effective project
 catalog. First-run discovery proposes pack IDs from installed dependencies; it
-does not download packs. Multiple configured packs are allowed and remain
-separate evidence sources.
+does not download packs. When no installed dependency identifies a pack,
+discovery proposes the extension's visible default `sber-space-ui`; the user may
+replace it before confirmation. Multiple configured packs are allowed and
+remain separate evidence sources.
 
 All paths are workspace-relative. Absolute paths, `..`, and symlink escapes are
 invalid.
@@ -265,7 +267,7 @@ invalid.
   "schema": "project-component-mappings/v1",
   "components": [
     {
-      "componentId": "project:@app/shared-ui#AppRadioGroup",
+      "componentId": "project:@/shared/ui#AppRadioGroup",
       "semanticRoles": ["choicePanel"],
       "capabilities": ["single-selection", "value", "change"],
       "formAdapters": ["controlled"],
@@ -277,7 +279,7 @@ invalid.
       "provider": "pixso",
       "designSystem": "sber-space-ui",
       "componentKey": "radio-group-key",
-      "componentId": "project:@app/shared-ui#AppRadioGroup",
+      "componentId": "project:@/shared/ui#AppRadioGroup",
       "status": "mapped"
     }
   ]
@@ -307,7 +309,7 @@ component ID. An annotation does not itself create a semantic mapping.
   "schema": "project-component-annotations/v1",
   "components": [
     {
-      "componentId": "project:@app/shared-ui#AppRadioGroup",
+      "componentId": "project:@/shared/ui#AppRadioGroup",
       "summary": "Single-selection option group",
       "usage": ["Pass stable option IDs"],
       "restrictions": ["Do not use for multiple selection"],
@@ -353,25 +355,28 @@ A stable project component ID is derived from the public import identity, not
 the internal source path:
 
 ```text
-project:<package-or-project-name>#<public-export>
+project:<public-import-source>#<public-export>
 ```
 
 Examples:
 
 ```text
-project:@app/shared-ui#AppRadioGroup
+project:@/shared/ui#AppRadioGroup
 project:@company/ui#Button
-project:customer-portal#FilterPanel
+project:@/components#FilterPanel
+project:@/cards#default
 ```
 
 An internal file move therefore does not invalidate mappings while the public
-export remains stable.
+import source and export remain stable. A default export uses the literal public
+export name `default`. Relative import sources are not accepted as public facade
+identity because they change meaning with the generated file's location.
 
 An entry in `public-components.json` has this conceptual shape:
 
 ```json
 {
-  "id": "project:@app/shared-ui#AppRadioGroup",
+  "id": "project:@/shared/ui#AppRadioGroup",
   "kind": "react-component",
   "framework": "react",
   "availability": "verified",
@@ -593,6 +598,12 @@ Its conceptual top-level shape is:
 }
 ```
 
+A pack's `verified: true` proves library knowledge, not installation in the
+current project. A pack component is technically available in the effective
+catalog only when the installed package proof also contains its public package
+and export/type entry. Missing project installation leaves the pack vocabulary
+available for reviewed mappings but does not produce a usable import binding.
+
 The fingerprint includes configuration, lockfile, installed versions, public
 export graphs, normalized contracts, human files, and selected pack versions
 and hashes. Operational time such as `generatedAt` does not affect it. Stable
@@ -638,14 +649,26 @@ It writes nothing. After user review, Qwen calls:
 ```json
 {
   "acceptDiscoveredConfig": true,
-  "discoveryId": "discovery_<hash>"
+  "discoveryId": "discovery_<hash>",
+  "acceptedConfig": {
+    "schema": "ui-context-config/v1",
+    "framework": "react",
+    "language": "typescript",
+    "designSystemPacks": ["sber-space-ui"],
+    "componentRoots": [],
+    "iconRoots": [],
+    "workspacePackages": { "discovery": "public-exports" },
+    "ignore": []
+  }
 }
 ```
 
 The tool rejects a changed discovery with `SCAN_DISCOVERY_STALE`. On success it
-creates the managed `.ui-context/.gitignore` and missing human-owned JSON files,
-scans the project, publishes generated artifacts, and returns only compact
-summary, paths, hashes, and diagnostic counts.
+validates `acceptedConfig` against the current workspace and available bundled
+packs; the accepted config may narrow or correct the proposal shown to the user.
+It then creates the managed `.ui-context/.gitignore` and missing human-owned
+JSON files, scans the project, publishes generated artifacts, and returns only
+compact summary, paths, hashes, and diagnostic counts.
 
 Subsequent calls use the existing config without another confirmation.
 
