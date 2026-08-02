@@ -83,6 +83,10 @@ describe("Qwen Git installation copy", () => {
         );
       }
       const listed = await client.listTools();
+      const status = await client.callTool({
+        name: "get_project_ui_context_status",
+        arguments: {},
+      });
       const generated = await client.callTool({
         name: "uig_generate",
         arguments: { runId: run.runId },
@@ -90,9 +94,20 @@ describe("Qwen Git installation copy", () => {
       await client.close();
 
       expect(listed.tools.map((tool) => tool.name).sort()).toEqual([
+        "confirm_project_component_mappings",
+        "get_component_contract",
+        "get_icon_paths",
+        "get_project_ui_context_status",
+        "project_component_search",
+        "remove_project_component_mappings",
+        "scan_project_components",
         "uig_generate",
         "uig_plan",
       ]);
+      expect(status.structuredContent).toEqual({
+        status: "missing",
+        changed: [],
+      });
       expect(generated.structuredContent).toMatchObject({
         schema: "uig-qwen-generate-result/v1",
         status: "generated",
@@ -113,6 +128,12 @@ describe("Qwen Git installation copy", () => {
       ).toContain("export");
       await expect(
         readFile(join(installRoot, "node_modules")),
+      ).rejects.toMatchObject({ code: "ENOENT" });
+      await expect(
+        readFile(join(installRoot, "packages")),
+      ).rejects.toMatchObject({ code: "ENOENT" });
+      await expect(
+        readFile(join(installRoot, "extensions")),
       ).rejects.toMatchObject({ code: "ENOENT" });
       expect(Buffer.concat(stderr).toString("utf8")).toBe("");
     } finally {

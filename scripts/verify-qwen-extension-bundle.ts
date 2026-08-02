@@ -107,6 +107,16 @@ function assertSafeBundle(bundle: string): void {
     [/C:\\Users\\/, "local Windows user path"],
     [/\/\/[#@]\s*sourceMappingURL=/, "source map directive"],
     [/fixtures\//, "fixture path"],
+    [/project-context-basic/, "project-context fixture source"],
+    [
+      /"schema"\s*:\s*"(?:public-components|installed-packages|effective-component-catalog|project-scan)\/v1"/,
+      "serialized generated project-context artifact",
+    ],
+    [/acceptance-sentinel-secret/, "project-context sentinel secret"],
+    [
+      /(?:from\s+|require\()['"]typescript['"]/,
+      "unbundled TypeScript runtime import",
+    ],
     [/your_access_token/i, "example access token"],
     [/-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----/, "private key"],
     [/\bPIXSO_ACCESS_TOKEN\s*=/, "access-token assignment"],

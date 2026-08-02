@@ -3,9 +3,9 @@
   "buildCommand": "pnpm build:qwen-extension",
   "bundler": "esbuild@0.28.1",
   "lockfile": "pnpm-lock.yaml",
-  "lockfileSha256": "2e97af74dd72cfec772a8c479ba7b6b3f63a241b6c9ed34908ba4213229eb0b4",
+  "lockfileSha256": "44dc661541916160169ccd53928d225f7e3224559974dbbe6e311ae6e67a8725",
   "node": ">=22",
   "schema": "uig-qwen-adapter-provenance/v1",
-  "sha256": "857d0918672e9e9f3dd956f803eee26ad6bfc970ac62529c2755899a88ad5a2f",
+  "sha256": "17c4296b950b517ca0a260481a54fc7f9f51d677d575657d94e7a9a7578637fa",
   "sourceEntry": "extensions/qwen-cli/src/server.ts"
 }

@@ -208,6 +208,10 @@ The default design system is `sber-space-ui`. The extension adds:
 /uig:plan <pixso-url> [design-system]
 /uig:generate <run-id>
 /uig:pixso-to-react <pixso-url> [design-system]
+/uig:scan
+/uig:components <query or role:semantic-role>
+/uig:map <add|remove> <component> <semantic-role>
+/uig:status
 ```
 
 `/uig:plan` creates a durable checkpoint and stops. A ready result contains
@@ -274,6 +278,68 @@ does not authorize TSX, and Qwen must not repair or bypass it.
 
 The generated bundle is presentation-only. The extension does not implement
 business logic, state, API calls, form integration, or application callbacks.
+
+### Project component context
+
+`/uig:scan` prepares an offline, deterministic catalog of the current
+project's proven public React components and icons. It does not require a Pixso
+token, contact Pixso or another network service, execute project JavaScript, or
+install packages. There is intentionally no user-facing `uig scan` CLI
+subcommand; project-context preparation is exposed through the bundled Qwen MCP
+tools and commands only.
+
+On first use, `/uig:scan` performs read-only discovery. Qwen shows every
+proposed public facade, import source, and selected design-system pack. Nothing
+is written until the user explicitly confirms or corrects that proposal. After
+confirmation the scanner proves public exports and TypeScript contracts and
+creates `.ui-context`.
+
+Ownership inside `.ui-context` is explicit:
+
+| Path               | Owner and lifecycle                                                     |
+| ------------------ | ----------------------------------------------------------------------- |
+| `config.json`      | Human-owned accepted public roots and selected packs                    |
+| `mappings.json`    | Human-owned, explicitly reviewed semantic mappings                      |
+| `annotations.json` | Human-owned usage notes and restrictions                                |
+| `policies.json`    | Human-owned fail-closed resolution policy                               |
+| `.gitignore`       | Managed file containing `generated/`                                    |
+| `generated/`       | Reproducible scanner facts, diagnostics, and effective catalog; ignored |
+
+Commit the four human-owned JSON files and the managed `.gitignore`. Do not
+edit generated files. Imports enter the catalog only when a configured public
+facade and TypeScript alias or package export prove the exact public import;
+presence somewhere under `src` is not sufficient.
+
+Use the commands as follows:
+
+- `/uig:status` reads only readiness. `missing` recommends a scan; `stale`
+  reports which fingerprint categories changed; it never starts a scan.
+- `/uig:components AppRadioGroup` performs bounded addressable search and, for
+  one exact result, returns its normalized prop contract and evidence.
+- `/uig:components role:choicePanel` searches one exact semantic role without
+  reading the complete generated catalog.
+- `/uig:map add AppRadioGroup choicePanel` shows the exact component, import,
+  evidence, binding changes, and current fingerprint, then requires explicit
+  confirmation before persisting the mapping. Use `remove` to remove reviewed
+  bindings.
+
+Trust states are intentionally different. `verified` proves technical public
+availability. `suggested` is a deterministic hint and is not generation
+authority. Only user-confirmed `mapped` and design-system `pack-owned` facts
+may be treated as resolved. Mapping mutations reject stale fingerprints rather
+than applying a review to changed project facts.
+
+If a source contract, public facade, lockfile, mapping, policy, annotation, or
+selected pack changes, `/uig:status` reports the catalog as stale and names the
+changed categories. Re-run `/uig:scan` explicitly. A semantic catalog blocker
+returns compact diagnostics plus
+`.ui-context/generated/failed-scan-diagnostics.json`; when a prior valid catalog
+exists, its authority bytes remain unchanged.
+
+This slice deliberately stops at verified project context. `uig_plan` does not
+yet consume the project component catalog, so the new catalog does not change
+Pixso resolution or React generation behavior. That resolver integration is a
+separate future slice.
 
 ### Extension lifecycle and local development
 
