@@ -141,6 +141,15 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/project-scanner:
+    dependencies:
+      "@uig/contracts":
+        specifier: workspace:*
+        version: link:../contracts
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+
   packages/provider-pixso:
     dependencies:
       "@modelcontextprotocol/client":
