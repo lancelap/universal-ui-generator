@@ -12,12 +12,17 @@ import { assertPublicComponentsV1Integrity } from "@uig/contracts";
 import ts from "typescript";
 
 import { normalizeType } from "./normalize-prop-type.js";
+import {
+  type SemanticVocabulary,
+  suggestProjectSemantics,
+} from "./suggest-semantics.js";
 import type { ResolvedPublicRoot } from "./types.js";
 
 export async function scanPublicProject(input: {
   workspaceDir: string;
   config: UiContextConfigV1;
   resolvedRoots: readonly ResolvedPublicRoot[];
+  semanticVocabulary?: SemanticVocabulary;
 }): Promise<PublicComponentsV1> {
   const configPath = ts.findConfigFile(
     input.workspaceDir,
@@ -143,7 +148,7 @@ export async function scanPublicProject(input: {
               };
             })
         : [];
-      components.push({
+      const verifiedComponent: VerifiedProjectComponent = {
         id,
         kind: "react-component",
         framework: "react",
@@ -165,7 +170,18 @@ export async function scanPublicProject(input: {
             symbol: checker.typeToString(propsType, declaration),
           },
         ],
-      });
+      };
+      if (input.semanticVocabulary) {
+        const suggestions = suggestProjectSemantics({
+          component: verifiedComponent,
+          vocabulary: input.semanticVocabulary,
+        });
+        verifiedComponent.semantics = suggestions.semanticRoles;
+        verifiedComponent.capabilities = suggestions.capabilities;
+        verifiedComponent.formAdapters = suggestions.formAdapters;
+        diagnostics.push(...suggestions.diagnostics);
+      }
+      components.push(verifiedComponent);
     }
   }
   const result: PublicComponentsV1 = {

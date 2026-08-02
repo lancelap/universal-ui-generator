@@ -64,6 +64,37 @@ describe("scanPublicProject", () => {
     ]);
   });
 
+  it("attaches only vocabulary-approved suggestions after technical proof", async () => {
+    const semanticConfig: UiContextConfigV1 = {
+      ...config,
+      componentRoots: [
+        {
+          path: "src/semantic",
+          entry: "src/semantic/index.ts",
+          importSource: "@/semantic",
+        },
+      ],
+      iconRoots: [],
+    };
+    const resolvedRoots = await resolveConfiguredPublicRoots({
+      workspaceDir,
+      config: semanticConfig,
+    });
+    const result = await scanPublicProject({
+      workspaceDir,
+      config: semanticConfig,
+      resolvedRoots,
+      semanticVocabulary: {
+        roles: new Set(["choicePanel"]),
+        capabilities: new Set(["single-selection", "value", "change"]),
+        formAdapters: new Set(["controlled"]),
+      },
+    });
+    expect(result.components[0]?.semantics).toContainEqual(
+      expect.objectContaining({ role: "choicePanel", status: "suggested" }),
+    );
+  });
+
   it("preserves normalized public props and import styles", async () => {
     const resolvedRoots = await resolveConfiguredPublicRoots({
       workspaceDir,
