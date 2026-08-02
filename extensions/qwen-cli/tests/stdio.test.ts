@@ -50,7 +50,7 @@ describe("Qwen adapter bundle", () => {
     expect(repoRoot).not.toBe("");
   });
 
-  it("serves exactly two tools over stdio and forks itself for generation", async () => {
+  it("serves exactly nine tools over stdio and forks itself for generation", async () => {
     const workspace = await mkdtemp(join(tmpdir(), "uig-qwen-stdio-"));
     const stderr: Buffer[] = [];
     const transportErrors: string[] = [];
@@ -81,6 +81,13 @@ describe("Qwen adapter bundle", () => {
 
       const listed = await client.listTools();
       expect(listed.tools.map((tool) => tool.name).sort()).toEqual([
+        "confirm_project_component_mappings",
+        "get_component_contract",
+        "get_icon_paths",
+        "get_project_ui_context_status",
+        "project_component_search",
+        "remove_project_component_mappings",
+        "scan_project_components",
         "uig_generate",
         "uig_plan",
       ]);
@@ -88,6 +95,15 @@ describe("Qwen adapter bundle", () => {
         expect(tool.inputSchema).toBeDefined();
         expect(tool.outputSchema).toBeDefined();
       }
+
+      const status = await client.callTool({
+        name: "get_project_ui_context_status",
+        arguments: {},
+      });
+      expect(status.structuredContent).toEqual({
+        status: "missing",
+        changed: [],
+      });
 
       const generated = await client.callTool({
         name: "uig_generate",

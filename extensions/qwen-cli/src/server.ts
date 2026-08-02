@@ -8,6 +8,7 @@ import { generateFromRun } from "@uig/cli/generate-from-run";
 import { runGenerateWorker } from "@uig/cli/generate-from-run-worker";
 import { planFromUrl } from "@uig/cli/plan-from-url";
 import { createRemotePixsoDslClient } from "@uig/provider-pixso";
+import { createProjectContextService } from "@uig/project-context";
 
 import {
   type UigGenerateResult,
@@ -18,12 +19,29 @@ import {
   UigPlanResultSchema,
 } from "./results.js";
 import {
+  ComponentContractInputSchema,
+  ComponentContractResultSchema,
+  EmptyInputSchema,
+  IconPathsInputSchema,
+  IconPathsResultSchema,
+  MappingMutationInputSchema,
+  MappingMutationResultSchema,
+  ProjectComponentSearchInputSchema,
+  ProjectComponentSearchResultSchema,
+  ProjectScanInputSchema,
+  ProjectScanResultSchema,
+  ProjectStatusResultSchema,
+} from "./project-context-results.js";
+import { createProjectContextTools } from "./project-context-tools.js";
+import {
   createUigTools,
   UigToolError,
   type UigToolDependencies,
 } from "./tools.js";
 
-export interface UigMcpToolHandlers {
+export interface UigMcpToolHandlers extends ReturnType<
+  typeof createProjectContextTools
+> {
   plan(input: unknown): Promise<UigPlanResult>;
   generate(input: unknown): Promise<UigGenerateResult>;
 }
@@ -54,6 +72,8 @@ export function createUigMcpServer(input: {
     },
     async (arguments_) => toolResponse(() => input.tools.plan(arguments_)),
   );
+
+  registerProjectContextTools(server, input.tools);
 
   server.registerTool(
     "uig_generate",
@@ -88,16 +108,23 @@ export async function runQwenAdapter(): Promise<void> {
     generateFromRun,
   };
   const tools = createUigTools(dependencies);
-  serveStdio(() => createUigMcpServer({ tools }), {
-    onerror: () => {
-      process.stderr.write("uig adapter protocol error\n");
+  const projectContextTools = createProjectContextTools(
+    createProjectContextService({
+      workspaceDir: process.cwd(),
+      extensionRoot,
+    }),
+  );
+  serveStdio(
+    () => createUigMcpServer({ tools: { ...tools, ...projectContextTools } }),
+    {
+      onerror: () => {
+        process.stderr.write("uig adapter protocol error\n");
+      },
     },
-  });
+  );
 }
 
-async function toolResponse<T extends UigPlanResult | UigGenerateResult>(
-  action: () => Promise<T>,
-) {
+async function toolResponse<T extends object>(action: () => Promise<T>) {
   try {
     const result = await action();
     return {
@@ -130,6 +157,88 @@ async function toolResponse<T extends UigPlanResult | UigGenerateResult>(
       ],
     };
   }
+}
+
+function registerProjectContextTools(
+  server: McpServer,
+  tools: UigMcpToolHandlers,
+): void {
+  server.registerTool(
+    "scan_project_components",
+    {
+      title: "Scan project components",
+      description: "Discover or refresh the verified project component catalog",
+      inputSchema: ProjectScanInputSchema,
+      outputSchema: ProjectScanResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.scanProjectComponents(arguments_)),
+  );
+  server.registerTool(
+    "project_component_search",
+    {
+      title: "Search project components",
+      description: "Search the active verified project component catalog",
+      inputSchema: ProjectComponentSearchInputSchema,
+      outputSchema: ProjectComponentSearchResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.projectComponentSearch(arguments_)),
+  );
+  server.registerTool(
+    "get_component_contract",
+    {
+      title: "Get component contract",
+      description: "Read one exact verified component contract",
+      inputSchema: ComponentContractInputSchema,
+      outputSchema: ComponentContractResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.getComponentContract(arguments_)),
+  );
+  server.registerTool(
+    "get_icon_paths",
+    {
+      title: "Get icon paths",
+      description: "Resolve exact verified project icon imports",
+      inputSchema: IconPathsInputSchema,
+      outputSchema: IconPathsResultSchema,
+    },
+    async (arguments_) => toolResponse(() => tools.getIconPaths(arguments_)),
+  );
+  server.registerTool(
+    "confirm_project_component_mappings",
+    {
+      title: "Confirm project component mappings",
+      description: "Persist explicitly reviewed semantic component mappings",
+      inputSchema: MappingMutationInputSchema,
+      outputSchema: MappingMutationResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.confirmProjectComponentMappings(arguments_)),
+  );
+  server.registerTool(
+    "remove_project_component_mappings",
+    {
+      title: "Remove project component mappings",
+      description: "Remove explicitly selected semantic component mappings",
+      inputSchema: MappingMutationInputSchema,
+      outputSchema: MappingMutationResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.removeProjectComponentMappings(arguments_)),
+  );
+  server.registerTool(
+    "get_project_ui_context_status",
+    {
+      title: "Get project UI context status",
+      description: "Read project component catalog readiness without scanning",
+      inputSchema: EmptyInputSchema,
+      outputSchema: ProjectStatusResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.getProjectUiContextStatus(arguments_)),
+  );
 }
 
 function isMainModule(): boolean {

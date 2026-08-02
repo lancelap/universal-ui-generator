@@ -8,9 +8,11 @@ import { Client, InMemoryTransport } from "@modelcontextprotocol/client";
 import { generateFromRun } from "@uig/cli/generate-from-run";
 import { planFromUrl } from "@uig/cli/plan-from-url";
 import type { PixsoDslClient } from "@uig/provider-pixso";
+import { createProjectContextService } from "@uig/project-context";
 import { afterEach, describe, expect, it } from "vitest";
 
 import { createUigMcpServer } from "../src/server.js";
+import { createProjectContextTools } from "../src/project-context-tools.js";
 import { createUigTools } from "../src/tools.js";
 
 const repoRoot = fileURLToPath(new URL("../../../", import.meta.url));
@@ -60,7 +62,15 @@ describe("direct service and MCP adapter parity", () => {
       planFromUrl,
       generateFromRun,
     });
-    const server = createUigMcpServer({ tools });
+    const projectContextTools = createProjectContextTools(
+      createProjectContextService({
+        workspaceDir: mcpWorkspace,
+        extensionRoot: repoRoot,
+      }),
+    );
+    const server = createUigMcpServer({
+      tools: { ...tools, ...projectContextTools },
+    });
     const [clientTransport, serverTransport] =
       InMemoryTransport.createLinkedPair();
     const client = new Client({

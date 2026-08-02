@@ -21,6 +21,7 @@ import { ensureContainedDirectoryTree } from "@uig/design-context";
 import { ReactGenerationError } from "@uig/generator-react";
 import { type PixsoDslClient, PixsoProviderError } from "@uig/provider-pixso";
 import { ZodError } from "zod";
+import type { ProjectContextErrorCode } from "@uig/project-context";
 
 import {
   buildGenerateResult,
@@ -38,7 +39,8 @@ export type UigToolErrorCode =
   | "UIG_PACK_INVALID"
   | "UIG_RUN_INVALID"
   | "UIG_GENERATION_FAILED"
-  | "UIG_FILESYSTEM_FAILED";
+  | "UIG_FILESYSTEM_FAILED"
+  | ProjectContextErrorCode;
 
 export class UigToolError extends Error {
   readonly name = "UigToolError";

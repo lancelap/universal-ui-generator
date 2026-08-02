@@ -73,6 +73,9 @@ importers:
       "@uig/generator-react":
         specifier: workspace:*
         version: link:../../packages/generator-react
+      "@uig/project-context":
+        specifier: workspace:*
+        version: link:../../packages/project-context
       "@uig/provider-pixso":
         specifier: workspace:*
         version: link:../../packages/provider-pixso

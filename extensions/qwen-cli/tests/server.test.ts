@@ -14,12 +14,19 @@ describe("createUigMcpServer", () => {
     await Promise.all(closeActions.splice(0).map((close) => close()));
   });
 
-  it("exposes exactly two tools with visible schemas", async () => {
+  it("exposes exactly nine tools with visible schemas", async () => {
     const { client } = await connectedClient(handlers());
 
     const listed = await client.listTools();
 
     expect(listed.tools.map((tool) => tool.name).sort()).toEqual([
+      "confirm_project_component_mappings",
+      "get_component_contract",
+      "get_icon_paths",
+      "get_project_ui_context_status",
+      "project_component_search",
+      "remove_project_component_mappings",
+      "scan_project_components",
       "uig_generate",
       "uig_plan",
     ]);
@@ -29,10 +36,24 @@ describe("createUigMcpServer", () => {
     }
   });
 
+  it("returns project status as identical text and structured content", async () => {
+    const { client } = await connectedClient(handlers());
+    const result = await client.callTool({
+      name: "get_project_ui_context_status",
+      arguments: {},
+    });
+    const expected = { status: "missing", changed: [] };
+    expect(result.structuredContent).toEqual(expected);
+    expect(result.content).toEqual([
+      { type: "text", text: JSON.stringify(expected) },
+    ]);
+  });
+
   it("returns compact plan and generation results as structured content", async () => {
     const expectedPlan = planResult();
     const expectedGeneration = generateResult();
     const { client } = await connectedClient({
+      ...handlers(),
       plan: async () => expectedPlan,
       generate: async () => expectedGeneration,
     });
@@ -112,7 +133,18 @@ function handlers(): UigMcpToolHandlers {
   return {
     plan: async () => planResult(),
     generate: async () => generateResult(),
+    scanProjectComponents: unimplemented,
+    projectComponentSearch: unimplemented,
+    getComponentContract: unimplemented,
+    getIconPaths: unimplemented,
+    confirmProjectComponentMappings: unimplemented,
+    removeProjectComponentMappings: unimplemented,
+    getProjectUiContextStatus: async () => ({ status: "missing", changed: [] }),
   };
+}
+
+async function unimplemented(): Promise<never> {
+  throw new Error("not called");
 }
 
 function planResult(): UigPlanResult {

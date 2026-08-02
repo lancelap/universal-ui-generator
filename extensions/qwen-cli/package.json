@@ -11,6 +11,7 @@
     "@uig/design-context": "workspace:*",
     "@uig/generator-react": "workspace:*",
     "@uig/provider-pixso": "workspace:*",
+    "@uig/project-context": "workspace:*",
     "zod": "4.2.0"
   },
   "devDependencies": {
