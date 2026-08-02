@@ -14,6 +14,7 @@ import {
   type ProjectComponentPoliciesV1,
   ProjectComponentPoliciesV1Schema,
   type ProjectScanDiagnostic,
+  ProjectScanDiagnosticSchema,
   type PublicComponentsV1,
   PublicComponentsV1Schema,
   stableStringify,
@@ -70,6 +71,12 @@ export interface ProjectContextStore {
   }>;
   readActiveCatalog(): Promise<EffectiveComponentCatalogV1 | null>;
   readPublicComponents(): Promise<PublicComponentsV1 | null>;
+  publishFailedScan(input: {
+    scanId: string;
+    diagnostics: ProjectScanDiagnostic[];
+  }): Promise<{
+    artifactPath: ".ui-context/generated/failed-scan-diagnostics.json";
+  }>;
 }
 
 export function createProjectContextStore(
@@ -334,6 +341,38 @@ export function createProjectContextStore(
         if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
         throw error;
       }
+    },
+
+    async publishFailedScan(input) {
+      for (const diagnostic of input.diagnostics) {
+        validateWithSchema(ProjectScanDiagnosticSchema, diagnostic);
+      }
+      const artifact = {
+        schema: "project-scan-failure/v1",
+        scanId: input.scanId,
+        diagnostics: input.diagnostics,
+      };
+      const serialized = stableStringify(artifact);
+      if (
+        serialized.includes(workspaceDir) ||
+        /PIXSO_ACCESS_TOKEN|authorization|password|secret/i.test(serialized)
+      ) {
+        throw new ProjectContextError(
+          "PROJECT_CONTEXT_FILESYSTEM_FAILED",
+          "Failed scan diagnostics contain forbidden local or secret data",
+        );
+      }
+      await ensureContext();
+      await ensureContainedDirectoryTree(contextDir, ["generated"]);
+      await writeAtomically(
+        generatedDir,
+        "failed-scan-diagnostics.json",
+        new TextEncoder().encode(serialized),
+      );
+      return {
+        artifactPath:
+          ".ui-context/generated/failed-scan-diagnostics.json" as const,
+      };
     },
   };
 

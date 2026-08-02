@@ -71,7 +71,7 @@ export type ProjectScanCommandResult =
         returned: ProjectScanDiagnostic[];
         truncated: boolean;
       };
-      artifactPath: ".ui-context/generated/diagnostics.json";
+      artifactPath: ".ui-context/generated/failed-scan-diagnostics.json";
     };
 
 export interface ProjectUiContextStatus {
@@ -102,8 +102,12 @@ export interface ProjectContextService {
   getIconPaths(input: {
     names: readonly string[];
   }): Promise<ReturnType<typeof getIconPathsFromCatalog>>;
-  confirmMappings(input: MappingMutationCommand): Promise<ProjectMappingMutationResult>;
-  removeMappings(input: MappingMutationCommand): Promise<ProjectMappingMutationResult>;
+  confirmMappings(
+    input: MappingMutationCommand,
+  ): Promise<ProjectMappingMutationResult>;
+  removeMappings(
+    input: MappingMutationCommand,
+  ): Promise<ProjectMappingMutationResult>;
 }
 
 export interface MappingMutationCommand {
@@ -281,6 +285,22 @@ export function createProjectContextService(input: {
           summary: built.catalog.summary,
           diagnostics: boundedDiagnostics(built.catalog.diagnostics),
         };
+      } catch (error) {
+        if (!isBlockingCatalogError(error)) throw error;
+        const diagnostics: ProjectScanDiagnostic[] = [
+          {
+            severity: "error",
+            code: error.code,
+            message: `Project component scan blocked with ${error.code}`,
+          },
+        ];
+        const failed = await store.publishFailedScan({ scanId, diagnostics });
+        return {
+          status: "blocked",
+          stage: "project-scan",
+          diagnostics: boundedDiagnostics(diagnostics),
+          artifactPath: failed.artifactPath,
+        };
       } finally {
         await reservation.release();
       }
@@ -321,7 +341,11 @@ export function createProjectContextService(input: {
     async getComponentContract(query) {
       const catalog = await requireActiveCatalog(store);
       const publicComponents = await store.readPublicComponents();
-      return getComponentContractFromCatalog(catalog, query, publicComponents ?? undefined);
+      return getComponentContractFromCatalog(
+        catalog,
+        query,
+        publicComponents ?? undefined,
+      );
     },
 
     async getIconPaths(query) {
@@ -336,6 +360,20 @@ export function createProjectContextService(input: {
       return mutateMappings("remove", command);
     },
   };
+}
+
+const blockingCatalogCodes = new Set([
+  "DUPLICATE_COMPONENT_ID",
+  "MAPPING_TARGET_NOT_FOUND",
+  "SEMANTIC_ROLE_UNKNOWN",
+  "COMPONENT_CAPABILITY_UNKNOWN",
+  "FORM_ADAPTER_UNKNOWN",
+]);
+
+function isBlockingCatalogError(error: unknown): error is ProjectContextError {
+  return (
+    error instanceof ProjectContextError && blockingCatalogCodes.has(error.code)
+  );
 }
 
 async function requireActiveCatalog(

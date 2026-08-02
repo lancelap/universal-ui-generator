@@ -155,6 +155,81 @@ describe("createProjectContextService", () => {
       changed: ["mappings"],
     });
   });
+
+  it("returns blocked diagnostics without replacing the previous authority catalog", async () => {
+    const workspaceDir = await fixtureWorkspace();
+    const service = createProjectContextService({
+      workspaceDir,
+      extensionRoot,
+    });
+    const discovered = await service.scan({});
+    if (discovered.status !== "needs-configuration")
+      throw new Error("unexpected state");
+    const completed = await service.scan({
+      acceptDiscoveredConfig: true,
+      discoveryId: discovered.discoveryId,
+      acceptedConfig: discovered.proposedConfig,
+    });
+    if (completed.status !== "completed") throw new Error("unexpected state");
+    const catalogPath = join(
+      workspaceDir,
+      ".ui-context/generated/effective-component-catalog.json",
+    );
+    const previousCatalog = await readFile(catalogPath);
+
+    await writeFile(
+      join(workspaceDir, ".ui-context/mappings.json"),
+      stableStringify({
+        schema: "project-component-mappings/v1",
+        components: [
+          {
+            componentId: "project:@/shared/ui#Missing",
+            semanticRoles: ["choicePanel"],
+            capabilities: [],
+            formAdapters: [],
+            status: "mapped",
+          },
+        ],
+        designComponents: [],
+      }),
+    );
+
+    const blocked = await service.scan({});
+
+    expect(blocked).toMatchObject({
+      status: "blocked",
+      stage: "project-scan",
+      artifactPath: ".ui-context/generated/failed-scan-diagnostics.json",
+      diagnostics: {
+        total: 1,
+        returned: [
+          expect.objectContaining({
+            severity: "error",
+            code: "MAPPING_TARGET_NOT_FOUND",
+          }),
+        ],
+      },
+    });
+    expect(await readFile(catalogPath)).toEqual(previousCatalog);
+    expect(
+      JSON.parse(
+        await readFile(
+          join(
+            workspaceDir,
+            ".ui-context/generated/failed-scan-diagnostics.json",
+          ),
+          "utf8",
+        ),
+      ),
+    ).toMatchObject({
+      schema: "project-scan-failure/v1",
+      diagnostics: [{ code: "MAPPING_TARGET_NOT_FOUND" }],
+    });
+    expect(await service.status()).toMatchObject({
+      status: "stale",
+      changed: ["mappings"],
+    });
+  });
 });
 
 async function exists(path: string): Promise<boolean> {
