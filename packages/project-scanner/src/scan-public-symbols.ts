@@ -1,3 +1,4 @@
+import { realpath } from "node:fs/promises";
 import { relative, sep } from "node:path";
 
 import type {
@@ -24,8 +25,9 @@ export async function scanPublicProject(input: {
   resolvedRoots: readonly ResolvedPublicRoot[];
   semanticVocabulary?: SemanticVocabulary;
 }): Promise<PublicComponentsV1> {
+  const workspaceDir = await realpath(input.workspaceDir);
   const configPath = ts.findConfigFile(
-    input.workspaceDir,
+    workspaceDir,
     ts.sys.fileExists,
     "tsconfig.json",
   );
@@ -34,7 +36,7 @@ export async function scanPublicProject(input: {
   const parsed = ts.parseJsonConfigFileContent(
     read.config,
     ts.sys,
-    input.workspaceDir,
+    workspaceDir,
     undefined,
     configPath,
   );
@@ -84,10 +86,7 @@ export async function scanPublicProject(input: {
           exportName === "default" ? ("default" as const) : ("named" as const),
       };
       const id = `project:${root.importSource}#${exportName}`;
-      const path = relative(
-        input.workspaceDir,
-        declaration.getSourceFile().fileName,
-      )
+      const path = relative(workspaceDir, declaration.getSourceFile().fileName)
         .split(sep)
         .join("/");
       const evidence = [
