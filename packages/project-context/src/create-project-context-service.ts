@@ -26,6 +26,15 @@ import {
   createProjectContextStore,
   type HumanProjectContext,
 } from "./project-context-store.js";
+import {
+  applyMappingChanges,
+  type ProjectComponentMappingChange,
+} from "./mutate-mappings.js";
+import {
+  getComponentContractFromCatalog,
+  getIconPathsFromCatalog,
+  searchProjectContextCatalog,
+} from "./query-project-context.js";
 
 export type ProjectScanCommandResult =
   | {
@@ -81,6 +90,39 @@ export interface ProjectContextService {
     acceptedConfig?: UiContextConfigV1;
   }): Promise<ProjectScanCommandResult>;
   status(): Promise<ProjectUiContextStatus>;
+  search(input: {
+    query?: string;
+    semanticRole?: string;
+    status?: "suggested" | "mapped" | "pack-owned";
+    limit?: number;
+  }): Promise<ReturnType<typeof searchProjectContextCatalog>>;
+  getComponentContract(input: {
+    componentId: string;
+  }): Promise<ReturnType<typeof getComponentContractFromCatalog>>;
+  getIconPaths(input: {
+    names: readonly string[];
+  }): Promise<ReturnType<typeof getIconPathsFromCatalog>>;
+  confirmMappings(input: MappingMutationCommand): Promise<ProjectMappingMutationResult>;
+  removeMappings(input: MappingMutationCommand): Promise<ProjectMappingMutationResult>;
+}
+
+export interface MappingMutationCommand {
+  catalogFingerprint: string;
+  mappings: readonly ProjectComponentMappingChange[];
+}
+
+export interface ProjectMappingMutationResult {
+  mappingPath: ".ui-context/mappings.json";
+  catalogPath: ".ui-context/generated/effective-component-catalog.json";
+  catalogSha256: string;
+  catalogFingerprint: string;
+  summary: {
+    verifiedComponents: number;
+    verifiedIcons: number;
+    mappedRoles: number;
+    suggestedRoles: number;
+    warnings: number;
+  };
 }
 
 export function createProjectContextService(input: {
@@ -94,6 +136,81 @@ export function createProjectContextService(input: {
     input.processIsAlive ? { processIsAlive: input.processIsAlive } : {},
   );
   const now = input.now ?? (() => new Date());
+
+  async function mutateMappings(
+    operation: "confirm" | "remove",
+    command: MappingMutationCommand,
+  ): Promise<ProjectMappingMutationResult> {
+    const human = await store.readHumanContext();
+    const active = await requireActiveCatalog(store);
+    if (!human) {
+      throw new ProjectContextError(
+        "PROJECT_COMPONENT_CATALOG_MISSING",
+        "Project UI context is missing",
+      );
+    }
+    const current = await buildCurrentInputs({
+      workspaceDir: input.workspaceDir,
+      extensionRoot: input.extensionRoot,
+      human,
+    });
+    const currentFingerprint = fingerprintProjectContext(current.inputs);
+    if (
+      active.fingerprint.value !== currentFingerprint.value ||
+      command.catalogFingerprint !== currentFingerprint.value
+    ) {
+      throw new ProjectContextError(
+        "PROJECT_COMPONENT_CATALOG_STALE",
+        "Project component catalog changed before mapping confirmation",
+      );
+    }
+    const nextMappings = applyMappingChanges({
+      current: human.mappings,
+      changes: command.mappings,
+      operation,
+    });
+    const replaced = await store.replaceMappings({
+      expectedSha256: human.mappingsSha256,
+      mappings: nextMappings,
+    });
+    try {
+      const built = await buildCurrentContext({
+        workspaceDir: input.workspaceDir,
+        extensionRoot: input.extensionRoot,
+        human: {
+          ...human,
+          mappings: nextMappings,
+          mappingsSha256: replaced.writtenSha256,
+        },
+      });
+      const published = await store.publishGenerated({
+        projectScan: {
+          schema: "project-scan/v1",
+          scanId: createHash("sha256")
+            .update(`mapping:${built.fingerprint.value}`)
+            .digest("hex"),
+          fingerprint: built.fingerprint.value,
+        },
+        installedPackages: built.inputs.installedPackages,
+        publicComponents: built.inputs.publicComponents,
+        diagnostics: built.catalog.diagnostics,
+        catalog: built.catalog,
+      });
+      return {
+        mappingPath: ".ui-context/mappings.json",
+        catalogPath: published.catalogPath,
+        catalogSha256: published.catalogSha256,
+        catalogFingerprint: built.fingerprint.value,
+        summary: built.catalog.summary,
+      };
+    } catch (error) {
+      await store.replaceMappings({
+        expectedSha256: replaced.writtenSha256,
+        mappings: replaced.previous,
+      });
+      throw error;
+    }
+  }
 
   return {
     async scan(command) {
@@ -193,7 +310,45 @@ export function createProjectContextService(input: {
         },
       };
     },
+
+    async search(query) {
+      return searchProjectContextCatalog(
+        await requireActiveCatalog(store),
+        query,
+      );
+    },
+
+    async getComponentContract(query) {
+      const catalog = await requireActiveCatalog(store);
+      const publicComponents = await store.readPublicComponents();
+      return getComponentContractFromCatalog(catalog, query, publicComponents ?? undefined);
+    },
+
+    async getIconPaths(query) {
+      return getIconPathsFromCatalog(await requireActiveCatalog(store), query);
+    },
+
+    async confirmMappings(command) {
+      return mutateMappings("confirm", command);
+    },
+
+    async removeMappings(command) {
+      return mutateMappings("remove", command);
+    },
   };
+}
+
+async function requireActiveCatalog(
+  store: ReturnType<typeof createProjectContextStore>,
+) {
+  const catalog = await store.readActiveCatalog();
+  if (!catalog) {
+    throw new ProjectContextError(
+      "PROJECT_COMPONENT_CATALOG_MISSING",
+      "Run project component scan first",
+    );
+  }
+  return catalog;
 }
 
 async function buildCurrentContext(input: {

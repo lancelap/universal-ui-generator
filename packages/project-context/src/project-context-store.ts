@@ -69,6 +69,7 @@ export interface ProjectContextStore {
     catalogSha256: string;
   }>;
   readActiveCatalog(): Promise<EffectiveComponentCatalogV1 | null>;
+  readPublicComponents(): Promise<PublicComponentsV1 | null>;
 }
 
 export function createProjectContextStore(
@@ -310,6 +311,25 @@ export function createProjectContextStore(
           }
         }
         return catalog;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
+        throw error;
+      }
+    },
+
+    async readPublicComponents() {
+      try {
+        const path = await assertContainedOrdinaryPath({
+          baseDirectory: workspaceDir,
+          relativePath: ".ui-context/generated/public-components.json",
+          expected: "file",
+        });
+        const publicComponents = validateWithSchema(
+          PublicComponentsV1Schema,
+          JSON.parse(await readFile(path, "utf8")),
+        );
+        assertPublicComponentsV1Integrity(publicComponents);
+        return publicComponents;
       } catch (error) {
         if ((error as NodeJS.ErrnoException).code === "ENOENT") return null;
         throw error;
