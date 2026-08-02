@@ -11,6 +11,16 @@ Parse the action, component selector, and semantic role from `{{args}}`. Use
 one exact verified component. Stop on zero or ambiguous results; never guess a
 component or import.
 
+Before any other action, call `project_component_search`. Use only its result
+and the subsequent exact `get_component_contract` result. Do not use filesystem
+or shell tools and do not inspect `.ui-context` files. If either MCP call is
+unavailable, stop and report the tool error.
+
+Call search with
+`{ "query": "<exact component selector from {{args}}>", "limit": 20 }`.
+
+Omit `semanticRole` and `status`. Never add or infer another search filter.
+
 Before any mutation, show:
 
 - the exact component ID and verified import;

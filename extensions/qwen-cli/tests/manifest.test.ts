@@ -126,10 +126,16 @@ describe("Qwen extension manifest and commands", () => {
     expect(scan).toContain("Do not search the repository yourself");
     expect(components).toContain("project_component_search");
     expect(components).toContain("get_component_contract");
+    expect(components).toContain("Before any other action");
+    expect(components).toContain("Do not use filesystem or shell tools");
+    expect(components).toContain("If that MCP call is unavailable, stop");
+    expect(components).toContain("Omit `semanticRole` and `status`");
+    expect(components).toContain("Omit `query` and `status`");
     expect(components).not.toContain("read_file");
     expect(map).toContain("explicit confirmation");
     expect(map).toContain("confirm_project_component_mappings");
     expect(map).toContain("remove_project_component_mappings");
+    expect(map).toContain("Omit `semanticRole` and `status`");
     expect(status).toContain("get_project_ui_context_status");
     expect(status).toContain("Do not run a scan automatically");
 
@@ -141,6 +147,7 @@ describe("Qwen extension manifest and commands", () => {
     expect(qwen).toContain("never edit `.ui-context/*.json` directly");
     expect(qwen).toContain("`suggested` mappings are not generation authority");
     expect(qwen).toContain("`/uig:status` is read-only");
+    expect(qwen).toContain("Never read `.ui-context/generated` files directly");
   });
 
   it("documents installation, lifecycle, usage, and boundaries", async () => {

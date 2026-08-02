@@ -25,6 +25,9 @@ or pack-owned facts may be treated as resolved.
 - Use `scan_project_components` for deterministic discovery and scanning.
 - Use `project_component_search` and `get_component_contract` for bounded,
   addressable component inspection; never read the entire generated catalog.
+- Never read `.ui-context/generated` files directly. If a project-context MCP
+  tool is unavailable, report the error and stop instead of using filesystem or
+  shell tools as a fallback.
 - Use `get_icon_paths` only for exact verified icon resolution.
 - Call mapping mutation tools only after explicit user confirmation and with
   the exact current catalog fingerprint.
