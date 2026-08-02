@@ -9,18 +9,34 @@ import { createProjectContextService } from "./create-project-context-service.js
 
 const roots: string[] = [];
 afterEach(async () =>
-  Promise.all(roots.splice(0).map((path) => rm(path, { recursive: true, force: true }))),
+  Promise.all(
+    roots.splice(0).map((path) => rm(path, { recursive: true, force: true })),
+  ),
 );
 
 async function readyService() {
   const workspaceDir = await mkdtemp(join(tmpdir(), "uig-mapping-"));
   roots.push(workspaceDir);
-  await cp(resolve("packages/project-scanner/src/__fixtures__/react-public-api"), workspaceDir, { recursive: true });
-  await writeFile(join(workspaceDir, "package.json"), stableStringify({ name: "mapping-fixture", dependencies: {} }));
-  await writeFile(join(workspaceDir, "pnpm-lock.yaml"), "lockfileVersion: '9.0'\n");
-  const service = createProjectContextService({ workspaceDir, extensionRoot: resolve(".") });
+  await cp(
+    resolve("packages/project-scanner/src/__fixtures__/react-public-api"),
+    workspaceDir,
+    { recursive: true },
+  );
+  await writeFile(
+    join(workspaceDir, "package.json"),
+    stableStringify({ name: "mapping-fixture", dependencies: {} }),
+  );
+  await writeFile(
+    join(workspaceDir, "pnpm-lock.yaml"),
+    "lockfileVersion: '9.0'\n",
+  );
+  const service = createProjectContextService({
+    workspaceDir,
+    extensionRoot: resolve("."),
+  });
   const discovered = await service.scan({});
-  if (discovered.status !== "needs-configuration") throw new Error("unexpected state");
+  if (discovered.status !== "needs-configuration")
+    throw new Error("unexpected state");
   const scanned = await service.scan({
     acceptDiscoveredConfig: true,
     discoveryId: discovered.discoveryId,
@@ -40,22 +56,36 @@ const change = {
 describe("fingerprint-bound mapping mutation", () => {
   it("rejects a stale fingerprint before changing mappings", async () => {
     const { workspaceDir, service } = await readyService();
-    const before = await readFile(join(workspaceDir, ".ui-context/mappings.json"));
+    const before = await readFile(
+      join(workspaceDir, ".ui-context/mappings.json"),
+    );
     await expect(
-      service.confirmMappings({ catalogFingerprint: "0".repeat(64), mappings: [change] }),
+      service.confirmMappings({
+        catalogFingerprint: "0".repeat(64),
+        mappings: [change],
+      }),
     ).rejects.toMatchObject({ code: "PROJECT_COMPONENT_CATALOG_STALE" });
-    expect(await readFile(join(workspaceDir, ".ui-context/mappings.json"))).toEqual(before);
+    expect(
+      await readFile(join(workspaceDir, ".ui-context/mappings.json")),
+    ).toEqual(before);
   });
 
   it("confirms and removes one reviewed semantic binding", async () => {
     const { service, fingerprint } = await readyService();
-    const confirmed = await service.confirmMappings({ catalogFingerprint: fingerprint, mappings: [change] });
+    const confirmed = await service.confirmMappings({
+      catalogFingerprint: fingerprint,
+      mappings: [change],
+    });
     expect(confirmed.catalogFingerprint).not.toBe(fingerprint);
     const contract = await service.getComponentContract({
       componentId: change.componentId,
     });
     expect(contract.semantics).toContainEqual(
-      expect.objectContaining({ role: "choicePanel", status: "mapped", confidence: 1 }),
+      expect.objectContaining({
+        role: "choicePanel",
+        status: "mapped",
+        confidence: 1,
+      }),
     );
     expect(contract.contract).toMatchObject({
       propsType: "AppRadioGroupProps",
@@ -70,19 +100,26 @@ describe("fingerprint-bound mapping mutation", () => {
     });
     expect(removed.catalogFingerprint).not.toBe(confirmed.catalogFingerprint);
     expect(
-      (await service.getComponentContract({ componentId: change.componentId })).semantics,
-    ).toContainEqual(expect.objectContaining({ role: "choicePanel", status: "suggested" }));
+      (await service.getComponentContract({ componentId: change.componentId }))
+        .semantics,
+    ).toContainEqual(
+      expect.objectContaining({ role: "choicePanel", status: "suggested" }),
+    );
   });
 
   it("rolls back the human file when catalog rebuild rejects a term", async () => {
     const { workspaceDir, service, fingerprint } = await readyService();
-    const before = await readFile(join(workspaceDir, ".ui-context/mappings.json"));
+    const before = await readFile(
+      join(workspaceDir, ".ui-context/mappings.json"),
+    );
     await expect(
       service.confirmMappings({
         catalogFingerprint: fingerprint,
         mappings: [{ ...change, semanticRoles: ["unknownRole"] }],
       }),
     ).rejects.toMatchObject({ code: "SEMANTIC_ROLE_UNKNOWN" });
-    expect(await readFile(join(workspaceDir, ".ui-context/mappings.json"))).toEqual(before);
+    expect(
+      await readFile(join(workspaceDir, ".ui-context/mappings.json")),
+    ).toEqual(before);
   });
 });

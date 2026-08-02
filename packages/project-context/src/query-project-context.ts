@@ -51,14 +51,17 @@ export function searchProjectContextCatalog(
   }
   const scored = catalog.components.flatMap((component) => {
     const roleEntries = component.semantics.filter(
-      (entry) => (!role || entry.role === role) && (!input.status || entry.status === input.status),
+      (entry) =>
+        (!role || entry.role === role) &&
+        (!input.status || entry.status === input.status),
     );
     if ((role || input.status) && roleEntries.length === 0) return [];
     let score = role && roleEntries.length > 0 ? SCORE.exactRole : 0;
     if (query) {
       const exportName = component.import.export.toLocaleLowerCase("en-US");
       if (exportName === query) score = Math.max(score, SCORE.exactExport);
-      else if (exportName.startsWith(query)) score = Math.max(score, SCORE.exportPrefix);
+      else if (exportName.startsWith(query))
+        score = Math.max(score, SCORE.exportPrefix);
       else if (
         component.annotations.some((value) =>
           value.toLocaleLowerCase("en-US").includes(query),
@@ -73,7 +76,8 @@ export function searchProjectContextCatalog(
   });
   scored.sort(
     (left, right) =>
-      right.score - left.score || left.component.id.localeCompare(right.component.id),
+      right.score - left.score ||
+      left.component.id.localeCompare(right.component.id),
   );
   const limit = Math.min(50, Math.max(1, input.limit ?? 20));
   const selected = scored.slice(0, limit);
@@ -98,7 +102,9 @@ export function getComponentContractFromCatalog(
   input: { componentId: string },
   publicComponents?: PublicComponentsV1,
 ) {
-  const component = catalog.components.find((entry) => entry.id === input.componentId);
+  const component = catalog.components.find(
+    (entry) => entry.id === input.componentId,
+  );
   if (!component) {
     throw new ProjectContextError(
       "PROJECT_COMPONENT_NOT_FOUND",
@@ -147,13 +153,21 @@ export function getIconPathsFromCatalog(
         (icon) => icon.import.export === name || icon.aliases.includes(name),
       );
       if (exact.length === 1) {
-        return { name, status: "resolved" as const, import: exact[0]!.import, componentId: exact[0]!.id };
+        return {
+          name,
+          status: "resolved" as const,
+          import: exact[0]!.import,
+          componentId: exact[0]!.id,
+        };
       }
       if (exact.length > 1) {
         return {
           name,
           status: "ambiguous" as const,
-          candidates: exact.map((icon) => ({ componentId: icon.id, import: icon.import })),
+          candidates: exact.map((icon) => ({
+            componentId: icon.id,
+            import: icon.import,
+          })),
         };
       }
       const normalized = name.toLocaleLowerCase("en-US");
@@ -162,7 +176,9 @@ export function getIconPathsFromCatalog(
         status: "unresolved" as const,
         suggestions: catalog.icons
           .filter((icon) =>
-            icon.import.export.toLocaleLowerCase("en-US").startsWith(normalized.slice(0, 3)),
+            icon.import.export
+              .toLocaleLowerCase("en-US")
+              .startsWith(normalized.slice(0, 3)),
           )
           .map((icon) => icon.import.export)
           .slice(0, 5),

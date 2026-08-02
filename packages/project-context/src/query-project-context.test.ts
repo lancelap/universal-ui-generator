@@ -65,9 +65,18 @@ describe("project context queries", () => {
         id: `project:@/generated#Component${String(index).padStart(3, "0")}`,
       },
     }));
-    const result = searchProjectContextCatalog(value, { query: "Component", limit: 50 });
-    expect(result).toMatchObject({ totalCount: 168, returnedCount: 50, truncated: true });
-    expect(result.catalogPath).toBe(".ui-context/generated/effective-component-catalog.json");
+    const result = searchProjectContextCatalog(value, {
+      query: "Component",
+      limit: 50,
+    });
+    expect(result).toMatchObject({
+      totalCount: 168,
+      returnedCount: 50,
+      truncated: true,
+    });
+    expect(result.catalogPath).toBe(
+      ".ui-context/generated/effective-component-catalog.json",
+    );
   });
 
   it("returns one exact contract and never a nearest component", async () => {
@@ -85,7 +94,9 @@ describe("project context queries", () => {
       getComponentContractFromCatalog(value, {
         componentId: "project:@/shared/ui#AppRadioGrou",
       }),
-    ).toThrowError(expect.objectContaining({ code: "PROJECT_COMPONENT_NOT_FOUND" }));
+    ).toThrowError(
+      expect.objectContaining({ code: "PROJECT_COMPONENT_NOT_FOUND" }),
+    );
   });
 
   it("resolves only exact icons and keeps fuzzy names unresolved", async () => {
@@ -96,11 +107,20 @@ describe("project context queries", () => {
         availability: "verified",
         import: { source: "@/icons", export: "Upload", style: "named" },
         aliases: ["UploadFile"],
-        contractRef: { artifact: "public-components", id: "project:@/icons#Upload" },
+        contractRef: {
+          artifact: "public-components",
+          id: "project:@/icons#Upload",
+        },
       },
     ];
-    expect(getIconPathsFromCatalog(value, { names: ["Upload", "Uplod"] }).results).toEqual([
-      expect.objectContaining({ name: "Upload", status: "resolved", import: { source: "@/icons", export: "Upload", style: "named" } }),
+    expect(
+      getIconPathsFromCatalog(value, { names: ["Upload", "Uplod"] }).results,
+    ).toEqual([
+      expect.objectContaining({
+        name: "Upload",
+        status: "resolved",
+        import: { source: "@/icons", export: "Upload", style: "named" },
+      }),
       expect.objectContaining({ name: "Uplod", status: "unresolved" }),
     ]);
   });
