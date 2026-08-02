@@ -49,3 +49,62 @@ export async function ensureContainedDirectoryTree(
     }
   }
 }
+
+export async function assertContainedOrdinaryPath(input: {
+  baseDirectory: string;
+  relativePath: string;
+  expected: "file" | "directory";
+  allowMissingLeaf?: boolean;
+}): Promise<string> {
+  if (
+    input.relativePath.length === 0 ||
+    isAbsolute(input.relativePath) ||
+    input.relativePath.split(/[\\/]/).includes("..")
+  ) {
+    throw new Error("Unsafe contained path");
+  }
+  const canonicalBase = await realpath(input.baseDirectory);
+  const target = resolve(input.baseDirectory, input.relativePath);
+  const rel = relative(input.baseDirectory, target);
+  if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
+    throw new Error("Contained path escapes its base");
+  }
+  const parts = input.relativePath.split(/[\\/]/).filter(Boolean);
+  let current = input.baseDirectory;
+  for (let index = 0; index < parts.length; index += 1) {
+    current = resolve(current, parts[index]!);
+    try {
+      const metadata = await lstat(current);
+      if (metadata.isSymbolicLink()) {
+        throw new Error("Contained path must not contain symbolic links");
+      }
+      if (index === parts.length - 1) {
+        const valid =
+          input.expected === "file"
+            ? metadata.isFile()
+            : metadata.isDirectory();
+        if (!valid) throw new Error("Contained path is not ordinary");
+      } else if (!metadata.isDirectory()) {
+        throw new Error("Contained path parent must be an ordinary directory");
+      }
+    } catch (error) {
+      const code = (error as NodeJS.ErrnoException).code;
+      if (
+        code === "ENOENT" &&
+        input.allowMissingLeaf &&
+        index === parts.length - 1
+      ) {
+        return target;
+      }
+      throw error;
+    }
+  }
+  const canonicalTarget = await realpath(target);
+  if (
+    canonicalTarget !== canonicalBase &&
+    !canonicalTarget.startsWith(`${canonicalBase}${sep}`)
+  ) {
+    throw new Error("Contained path resolves outside its base");
+  }
+  return target;
+}

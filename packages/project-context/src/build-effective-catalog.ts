@@ -178,7 +178,7 @@ export function buildEffectiveComponentCatalog(input: {
       },
       installedPackages: {
         path: ".ui-context/generated/installed-packages.json",
-        sha256: input.fingerprint.inputs.installedPackages,
+        sha256: hashContextValue(input.installedPackages),
       },
       diagnostics: {
         path: ".ui-context/generated/diagnostics.json",
