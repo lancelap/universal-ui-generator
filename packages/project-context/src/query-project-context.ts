@@ -40,9 +40,18 @@ export function searchProjectContextCatalog(
     status?: "suggested" | "mapped" | "pack-owned";
     limit?: number;
   },
+  publicComponents?: PublicComponentsV1,
 ): ProjectComponentSearchResult {
   const query = input.query?.trim().toLocaleLowerCase("en-US");
   const role = input.semanticRole?.trim();
+  const propsById = new Map(
+    publicComponents?.components.map((component) => [
+      component.id,
+      component.contract.props.map((prop) =>
+        prop.name.toLocaleLowerCase("en-US"),
+      ),
+    ]) ?? [],
+  );
   if (!query && !role && !input.status) {
     throw new ProjectContextError(
       "PROJECT_COMPONENT_NOT_FOUND",
@@ -68,6 +77,12 @@ export function searchProjectContextCatalog(
         )
       ) {
         score = Math.max(score, SCORE.annotationToken);
+      } else if (
+        propsById
+          .get(component.id)
+          ?.some((propName) => propName.includes(query))
+      ) {
+        score = Math.max(score, SCORE.propToken);
       } else if (!role && !input.status) {
         return [];
       }
@@ -143,6 +158,12 @@ export function getIconPathsFromCatalog(
     throw new ProjectContextError(
       "PROJECT_COMPONENT_NOT_FOUND",
       "Icon names must contain between 1 and 50 entries",
+    );
+  }
+  if (new Set(input.names).size !== input.names.length) {
+    throw new ProjectContextError(
+      "PROJECT_COMPONENT_NOT_FOUND",
+      "Icon names must be unique",
     );
   }
   return {

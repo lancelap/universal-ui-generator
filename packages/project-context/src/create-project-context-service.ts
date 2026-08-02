@@ -310,7 +310,11 @@ export function createProjectContextService(input: {
       const human = await store.readHumanContext();
       if (!human) return { status: "missing", changed: [] };
       const active = await store.readActiveCatalog();
-      if (!active) return { status: "missing", changed: [] };
+      if (!active) {
+        return (await store.hasFailedScan())
+          ? { status: "blocked", changed: [] }
+          : { status: "missing", changed: [] };
+      }
       const current = await buildCurrentInputs({
         workspaceDir: input.workspaceDir,
         extensionRoot: input.extensionRoot,
@@ -332,9 +336,12 @@ export function createProjectContextService(input: {
     },
 
     async search(query) {
+      const catalog = await requireActiveCatalog(store);
+      const publicComponents = await store.readPublicComponents();
       return searchProjectContextCatalog(
-        await requireActiveCatalog(store),
+        catalog,
         query,
+        publicComponents ?? undefined,
       );
     },
 

@@ -30,6 +30,15 @@ async function catalog() {
 
 describe("project context queries", () => {
   it("scores exact role and export deterministically", async () => {
+    const inputs = contextInputs();
+    inputs.publicComponents.components[0]!.contract.props = [
+      {
+        name: "options",
+        required: true,
+        type: { kind: "array", element: { kind: "string" } },
+        deprecated: false,
+      },
+    ];
     const value = await catalog();
     const role = searchProjectContextCatalog(value, {
       semanticRole: "choicePanel",
@@ -48,6 +57,16 @@ describe("project context queries", () => {
       score: 900,
     });
     expect(named.catalogFingerprint).toBe(value.fingerprint.value);
+    expect(
+      searchProjectContextCatalog(
+        value,
+        { query: "options", limit: 20 },
+        inputs.publicComponents,
+      ).results[0],
+    ).toMatchObject({
+      componentId: "project:@/shared/ui#AppRadioGroup",
+      score: 200,
+    });
   });
 
   it("returns at most fifty compact results and points to the catalog", async () => {
@@ -123,5 +142,10 @@ describe("project context queries", () => {
       }),
       expect.objectContaining({ name: "Uplod", status: "unresolved" }),
     ]);
+    expect(() =>
+      getIconPathsFromCatalog(value, { names: ["Upload", "Upload"] }),
+    ).toThrowError(
+      expect.objectContaining({ code: "PROJECT_COMPONENT_NOT_FOUND" }),
+    );
   });
 });

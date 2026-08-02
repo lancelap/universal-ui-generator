@@ -77,6 +77,7 @@ export interface ProjectContextStore {
   }): Promise<{
     artifactPath: ".ui-context/generated/failed-scan-diagnostics.json";
   }>;
+  hasFailedScan(): Promise<boolean>;
 }
 
 export function createProjectContextStore(
@@ -373,6 +374,37 @@ export function createProjectContextStore(
         artifactPath:
           ".ui-context/generated/failed-scan-diagnostics.json" as const,
       };
+    },
+
+    async hasFailedScan() {
+      try {
+        const path = await assertContainedOrdinaryPath({
+          baseDirectory: workspaceDir,
+          relativePath: ".ui-context/generated/failed-scan-diagnostics.json",
+          expected: "file",
+        });
+        const value = JSON.parse(await readFile(path, "utf8")) as Record<
+          string,
+          unknown
+        >;
+        if (
+          value.schema !== "project-scan-failure/v1" ||
+          typeof value.scanId !== "string" ||
+          !Array.isArray(value.diagnostics)
+        ) {
+          throw new ProjectContextError(
+            "PROJECT_CONTEXT_FILESYSTEM_FAILED",
+            "Failed scan diagnostics are invalid",
+          );
+        }
+        for (const diagnostic of value.diagnostics) {
+          validateWithSchema(ProjectScanDiagnosticSchema, diagnostic);
+        }
+        return true;
+      } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === "ENOENT") return false;
+        throw error;
+      }
     },
   };
 

@@ -7,6 +7,7 @@ import { afterEach, describe, expect, it } from "vitest";
 import { stableStringify } from "@uig/contracts";
 
 import { createProjectContextService } from "./create-project-context-service.js";
+import { createProjectContextStore } from "./project-context-store.js";
 
 const roots: string[] = [];
 const extensionRoot = resolve(".");
@@ -229,6 +230,39 @@ describe("createProjectContextService", () => {
       status: "stale",
       changed: ["mappings"],
     });
+  });
+
+  it("reports blocked when the first configured scan has no authority catalog", async () => {
+    const workspaceDir = await fixtureWorkspace();
+    const service = createProjectContextService({
+      workspaceDir,
+      extensionRoot,
+    });
+    const discovered = await service.scan({});
+    if (discovered.status !== "needs-configuration")
+      throw new Error("unexpected state");
+    await createProjectContextStore(workspaceDir).initializeHumanContext(
+      discovered.proposedConfig,
+    );
+    await writeFile(
+      join(workspaceDir, ".ui-context/mappings.json"),
+      stableStringify({
+        schema: "project-component-mappings/v1",
+        components: [
+          {
+            componentId: "project:@/shared/ui#Missing",
+            semanticRoles: ["choicePanel"],
+            capabilities: [],
+            formAdapters: [],
+            status: "mapped",
+          },
+        ],
+        designComponents: [],
+      }),
+    );
+
+    expect(await service.scan({})).toMatchObject({ status: "blocked" });
+    expect(await service.status()).toEqual({ status: "blocked", changed: [] });
   });
 });
 

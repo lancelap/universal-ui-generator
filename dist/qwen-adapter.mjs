@@ -269917,6 +269917,29 @@ function createProjectContextStore(workspaceDir, hooks = {}) {
       return {
         artifactPath: ".ui-context/generated/failed-scan-diagnostics.json"
       };
+    },
+    async hasFailedScan() {
+      try {
+        const path = await assertContainedOrdinaryPath({
+          baseDirectory: workspaceDir,
+          relativePath: ".ui-context/generated/failed-scan-diagnostics.json",
+          expected: "file"
+        });
+        const value = JSON.parse(await readFile7(path, "utf8"));
+        if (value.schema !== "project-scan-failure/v1" || typeof value.scanId !== "string" || !Array.isArray(value.diagnostics)) {
+          throw new ProjectContextError(
+            "PROJECT_CONTEXT_FILESYSTEM_FAILED",
+            "Failed scan diagnostics are invalid"
+          );
+        }
+        for (const diagnostic2 of value.diagnostics) {
+          validateWithSchema(ProjectScanDiagnosticSchema, diagnostic2);
+        }
+        return true;
+      } catch (error46) {
+        if (error46.code === "ENOENT") return false;
+        throw error46;
+      }
     }
   };
   async function readValidated(name, schema) {
@@ -270078,9 +270101,17 @@ var SCORE = {
   annotationToken: 300,
   propToken: 200
 };
-function searchProjectContextCatalog(catalog, input) {
+function searchProjectContextCatalog(catalog, input, publicComponents) {
   const query = input.query?.trim().toLocaleLowerCase("en-US");
   const role = input.semanticRole?.trim();
+  const propsById = new Map(
+    publicComponents?.components.map((component) => [
+      component.id,
+      component.contract.props.map(
+        (prop) => prop.name.toLocaleLowerCase("en-US")
+      )
+    ]) ?? []
+  );
   if (!query && !role && !input.status) {
     throw new ProjectContextError(
       "PROJECT_COMPONENT_NOT_FOUND",
@@ -270102,6 +270133,8 @@ function searchProjectContextCatalog(catalog, input) {
         (value) => value.toLocaleLowerCase("en-US").includes(query)
       )) {
         score = Math.max(score, SCORE.annotationToken);
+      } else if (propsById.get(component.id)?.some((propName) => propName.includes(query))) {
+        score = Math.max(score, SCORE.propToken);
       } else if (!role && !input.status) {
         return [];
       }
@@ -270163,6 +270196,12 @@ function getIconPathsFromCatalog(catalog, input) {
     throw new ProjectContextError(
       "PROJECT_COMPONENT_NOT_FOUND",
       "Icon names must contain between 1 and 50 entries"
+    );
+  }
+  if (new Set(input.names).size !== input.names.length) {
+    throw new ProjectContextError(
+      "PROJECT_COMPONENT_NOT_FOUND",
+      "Icon names must be unique"
     );
   }
   return {
@@ -270365,7 +270404,9 @@ function createProjectContextService(input) {
       const human = await store.readHumanContext();
       if (!human) return { status: "missing", changed: [] };
       const active = await store.readActiveCatalog();
-      if (!active) return { status: "missing", changed: [] };
+      if (!active) {
+        return await store.hasFailedScan() ? { status: "blocked", changed: [] } : { status: "missing", changed: [] };
+      }
       const current = await buildCurrentInputs({
         workspaceDir: input.workspaceDir,
         extensionRoot: input.extensionRoot,
@@ -270386,9 +270427,12 @@ function createProjectContextService(input) {
       };
     },
     async search(query) {
+      const catalog = await requireActiveCatalog(store);
+      const publicComponents = await store.readPublicComponents();
       return searchProjectContextCatalog(
-        await requireActiveCatalog(store),
-        query
+        catalog,
+        query,
+        publicComponents ?? void 0
       );
     },
     async getComponentContract(query) {
