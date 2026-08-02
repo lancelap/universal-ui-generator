@@ -11,6 +11,10 @@ const extensionFiles = [
   "commands/uig/plan.md",
   "commands/uig/generate.md",
   "commands/uig/pixso-to-react.md",
+  "commands/uig/scan.md",
+  "commands/uig/components.md",
+  "commands/uig/map.md",
+  "commands/uig/status.md",
 ] as const;
 
 describe("Qwen extension manifest and commands", () => {
@@ -63,7 +67,7 @@ describe("Qwen extension manifest and commands", () => {
     expect(manifest).not.toHaveProperty("trust");
   });
 
-  it("ships invariant context and exactly three safe commands", async () => {
+  it("ships invariant context and exactly seven safe commands", async () => {
     await Promise.all(
       extensionFiles.map((path) => access(join(repoRoot, path))),
     );
@@ -105,6 +109,38 @@ describe("Qwen extension manifest and commands", () => {
     expect(combinedCommand.indexOf("uig_plan")).toBeLessThan(
       combinedCommand.indexOf("uig_generate"),
     );
+
+    const scan = contents.find(
+      (entry) => entry.path === "commands/uig/scan.md",
+    )!.text;
+    const components = contents.find(
+      (entry) => entry.path === "commands/uig/components.md",
+    )!.text;
+    const map = contents.find(
+      (entry) => entry.path === "commands/uig/map.md",
+    )!.text;
+    const status = contents.find(
+      (entry) => entry.path === "commands/uig/status.md",
+    )!.text;
+    expect(scan).toContain("scan_project_components");
+    expect(scan).toContain("Do not search the repository yourself");
+    expect(components).toContain("project_component_search");
+    expect(components).toContain("get_component_contract");
+    expect(components).not.toContain("read_file");
+    expect(map).toContain("explicit confirmation");
+    expect(map).toContain("confirm_project_component_mappings");
+    expect(map).toContain("remove_project_component_mappings");
+    expect(status).toContain("get_project_ui_context_status");
+    expect(status).toContain("Do not run a scan automatically");
+
+    const qwen = contents.find((entry) => entry.path === "QWEN.md")!.text;
+    expect(qwen).toContain("uig_plan");
+    expect(qwen).toContain("uig_generate");
+    expect(qwen).toContain("Never call Pixso Remote MCP directly");
+    expect(qwen).toContain("Never replace `/uig:scan` with repository search");
+    expect(qwen).toContain("never edit `.ui-context/*.json` directly");
+    expect(qwen).toContain("`suggested` mappings are not generation authority");
+    expect(qwen).toContain("`/uig:status` is read-only");
   });
 
   it("documents installation, lifecycle, usage, and boundaries", async () => {
