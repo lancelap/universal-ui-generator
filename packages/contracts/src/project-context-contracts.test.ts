@@ -291,7 +291,11 @@ describe("project context contracts", () => {
 
   it("rejects a contract reference to another component", () => {
     const catalog = validEffectiveCatalog();
-    catalog.components[0]!.contractRef.id = "project:@/shared/ui#Missing";
+    const contractRef = catalog.components[0]!.contractRef;
+    expect(contractRef.artifact).toBe("public-components");
+    if (contractRef.artifact === "public-components") {
+      contractRef.id = "project:@/shared/ui#Missing";
+    }
     expect(() => assertEffectiveComponentCatalogV1Integrity(catalog)).toThrow(
       /contractRef/i,
     );

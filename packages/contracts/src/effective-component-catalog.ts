@@ -56,10 +56,17 @@ const EffectiveComponentSchema = closedObject({
   id: Type.String({ minLength: 1 }),
   availability: Type.Literal("verified"),
   import: VerifiedImportSchema,
-  contractRef: closedObject({
-    artifact: Type.Literal("public-components"),
-    id: Type.String({ minLength: 1 }),
-  }),
+  contractRef: Type.Union([
+    closedObject({
+      artifact: Type.Literal("public-components"),
+      id: Type.String({ minLength: 1 }),
+    }),
+    closedObject({
+      artifact: Type.Literal("installed-packages"),
+      package: Type.String({ minLength: 1 }),
+      export: Type.String({ minLength: 1 }),
+    }),
+  ]),
   semantics: Type.Array(EffectiveSemanticSchema),
   capabilities: Type.Array(EffectiveNamedBindingSchema),
   formAdapters: Type.Array(EffectiveNamedBindingSchema),
@@ -138,7 +145,10 @@ export function assertEffectiveComponentCatalogV1Integrity(
   );
 
   for (const component of value.components) {
-    if (component.contractRef.id !== component.id) {
+    if (
+      component.contractRef.artifact === "public-components" &&
+      component.contractRef.id !== component.id
+    ) {
       throw new Error(
         `contractRef for ${component.id} must reference the same component`,
       );

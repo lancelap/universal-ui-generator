@@ -141,6 +141,21 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
+  packages/project-context:
+    dependencies:
+      "@uig/component-catalog":
+        specifier: workspace:*
+        version: link:../component-catalog
+      "@uig/contracts":
+        specifier: workspace:*
+        version: link:../contracts
+      "@uig/design-context":
+        specifier: workspace:*
+        version: link:../design-context
+      "@uig/project-scanner":
+        specifier: workspace:*
+        version: link:../project-scanner
+
   packages/project-scanner:
     dependencies:
       "@uig/contracts":

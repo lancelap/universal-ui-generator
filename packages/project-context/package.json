@@ -1,0 +1,15 @@
+{
+  "name": "@uig/project-context",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@uig/component-catalog": "workspace:*",
+    "@uig/contracts": "workspace:*",
+    "@uig/design-context": "workspace:*",
+    "@uig/project-scanner": "workspace:*"
+  }
+}
