@@ -248258,7 +248258,7 @@ function literalExpression(value) {
     return factory.createNull();
   }
   if (typeof value === "string") {
-    return factory.createStringLiteral(value);
+    return createUtf8StringLiteral(value);
   }
   if (typeof value === "boolean") {
     return value ? factory.createTrue() : factory.createFalse();
@@ -248266,10 +248266,11 @@ function literalExpression(value) {
   return factory.createNumericLiteral(value);
 }
 function jsxText(value) {
-  return factory.createJsxExpression(
-    void 0,
-    factory.createStringLiteral(value)
-  );
+  return factory.createJsxExpression(void 0, createUtf8StringLiteral(value));
+}
+function createUtf8StringLiteral(value) {
+  const literal2 = factory.createStringLiteral(value);
+  return import_typescript.default.setEmitFlags(literal2, import_typescript.default.EmitFlags.NoAsciiEscaping);
 }
 function containsClassName(element) {
   if (element.kind === "single-selection-collection") {
