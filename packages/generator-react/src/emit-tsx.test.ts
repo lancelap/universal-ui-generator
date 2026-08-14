@@ -25,7 +25,8 @@ describe("emitTsx", () => {
     expect(source).toContain("onChange={() => undefined}");
     expect(source).toContain('className={styles["ui_dialog_4-314"]}');
     expect(source).toContain('title="Закрыть &quot;диалог&quot; <script>"');
-    expect(source).toContain('{"\\u041F\\u0440\\u0438\\u0432\\u0435\\u0442');
+    expect(source).toContain('{"Привет, <мир> & {не код}"}');
+    expect(source).not.toMatch(/\\u04[0-9a-fA-F]{2}/);
     expect(source).toContain("<DialogBody>");
     expect(source).toContain("<Logo />");
     expect(source.endsWith("\n")).toBe(true);

@@ -570,7 +570,7 @@ function literalExpression(
     return factory.createNull();
   }
   if (typeof value === "string") {
-    return factory.createStringLiteral(value);
+    return createUtf8StringLiteral(value);
   }
   if (typeof value === "boolean") {
     return value ? factory.createTrue() : factory.createFalse();
@@ -579,10 +579,12 @@ function literalExpression(
 }
 
 function jsxText(value: string): ts.JsxExpression {
-  return factory.createJsxExpression(
-    undefined,
-    factory.createStringLiteral(value),
-  );
+  return factory.createJsxExpression(undefined, createUtf8StringLiteral(value));
+}
+
+function createUtf8StringLiteral(value: string): ts.StringLiteral {
+  const literal = factory.createStringLiteral(value);
+  return ts.setEmitFlags(literal, ts.EmitFlags.NoAsciiEscaping);
 }
 
 function containsClassName(element: ReactElementModel): boolean {
