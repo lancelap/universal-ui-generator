@@ -175,10 +175,10 @@
       "sha256": "3b518acb969420f41141b649e1e3c0b4c61af35e31b8da4b35eed377503d73db"
     },
     {
-      "byteLength": 1384,
+      "byteLength": 1176,
       "kind": "tsx",
       "path": "GeneratedModal.tsx",
-      "sha256": "49a85308f47e1d0996e51e208c3dd1026983135787f3cfcec70f94ddceee0e65"
+      "sha256": "69bbf27890f992ac911e50df57f25e398a4270e14942e8a3f92ecaf4c05fece4"
     }
   ],
   "renderOnlyProps": [
@@ -207,7 +207,7 @@
     "generatedProps": 2,
     "imports": 8,
     "manifestNodes": 6,
-    "sourceByteLength": 1690
+    "sourceByteLength": 1482
   },
   "status": "generated",
   "validation": {

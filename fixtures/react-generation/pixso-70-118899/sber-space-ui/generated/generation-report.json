@@ -250,10 +250,10 @@
       "sha256": "9fa05ed31d3884851205e8e86b79d4409adb28859c17b34221d95214c4e3b72d"
     },
     {
-      "byteLength": 6433,
+      "byteLength": 4041,
       "kind": "tsx",
       "path": "GeneratedChoicePanel.tsx",
-      "sha256": "4055b5817d5b930053a98100c4d6ddf1890908cc59988f3788b0bcfc9e3b5f04"
+      "sha256": "f83dbe5d5ed817a9c54721762ef3b455c76afb61f9139263db20f11309175fc8"
     }
   ],
   "renderOnlyProps": [],
@@ -271,7 +271,7 @@
     "generatedProps": 0,
     "imports": 7,
     "manifestNodes": 1,
-    "sourceByteLength": 7130
+    "sourceByteLength": 4738
   },
   "status": "generated",
   "validation": {
