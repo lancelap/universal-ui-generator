@@ -294,9 +294,20 @@ Each case records both `DesignIRV2` and `NormalizationProvenanceV1` paths and ha
 An active official suite must have at least 15 approved cases and required category/trait
 coverage. Smaller draft suites are valid for runner development but not baseline-eligible.
 
-### 6.2 Validation status
+### 6.2 Pipeline and validation status
 
-Every validation stage uses a discriminated status:
+Pipeline execution and technical validation use separate discriminated statuses.
+
+Semantic planning, component resolution and source generation use:
+
+```text
+completed -> stage produced its normal artifact
+blocked   -> stage produced blocking diagnostics
+failed    -> stage crashed or could not produce valid evidence
+not-run   -> an earlier stage prevented execution
+```
+
+Contract, syntax, typecheck, build and render validation use:
 
 ```text
 passed  -> duration and evidence
@@ -306,7 +317,8 @@ not-run -> explicit reason
 
 Supported `not-run` reasons include `previous-stage-blocked`, `harness-not-configured`,
 `dependency-not-available` and `not-supported`. `not-run` is not counted as a pass or a
-failure.
+failure. A semantic `blocked` result is retained as a pipeline outcome and is not renamed to
+a technical validation failure.
 
 ### 6.3 Run
 
