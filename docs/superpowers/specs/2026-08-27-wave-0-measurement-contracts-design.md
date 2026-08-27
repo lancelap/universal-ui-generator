@@ -65,6 +65,7 @@ The contracts have the following ownership:
 | `DesignSnapshot` | Pixso acquisition identity, source URL/node and raw content hash |
 | lossless Pixso `source.json` | immutable provider evidence |
 | `DesignIRV2` | provider-normalized, UI-significant compact structure |
+| `NormalizationProvenanceV1` | value origins required to reproduce semantic interpretation |
 | `UiManifestV2` | design-system-neutral semantic interpretation |
 | `ResolutionPlanV2` | concrete decisions for a selected design-system pack |
 | generated React artifacts | presentation source produced from the plan |
@@ -83,6 +84,7 @@ One benchmark case is a reproducible combination of:
 ```text
 Pixso source identity
 + frozen DesignIRV2
++ frozen NormalizationProvenanceV1
 + design-system pack
 + effective component-catalog provenance
 + generator version/commit
@@ -185,7 +187,7 @@ fixture provenance policy.
 The representative 15-25-screen suite starts from frozen `DesignIRV2`:
 
 ```text
-frozen DesignIRV2
+frozen DesignIRV2 + NormalizationProvenanceV1
   -> semantic planner
   -> component resolver
   -> React generator
@@ -236,10 +238,15 @@ Each case contains:
 ```text
 cases/<case-id>/
   design-ir.json
+  normalization-provenance.json
   reference.png
   expectations.json
   notes.md
 ```
+
+`normalization-provenance.json` is a validated `normalization-provenance/v1` artifact whose
+`sourceArtifactId` must match `design-ir.json`. Both files and both SHA-256 values are frozen
+in the suite. The semantic planner consumes them together.
 
 `expectations.json` describes required regions, semantic elements, text and optionally
 allowed design-system components. It does not prescribe a single React implementation.
@@ -247,8 +254,10 @@ There is no product-level `expected.tsx`; existing React generation fixtures con
 test deterministic generator behavior separately.
 
 An accepted case has an exact Pixso URL/file key/node ID, verified reference and DesignIR,
-approved test-material status, no secrets or personal data, classification, expectations and
-a reason for adding distinct coverage.
+verified normalization provenance, approved test-material status, no secrets or personal
+data, classification, expectations and a reason for adding distinct coverage. A draft pilot
+case may omit `reference.png`, but that case is not eligible for human review or an active
+official suite until its reference is verified.
 
 A typical benchmark bug becomes a minimal regression fixture at the layer that caused it.
 Whole-screen benchmark cases are added only for new representative scenarios or errors that
@@ -278,6 +287,9 @@ cannot prove.
 The suite records its ID, version, lifecycle (`draft`, `active`, `retired`), target framework,
 design system, validation profile, cases, source hashes, classification and review
 requirements. Case IDs are unique and paths must stay within the suite root.
+
+Each case records both `DesignIRV2` and `NormalizationProvenanceV1` paths and hashes. Their
+`sourceArtifactId` values must match before planning begins.
 
 An active official suite must have at least 15 approved cases and required category/trait
 coverage. Smaller draft suites are valid for runner development but not baseline-eligible.
@@ -512,9 +524,10 @@ scripts/benchmark/
 ```
 
 The current four real Pixso fixtures (`4:314`, `6:12547`, `70:118892`, `70:118899`) are
-candidates for a draft `sber-space-ui-pilot-v1`. Only those with reviewed `DesignIRV2` are
-included. The pilot validates infrastructure but is not presented as the representative
-project baseline. An official active suite requires at least 15 approved real cases.
+candidates for a draft `sber-space-ui-pilot-v1`. Only those with reviewed `DesignIRV2` and
+matching `NormalizationProvenanceV1` are included. The pilot validates infrastructure but is
+not presented as the representative project baseline. An official active suite requires at
+least 15 approved real cases.
 
 ## 10. Stable runner errors
 
@@ -616,7 +629,7 @@ The specification is implementable with the current repository, but the product 
 cannot be declared complete without external project inputs:
 
 - 15-25 approved and classified real screens;
-- verified reference images and DesignIR artifacts for them;
+- verified reference images, DesignIR and normalization-provenance artifacts for them;
 - an approved project or fixture containing real Sber dependencies for meaningful
   typecheck/build/render validation;
 - team adapter policies and accepted Storybook/MCP snapshots when those providers are added.
