@@ -1,7 +1,7 @@
 # Wave 0 Measurement and Contracts Design
 
 **Date:** 2026-08-27
-**Status:** Design approved section-by-section; awaiting final specification review
+**Status:** Approved for implementation planning
 **Scope:** Measurement infrastructure only; no generator-quality changes
 
 ## 1. Product objective
@@ -269,8 +269,10 @@ Wave 0 adds closed, versioned TypeBox schemas and TypeScript types under `@uig/c
 
 ```text
 benchmark-suite/v1
+benchmark-candidate-inventory/v1
 benchmark-expectations/v1
 benchmark-validation-profile/v1
+benchmark-suite-run/v1
 benchmark-run/v1
 benchmark-review/v1
 benchmark-report/v1
@@ -322,10 +324,13 @@ a technical validation failure.
 
 ### 6.3 Run
 
-`benchmark-run/v1` is immutable and records suite/case identity, environment, generator and
-catalog provenance, stage outcomes, resolution and diagnostic counts, and artifact paths.
-`generated` requires source artifacts, `blocked` requires blocking evidence, and artifact
-paths must remain inside the run directory.
+`benchmark-suite-run/v1` is the immutable root execution index. It records the suite and
+environment identity, start/finish times, ordered per-case run paths/statuses and report path.
+
+`benchmark-run/v1` is the immutable evidence for one case. It records suite/case identity,
+environment, generator and catalog provenance, stage outcomes, resolution and diagnostic
+counts, and artifact paths. `generated` requires source artifacts, `blocked` requires blocking
+evidence, and artifact paths must remain inside the run directory.
 
 ### 6.4 Review
 
