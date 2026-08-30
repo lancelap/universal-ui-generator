@@ -1,3 +1,4 @@
+export * from "./agentic-run.js";
 export * from "./design-ir.js";
 export * from "./design-ir-v2.js";
 export * from "./design-snapshot.js";

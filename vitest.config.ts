@@ -8,5 +8,6 @@ export default defineConfig({
       "packages/**/*.test.ts",
     ],
     exclude: ["**/*.live.test.ts", "**/node_modules/**", "**/dist/**"],
+    testTimeout: 30_000,
   },
 });

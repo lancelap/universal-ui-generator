@@ -14,7 +14,7 @@ describe("createUigMcpServer", () => {
     await Promise.all(closeActions.splice(0).map((close) => close()));
   });
 
-  it("exposes exactly nine tools with visible schemas", async () => {
+  it("exposes exactly thirteen tools with visible schemas", async () => {
     const { client } = await connectedClient(handlers());
 
     const listed = await client.listTools();
@@ -29,6 +29,10 @@ describe("createUigMcpServer", () => {
       "scan_project_components",
       "uig_generate",
       "uig_plan",
+      "uig_prepare_build",
+      "uig_record_browser_review",
+      "uig_record_code_review",
+      "uig_record_implementation",
     ]);
     for (const tool of listed.tools) {
       expect(tool.inputSchema).toBeDefined();
@@ -140,6 +144,10 @@ function handlers(): UigMcpToolHandlers {
     confirmProjectComponentMappings: unimplemented,
     removeProjectComponentMappings: unimplemented,
     getProjectUiContextStatus: async () => ({ status: "missing", changed: [] }),
+    prepareBuild: unimplemented,
+    recordImplementation: unimplemented,
+    recordCodeReview: unimplemented,
+    recordBrowserReview: unimplemented,
   };
 }
 

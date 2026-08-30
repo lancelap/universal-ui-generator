@@ -103,6 +103,10 @@ describe("Qwen Git installation copy", () => {
         "scan_project_components",
         "uig_generate",
         "uig_plan",
+        "uig_prepare_build",
+        "uig_record_browser_review",
+        "uig_record_code_review",
+        "uig_record_implementation",
       ]);
       expect(status.structuredContent).toEqual({
         status: "missing",

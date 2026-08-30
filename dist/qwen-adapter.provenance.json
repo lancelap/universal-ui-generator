@@ -6,6 +6,6 @@
   "lockfileSha256": "44dc661541916160169ccd53928d225f7e3224559974dbbe6e311ae6e67a8725",
   "node": ">=22",
   "schema": "uig-qwen-adapter-provenance/v1",
-  "sha256": "f739573f1273605c096609d3e84900ecc5540a280f8015f95d7bc271b4f11043",
+  "sha256": "143da6e2aee51337f0fcd1e1bc4e2e58d2ff9f9b8d100c5ea7207108e12b406e",
   "sourceEntry": "extensions/qwen-cli/src/server.ts"
 }

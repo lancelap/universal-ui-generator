@@ -2310,7 +2310,7 @@ var require_typescript = __commonJS({
         walkUpParenthesizedTypesAndGetParentAndChild: () => walkUpParenthesizedTypesAndGetParentAndChild,
         whitespaceOrMapCommentRegExp: () => whitespaceOrMapCommentRegExp,
         writeCommentRange: () => writeCommentRange,
-        writeFile: () => writeFile5,
+        writeFile: () => writeFile6,
         writeFileEnsuringDirectories: () => writeFileEnsuringDirectories,
         zipWith: () => zipWith
       });
@@ -7971,7 +7971,7 @@ ${lanes.join("\n")}
         getCurrentDirectory,
         getAccessibleSortedChildDirectories,
         fileSystemEntryExists,
-        realpath: realpath8,
+        realpath: realpath9,
         setTimeout: setTimeout2,
         clearTimeout: clearTimeout2
       }) {
@@ -8147,7 +8147,7 @@ ${lanes.join("\n")}
         function updateChildWatches(parentDir, parentDirPath, options) {
           const parentWatcher = cache.get(parentDirPath);
           if (!parentWatcher) return false;
-          const target = normalizePath(realpath8(parentDir));
+          const target = normalizePath(realpath9(parentDir));
           let hasChanges;
           let newChildWatches;
           if (filePathComparer(target, parentDir) === 0) {
@@ -8158,7 +8158,7 @@ ${lanes.join("\n")}
                 /* Directory */
               ) ? mapDefined(getAccessibleSortedChildDirectories(parentDir), (child) => {
                 const childFullName = getNormalizedAbsolutePath(child, parentDir);
-                return !isIgnoredPath(childFullName, options) && filePathComparer(childFullName, normalizePath(realpath8(childFullName))) === 0 ? childFullName : void 0;
+                return !isIgnoredPath(childFullName, options) && filePathComparer(childFullName, normalizePath(realpath9(childFullName))) === 0 ? childFullName : void 0;
               }) : emptyArray,
               parentWatcher.childWatches,
               (child, childWatcher) => filePathComparer(child, childWatcher.dirName),
@@ -8242,7 +8242,7 @@ ${lanes.join("\n")}
         getCurrentDirectory,
         fsSupportsRecursiveFsWatch,
         getAccessibleSortedChildDirectories,
-        realpath: realpath8,
+        realpath: realpath9,
         tscWatchFile,
         useNonPollingWatchers,
         tscWatchDirectory,
@@ -8382,7 +8382,7 @@ ${lanes.join("\n")}
               fileSystemEntryExists,
               getAccessibleSortedChildDirectories,
               watchDirectory: nonRecursiveWatchDirectory,
-              realpath: realpath8,
+              realpath: realpath9,
               setTimeout: setTimeout2,
               clearTimeout: clearTimeout2
             });
@@ -8621,7 +8621,7 @@ ${lanes.join("\n")}
             // (ref: https://github.com/nodejs/node/pull/2649 and https://github.com/Microsoft/TypeScript/issues/4643)
             fsSupportsRecursiveFsWatch,
             getAccessibleSortedChildDirectories: (path) => getAccessibleFileSystemEntries(path).directories,
-            realpath: realpath8,
+            realpath: realpath9,
             tscWatchFile: process.env.TSC_WATCHFILE,
             useNonPollingWatchers: !!process.env.TSC_NONPOLLING_WATCHER,
             tscWatchDirectory: process.env.TSC_WATCHDIRECTORY,
@@ -8642,7 +8642,7 @@ ${lanes.join("\n")}
             writeOutputIsTTY() {
               return process.stdout.isTTY;
             },
-            readFile: readFile8,
+            readFile: readFile9,
             writeFile: writeFile22,
             watchFile: watchFile2,
             watchDirectory,
@@ -8695,7 +8695,7 @@ ${lanes.join("\n")}
             enableCPUProfiler,
             disableCPUProfiler,
             cpuProfilingEnabled: () => !!activeSession || contains(process.execArgv, "--cpu-prof") || contains(process.execArgv, "--prof"),
-            realpath: realpath8,
+            realpath: realpath9,
             debugMode: !!process.env.NODE_INSPECTOR_IPC || !!process.env.VSCODE_INSPECTOR_OPTIONS || some(process.execArgv, (arg) => /^--(?:inspect|debug)(?:-brk)?(?:=\d+)?$/i.test(arg)) || !!process.recordreplay,
             tryEnableSourceMapsForHost() {
               try {
@@ -8848,7 +8848,7 @@ ${lanes.join("\n")}
               callback
             );
           }
-          function readFile8(fileName, _encoding) {
+          function readFile9(fileName, _encoding) {
             let buffer;
             try {
               buffer = _fs.readFileSync(fileName);
@@ -8927,7 +8927,7 @@ ${lanes.join("\n")}
             }
           }
           function readDirectory(path, extensions, excludes, includes, depth) {
-            return matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, process.cwd(), depth, getAccessibleFileSystemEntries, realpath8);
+            return matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, process.cwd(), depth, getAccessibleFileSystemEntries, realpath9);
           }
           function fileSystemEntryExists(path, entryKind) {
             const stat2 = statSync(path);
@@ -8963,7 +8963,7 @@ ${lanes.join("\n")}
           function fsRealPathHandlingLongPath(path) {
             return path.length < 260 ? _fs.realpathSync.native(path) : _fs.realpathSync(path);
           }
-          function realpath8(path) {
+          function realpath9(path) {
             try {
               return fsRealpath(path);
             } catch {
@@ -9436,11 +9436,11 @@ ${lanes.join("\n")}
           return toComponents;
         }
         const components = toComponents.slice(start);
-        const relative9 = [];
+        const relative10 = [];
         for (; start < fromComponents.length; start++) {
-          relative9.push("..");
+          relative10.push("..");
         }
-        return ["", ...relative9, ...components];
+        return ["", ...relative10, ...components];
       }
       function getRelativePathFromDirectory(fromDirectory, to, getCanonicalFileNameOrIgnoreCase) {
         Debug.assert(getRootLength(fromDirectory) > 0 === getRootLength(to) > 0, "Paths must either both be absolute or both be relative");
@@ -20953,7 +20953,7 @@ ${lanes.join("\n")}
         sourceFilePath = isSourceFileInCommonSourceDirectory ? sourceFilePath.substring(commonSourceDirectory.length) : sourceFilePath;
         return combinePaths(newDirPath, sourceFilePath);
       }
-      function writeFile5(host, diagnostics2, fileName, text, writeByteOrderMark, sourceFiles, data) {
+      function writeFile6(host, diagnostics2, fileName, text, writeByteOrderMark, sourceFiles, data) {
         host.writeFile(
           fileName,
           text,
@@ -22047,15 +22047,15 @@ ${lanes.join("\n")}
         if (isAccessExpression(name.parent) && isRightSideOfAccessExpression(name)) {
           return walkAccessExpression(name.parent);
         }
-        function walkAccessExpression(access) {
-          if (access.kind === 212) {
-            const res = action2(access.name);
+        function walkAccessExpression(access2) {
+          if (access2.kind === 212) {
+            const res = action2(access2.name);
             if (res !== void 0) {
               return res;
             }
-          } else if (access.kind === 213) {
-            if (isIdentifier(access.argumentExpression) || isStringLiteralLike(access.argumentExpression)) {
-              const res = action2(access.argumentExpression);
+          } else if (access2.kind === 213) {
+            if (isIdentifier(access2.argumentExpression) || isStringLiteralLike(access2.argumentExpression)) {
+              const res = action2(access2.argumentExpression);
               if (res !== void 0) {
                 return res;
               }
@@ -22063,11 +22063,11 @@ ${lanes.join("\n")}
               return void 0;
             }
           }
-          if (isAccessExpression(access.expression)) {
-            return walkAccessExpression(access.expression);
+          if (isAccessExpression(access2.expression)) {
+            return walkAccessExpression(access2.expression);
           }
-          if (isIdentifier(access.expression)) {
-            return action2(access.expression);
+          if (isIdentifier(access2.expression)) {
+            return action2(access2.expression);
           }
           return void 0;
         }
@@ -23042,7 +23042,7 @@ ${lanes.join("\n")}
       function getRegexFromPattern(pattern, useCaseSensitiveFileNames2) {
         return new RegExp(pattern, useCaseSensitiveFileNames2 ? "" : "i");
       }
-      function matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, currentDirectory, depth, getFileSystemEntries, realpath8) {
+      function matchFiles(path, extensions, excludes, includes, useCaseSensitiveFileNames2, currentDirectory, depth, getFileSystemEntries, realpath9) {
         path = normalizePath(path);
         currentDirectory = normalizePath(currentDirectory);
         const patterns = getFileMatcherPatterns(path, excludes, includes, useCaseSensitiveFileNames2, currentDirectory);
@@ -23057,7 +23057,7 @@ ${lanes.join("\n")}
         }
         return flatten4(results);
         function visitDirectory2(path2, absolutePath, depth2) {
-          const canonicalPath = toCanonical(realpath8(absolutePath));
+          const canonicalPath = toCanonical(realpath9(absolutePath));
           if (visited2.has(canonicalPath)) return;
           visited2.set(canonicalPath, true);
           const { files, directories } = getFileSystemEntries(path2);
@@ -31320,11 +31320,11 @@ ${lanes.join("\n")}
             )
           );
         }
-        function createESDecorateClassElementAccessObject(name, access) {
+        function createESDecorateClassElementAccessObject(name, access2) {
           const properties = [];
           properties.push(createESDecorateClassElementAccessHasMethod(name));
-          if (access.get) properties.push(createESDecorateClassElementAccessGetMethod(name));
-          if (access.set) properties.push(createESDecorateClassElementAccessSetMethod(name));
+          if (access2.get) properties.push(createESDecorateClassElementAccessGetMethod(name));
+          if (access2.set) properties.push(createESDecorateClassElementAccessSetMethod(name));
           return factory22.createObjectLiteralExpression(properties);
         }
         function createESDecorateClassElementContextObject(contextIn) {
@@ -45404,7 +45404,7 @@ ${lanes.join("\n")}
         const possibleOption = getSpellingSuggestion(unknownOption, diagnostics2.optionDeclarations, getOptionName);
         return possibleOption ? createDiagnosticForNodeInSourceFileOrCompilerDiagnostic(sourceFile2, node, diagnostics2.unknownDidYouMeanDiagnostic, unknownOptionErrorText || unknownOption, possibleOption.name) : createDiagnosticForNodeInSourceFileOrCompilerDiagnostic(sourceFile2, node, diagnostics2.unknownOptionDiagnostic, unknownOptionErrorText || unknownOption);
       }
-      function parseCommandLineWorker(diagnostics2, commandLine, readFile8) {
+      function parseCommandLineWorker(diagnostics2, commandLine, readFile9) {
         const options = {};
         let watchOptions;
         const fileNames = [];
@@ -45452,7 +45452,7 @@ ${lanes.join("\n")}
           }
         }
         function parseResponseFile(fileName) {
-          const text = tryReadFile(fileName, readFile8 || ((fileName2) => sys.readFile(fileName2)));
+          const text = tryReadFile(fileName, readFile9 || ((fileName2) => sys.readFile(fileName2)));
           if (!isString(text)) {
             errors.push(text);
             return;
@@ -45555,8 +45555,8 @@ ${lanes.join("\n")}
         unknownDidYouMeanDiagnostic: Diagnostics.Unknown_compiler_option_0_Did_you_mean_1,
         optionTypeMismatchDiagnostic: Diagnostics.Compiler_option_0_expects_an_argument
       };
-      function parseCommandLine(commandLine, readFile8) {
-        return parseCommandLineWorker(compilerOptionsDidYouMeanDiagnostics, commandLine, readFile8);
+      function parseCommandLine(commandLine, readFile9) {
+        return parseCommandLineWorker(compilerOptionsDidYouMeanDiagnostics, commandLine, readFile9);
       }
       function getOptionFromName(optionName, allowShort) {
         return getOptionDeclarationFromName(getOptionsNameMap, optionName, allowShort);
@@ -45638,8 +45638,8 @@ ${lanes.join("\n")}
           watchOptionsToExtend
         );
       }
-      function readConfigFile(fileName, readFile8) {
-        const textOrDiagnostic = tryReadFile(fileName, readFile8);
+      function readConfigFile(fileName, readFile9) {
+        const textOrDiagnostic = tryReadFile(fileName, readFile9);
         return isString(textOrDiagnostic) ? parseConfigFileTextToJson(fileName, textOrDiagnostic) : { config: {}, error: textOrDiagnostic };
       }
       function parseConfigFileTextToJson(fileName, jsonText) {
@@ -45654,14 +45654,14 @@ ${lanes.join("\n")}
           error: jsonSourceFile.parseDiagnostics.length ? jsonSourceFile.parseDiagnostics[0] : void 0
         };
       }
-      function readJsonConfigFile(fileName, readFile8) {
-        const textOrDiagnostic = tryReadFile(fileName, readFile8);
+      function readJsonConfigFile(fileName, readFile9) {
+        const textOrDiagnostic = tryReadFile(fileName, readFile9);
         return isString(textOrDiagnostic) ? parseJsonText(fileName, textOrDiagnostic) : { fileName, parseDiagnostics: [textOrDiagnostic] };
       }
-      function tryReadFile(fileName, readFile8) {
+      function tryReadFile(fileName, readFile9) {
         let text;
         try {
-          text = readFile8(fileName);
+          text = readFile9(fileName);
         } catch (e) {
           return createCompilerDiagnostic(Diagnostics.Cannot_read_file_0_Colon_1, fileName, e.message);
         }
@@ -48009,11 +48009,11 @@ ${lanes.join("\n")}
             if (i < rootLength) {
               return void 0;
             }
-            const sep10 = directory.lastIndexOf(directorySeparator, i - 1);
-            if (sep10 === -1) {
+            const sep11 = directory.lastIndexOf(directorySeparator, i - 1);
+            if (sep11 === -1) {
               return void 0;
             }
-            return directory.substr(0, Math.max(sep10, rootLength));
+            return directory.substr(0, Math.max(sep11, rootLength));
           }
         }
       }
@@ -53919,9 +53919,9 @@ ${lanes.join("\n")}
               if (!startsWithDirectory(target, realPathDirectory, getCanonicalFileName)) {
                 return;
               }
-              const relative9 = getRelativePathFromDirectory(realPathDirectory, target, getCanonicalFileName);
+              const relative10 = getRelativePathFromDirectory(realPathDirectory, target, getCanonicalFileName);
               for (const symlinkDirectory of symlinkDirectories) {
-                const option = resolvePath(symlinkDirectory, relative9);
+                const option = resolvePath(symlinkDirectory, relative10);
                 const result2 = cb(option, target === referenceRedirect);
                 shouldFilterIgnoredPaths = true;
                 if (result2) return result2;
@@ -58841,7 +58841,7 @@ ${lanes.join("\n")}
           return false;
         }
         function isTypeSymbolAccessible(typeSymbol, enclosingDeclaration) {
-          const access = isSymbolAccessibleWorker(
+          const access2 = isSymbolAccessibleWorker(
             typeSymbol,
             enclosingDeclaration,
             788968,
@@ -58850,10 +58850,10 @@ ${lanes.join("\n")}
             /*allowModules*/
             true
           );
-          return access.accessibility === 0;
+          return access2.accessibility === 0;
         }
         function isValueSymbolAccessible(typeSymbol, enclosingDeclaration) {
-          const access = isSymbolAccessibleWorker(
+          const access2 = isSymbolAccessibleWorker(
             typeSymbol,
             enclosingDeclaration,
             111551,
@@ -58862,10 +58862,10 @@ ${lanes.join("\n")}
             /*allowModules*/
             true
           );
-          return access.accessibility === 0;
+          return access2.accessibility === 0;
         }
         function isSymbolAccessibleByFlags(typeSymbol, enclosingDeclaration, flags) {
-          const access = isSymbolAccessibleWorker(
+          const access2 = isSymbolAccessibleWorker(
             typeSymbol,
             enclosingDeclaration,
             flags,
@@ -58874,7 +58874,7 @@ ${lanes.join("\n")}
             /*allowModules*/
             false
           );
-          return access.accessibility === 0;
+          return access2.accessibility === 0;
         }
         function isAnySymbolAccessible(symbols, enclosingDeclaration, initialSymbol, meaning, shouldComputeAliasesToMakeVisible, allowModules) {
           if (!length(symbols)) return;
@@ -79184,19 +79184,19 @@ ${lanes.join("\n")}
           }
           return false;
         }
-        function getAccessedPropertyName(access) {
-          if (isPropertyAccessExpression(access)) {
-            return access.name.escapedText;
+        function getAccessedPropertyName(access2) {
+          if (isPropertyAccessExpression(access2)) {
+            return access2.name.escapedText;
           }
-          if (isElementAccessExpression(access)) {
-            return tryGetElementAccessExpressionName(access);
+          if (isElementAccessExpression(access2)) {
+            return tryGetElementAccessExpressionName(access2);
           }
-          if (isBindingElement(access)) {
-            const name = getDestructuringPropertyName(access);
+          if (isBindingElement(access2)) {
+            const name = getDestructuringPropertyName(access2);
             return name ? escapeLeadingUnderscores(name) : void 0;
           }
-          if (isParameter(access)) {
-            return "" + access.parent.parameters.indexOf(access);
+          if (isParameter(access2)) {
+            return "" + access2.parent.parameters.indexOf(access2);
           }
           return void 0;
         }
@@ -80411,9 +80411,9 @@ ${lanes.join("\n")}
                   type = narrowTypeBySwitchOptionalChainContainment(type, flow.node, (t) => !(t.flags & 131072 || t.flags & 128 && t.value === "undefined"));
                 }
               }
-              const access = getDiscriminantPropertyAccess(expr, type);
-              if (access) {
-                type = narrowTypeBySwitchOnDiscriminantProperty(type, access, flow.node);
+              const access2 = getDiscriminantPropertyAccess(expr, type);
+              if (access2) {
+                type = narrowTypeBySwitchOnDiscriminantProperty(type, access2, flow.node);
               }
             }
             return createFlowType(type, isIncomplete(flowType));
@@ -80575,26 +80575,26 @@ ${lanes.join("\n")}
           }
           function getDiscriminantPropertyAccess(expr, computedType) {
             if (declaredType.flags & 1048576 || computedType.flags & 1048576) {
-              const access = getCandidateDiscriminantPropertyAccess(expr);
-              if (access) {
-                const name = getAccessedPropertyName(access);
+              const access2 = getCandidateDiscriminantPropertyAccess(expr);
+              if (access2) {
+                const name = getAccessedPropertyName(access2);
                 if (name) {
                   const type = declaredType.flags & 1048576 && isTypeSubsetOf(computedType, declaredType) ? declaredType : computedType;
                   if (isDiscriminantProperty(type, name)) {
-                    return access;
+                    return access2;
                   }
                 }
               }
             }
             return void 0;
           }
-          function narrowTypeByDiscriminant(type, access, narrowType2) {
-            const propName = getAccessedPropertyName(access);
+          function narrowTypeByDiscriminant(type, access2, narrowType2) {
+            const propName = getAccessedPropertyName(access2);
             if (propName === void 0) {
               return type;
             }
-            const optionalChain = isOptionalChain(access);
-            const removeNullable = strictNullChecks && (optionalChain || isNonNullAccess(access)) && maybeTypeOfKind(
+            const optionalChain = isOptionalChain(access2);
+            const removeNullable = strictNullChecks && (optionalChain || isNonNullAccess(access2)) && maybeTypeOfKind(
               type,
               98304
               /* Nullable */
@@ -80614,27 +80614,27 @@ ${lanes.join("\n")}
               return !(discriminantType.flags & 131072) && !(narrowedPropType.flags & 131072) && areTypesComparable(narrowedPropType, discriminantType);
             });
           }
-          function narrowTypeByDiscriminantProperty(type, access, operator, value, assumeTrue) {
+          function narrowTypeByDiscriminantProperty(type, access2, operator, value, assumeTrue) {
             if ((operator === 37 || operator === 38) && type.flags & 1048576) {
               const keyPropertyName = getKeyPropertyName(type);
-              if (keyPropertyName && keyPropertyName === getAccessedPropertyName(access)) {
+              if (keyPropertyName && keyPropertyName === getAccessedPropertyName(access2)) {
                 const candidate2 = getConstituentTypeForKeyType(type, getTypeOfExpression(value));
                 if (candidate2) {
                   return operator === (assumeTrue ? 37 : 38) ? candidate2 : isUnitType(getTypeOfPropertyOfType(candidate2, keyPropertyName) || unknownType) ? removeType(type, candidate2) : type;
                 }
               }
             }
-            return narrowTypeByDiscriminant(type, access, (t) => narrowTypeByEquality(t, operator, value, assumeTrue));
+            return narrowTypeByDiscriminant(type, access2, (t) => narrowTypeByEquality(t, operator, value, assumeTrue));
           }
-          function narrowTypeBySwitchOnDiscriminantProperty(type, access, data) {
-            if (data.clauseStart < data.clauseEnd && type.flags & 1048576 && getKeyPropertyName(type) === getAccessedPropertyName(access)) {
+          function narrowTypeBySwitchOnDiscriminantProperty(type, access2, data) {
+            if (data.clauseStart < data.clauseEnd && type.flags & 1048576 && getKeyPropertyName(type) === getAccessedPropertyName(access2)) {
               const clauseTypes = getSwitchClauseTypes(data.switchStatement).slice(data.clauseStart, data.clauseEnd);
               const candidate2 = getUnionType(map4(clauseTypes, (t) => getConstituentTypeForKeyType(type, t) || unknownType));
               if (candidate2 !== unknownType) {
                 return candidate2;
               }
             }
-            return narrowTypeByDiscriminant(type, access, (t) => narrowTypeBySwitchOnDiscriminant(t, data));
+            return narrowTypeByDiscriminant(type, access2, (t) => narrowTypeBySwitchOnDiscriminant(t, data));
           }
           function narrowTypeByTruthiness(type, expr, assumeTrue) {
             if (isMatchingReference(reference, expr)) {
@@ -80651,9 +80651,9 @@ ${lanes.join("\n")}
                 /* NEUndefinedOrNull */
               );
             }
-            const access = getDiscriminantPropertyAccess(expr, type);
-            if (access) {
-              return narrowTypeByDiscriminant(type, access, (t) => getTypeWithFacts(
+            const access2 = getDiscriminantPropertyAccess(expr, type);
+            if (access2) {
+              return narrowTypeByDiscriminant(type, access2, (t) => getTypeWithFacts(
                 t,
                 assumeTrue ? 4194304 : 8388608
                 /* Falsy */
@@ -81281,9 +81281,9 @@ ${lanes.join("\n")}
                     /* NEUndefinedOrNull */
                   );
                 }
-                const access = getDiscriminantPropertyAccess(predicateArgument, type);
-                if (access) {
-                  return narrowTypeByDiscriminant(type, access, (t) => getNarrowedType(
+                const access2 = getDiscriminantPropertyAccess(predicateArgument, type);
+                if (access2) {
+                  return narrowTypeByDiscriminant(type, access2, (t) => getNarrowedType(
                     t,
                     predicate.type,
                     assumeTrue,
@@ -81343,9 +81343,9 @@ ${lanes.join("\n")}
                 /* EQUndefinedOrNull */
               );
             }
-            const access = getDiscriminantPropertyAccess(expr, type);
-            if (access) {
-              return narrowTypeByDiscriminant(type, access, (t) => getTypeWithFacts(
+            const access2 = getDiscriminantPropertyAccess(expr, type);
+            if (access2) {
+              return narrowTypeByDiscriminant(type, access2, (t) => getTypeWithFacts(
                 t,
                 assumePresent ? 2097152 : 262144
                 /* EQUndefinedOrNull */
@@ -123758,7 +123758,7 @@ ${lanes.join("\n")}
           }
         }
         function createImportCallExpressionAMD(arg, containsLexicalThis) {
-          const resolve7 = factory22.createUniqueName("resolve");
+          const resolve8 = factory22.createUniqueName("resolve");
           const reject = factory22.createUniqueName("reject");
           const parameters = [
             factory22.createParameterDeclaration(
@@ -123767,7 +123767,7 @@ ${lanes.join("\n")}
               /*dotDotDotToken*/
               void 0,
               /*name*/
-              resolve7
+              resolve8
             ),
             factory22.createParameterDeclaration(
               /*modifiers*/
@@ -123784,7 +123784,7 @@ ${lanes.join("\n")}
                 factory22.createIdentifier("require"),
                 /*typeArguments*/
                 void 0,
-                [factory22.createArrayLiteralExpression([arg || factory22.createOmittedExpression()]), resolve7, reject]
+                [factory22.createArrayLiteralExpression([arg || factory22.createOmittedExpression()]), resolve8, reject]
               )
             )
           ]);
@@ -129704,7 +129704,7 @@ ${lanes.join("\n")}
             return;
           }
           const buildInfo = host.getBuildInfo() || { version: version2 };
-          writeFile5(
+          writeFile6(
             host,
             emitterDiagnostics,
             buildInfoPath,
@@ -129916,7 +129916,7 @@ ${lanes.join("\n")}
             }
             if (sourceMapFilePath) {
               const sourceMap = sourceMapGenerator.toString();
-              writeFile5(
+              writeFile6(
                 host,
                 emitterDiagnostics,
                 sourceMapFilePath,
@@ -129931,7 +129931,7 @@ ${lanes.join("\n")}
           }
           const text = writer.getText();
           const data = { sourceMapUrlPos, diagnostics: transform22.diagnostics };
-          writeFile5(host, emitterDiagnostics, jsFilePath, text, !!compilerOptions.emitBOM, sourceFiles, data);
+          writeFile6(host, emitterDiagnostics, jsFilePath, text, !!compilerOptions.emitBOM, sourceFiles, data);
           writer.clear();
           return !data.skippedDtsWrite;
         }
@@ -134779,7 +134779,7 @@ ${lanes.join("\n")}
           addOrDeleteFileOrDirectory,
           addOrDeleteFile,
           clearCache,
-          realpath: host.realpath && realpath8
+          realpath: host.realpath && realpath9
         };
         function toPath3(fileName) {
           return toPath(fileName, currentDirectory, getCanonicalFileName);
@@ -134890,7 +134890,7 @@ ${lanes.join("\n")}
           const rootResult = tryReadDirectory2(rootDir, rootDirPath);
           let rootSymLinkResult;
           if (rootResult !== void 0) {
-            return matchFiles(rootDir, extensions, excludes, includes, useCaseSensitiveFileNames2, currentDirectory, depth, getFileSystemEntries, realpath8);
+            return matchFiles(rootDir, extensions, excludes, includes, useCaseSensitiveFileNames2, currentDirectory, depth, getFileSystemEntries, realpath9);
           }
           return host.readDirectory(rootDir, extensions, excludes, includes, depth);
           function getFileSystemEntries(dir) {
@@ -134919,7 +134919,7 @@ ${lanes.join("\n")}
             return result;
           }
         }
-        function realpath8(s) {
+        function realpath9(s) {
           return host.realpath ? host.realpath(s) : s;
         }
         function clearFirstAncestorEntry(fileOrDirectoryPath) {
@@ -135319,12 +135319,12 @@ ${lanes.join("\n")}
       function createCompilerHost(options, setParentNodes) {
         return createCompilerHostWorker(options, setParentNodes);
       }
-      function createGetSourceFile(readFile8, setParentNodes) {
+      function createGetSourceFile(readFile9, setParentNodes) {
         return (fileName, languageVersionOrOptions, onError) => {
           let text;
           try {
             mark("beforeIORead");
-            text = readFile8(fileName);
+            text = readFile9(fileName);
             mark("afterIORead");
             measure("I/O Read", "beforeIORead", "afterIORead");
           } catch (e) {
@@ -135374,7 +135374,7 @@ ${lanes.join("\n")}
           return getDirectoryPath(normalizePath(system.getExecutingFilePath()));
         }
         const newLine = getNewLineCharacter(options);
-        const realpath8 = system.realpath && ((path) => system.realpath(path));
+        const realpath9 = system.realpath && ((path) => system.realpath(path));
         const compilerHost = {
           getSourceFile: createGetSourceFile((fileName) => compilerHost.readFile(fileName), setParentNodes),
           getDefaultLibLocation,
@@ -135394,7 +135394,7 @@ ${lanes.join("\n")}
           directoryExists: (directoryName) => system.directoryExists(directoryName),
           getEnvironmentVariable: (name) => system.getEnvironmentVariable ? system.getEnvironmentVariable(name) : "",
           getDirectories: (path) => system.getDirectories(path),
-          realpath: realpath8,
+          realpath: realpath9,
           readDirectory: (path, extensions, include, exclude, depth) => system.readDirectory(path, extensions, include, exclude, depth),
           createDirectory: (d) => system.createDirectory(d),
           createHash: maybeBind(system, system.createHash)
@@ -136228,7 +136228,7 @@ ${lanes.join("\n")}
           getRedirectFromOutput,
           forEachResolvedProjectReference: forEachResolvedProjectReference2
         });
-        const readFile8 = host.readFile.bind(host);
+        const readFile9 = host.readFile.bind(host);
         (_e = tracing) == null ? void 0 : _e.push(tracing.Phase.Program, "shouldProgramCreateNewSourceFiles", { hasOldProgram: !!oldProgram });
         const shouldCreateNewSourceFile = shouldProgramCreateNewSourceFiles(oldProgram, options);
         (_f = tracing) == null ? void 0 : _f.pop();
@@ -136454,7 +136454,7 @@ ${lanes.join("\n")}
           shouldTransformImportCall,
           emitBuildInfo,
           fileExists,
-          readFile: readFile8,
+          readFile: readFile9,
           directoryExists,
           getSymlinkCache,
           realpath: (_o = host.realpath) == null ? void 0 : _o.bind(host),
@@ -156688,13 +156688,13 @@ interface Symbol {
         for (const element of toConvert.elements) {
           const propertyName = element.propertyName || element.name;
           ts_FindAllReferences_exports.Core.eachSymbolReferenceInFile(element.name, checker, sourceFile2, (id) => {
-            const access = propertyName.kind === 11 ? factory2.createElementAccessExpression(factory2.createIdentifier(namespaceImportName), factory2.cloneNode(propertyName)) : factory2.createPropertyAccessExpression(factory2.createIdentifier(namespaceImportName), factory2.cloneNode(propertyName));
+            const access2 = propertyName.kind === 11 ? factory2.createElementAccessExpression(factory2.createIdentifier(namespaceImportName), factory2.cloneNode(propertyName)) : factory2.createPropertyAccessExpression(factory2.createIdentifier(namespaceImportName), factory2.cloneNode(propertyName));
             if (isShorthandPropertyAssignment(id.parent)) {
-              changes.replaceNode(sourceFile2, id.parent, factory2.createPropertyAssignment(id.text, access));
+              changes.replaceNode(sourceFile2, id.parent, factory2.createPropertyAssignment(id.text, access2));
             } else if (isExportSpecifier(id.parent)) {
               neededNamedImports.add(element);
             } else {
-              changes.replaceNode(sourceFile2, id, access);
+              changes.replaceNode(sourceFile2, id, access2);
             }
           });
         }
@@ -197813,7 +197813,7 @@ ${options.prefix}` : "\n" : options.prefix
         walkUpParenthesizedTypesAndGetParentAndChild: () => walkUpParenthesizedTypesAndGetParentAndChild,
         whitespaceOrMapCommentRegExp: () => whitespaceOrMapCommentRegExp,
         writeCommentRange: () => writeCommentRange,
-        writeFile: () => writeFile5,
+        writeFile: () => writeFile6,
         writeFileEnsuringDirectories: () => writeFileEnsuringDirectories,
         zipWith: () => zipWith
       });
@@ -199053,9 +199053,9 @@ ${options.prefix}` : "\n" : options.prefix
             if (this.host.realpath) {
               Debug.assert(!!this.containingProjects.length);
               const project = this.containingProjects[0];
-              const realpath8 = this.host.realpath(this.path);
-              if (realpath8) {
-                this.realpath = project.toPath(realpath8);
+              const realpath9 = this.host.realpath(this.path);
+              if (realpath9) {
+                this.realpath = project.toPath(realpath9);
                 if (this.realpath !== this.path) {
                   project.projectService.realpathToScriptInfos.add(this.realpath, this);
                 }
@@ -203077,9 +203077,9 @@ ${options.prefix}` : "\n" : options.prefix
           this.filenameToScriptInfo.delete(info.path);
           this.filenameToScriptInfoVersion.set(info.path, info.textStorage.version);
           this.stopWatchingScriptInfo(info);
-          const realpath8 = info.getRealpathIfDifferent();
-          if (realpath8) {
-            this.realpathToScriptInfos.remove(realpath8, info);
+          const realpath9 = info.getRealpathIfDifferent();
+          if (realpath9) {
+            this.realpathToScriptInfos.remove(realpath9, info);
           }
           info.closeSourceMapFileWatcher();
         }
@@ -203968,9 +203968,9 @@ All files are: ${JSON.stringify(names)}`,
         getSymlinkedProjects(info) {
           let projects;
           if (this.realpathToScriptInfos) {
-            const realpath8 = info.getRealpathIfDifferent();
-            if (realpath8) {
-              forEach(this.realpathToScriptInfos.get(realpath8), combineProjects);
+            const realpath9 = info.getRealpathIfDifferent();
+            if (realpath9) {
+              forEach(this.realpathToScriptInfos.get(realpath9), combineProjects);
             }
             forEach(this.realpathToScriptInfos.get(info.path), combineProjects);
           }
@@ -210502,8 +210502,8 @@ Additional information: BADCLIENT: Bad error code, ${badCode} not found in range
         installPackage(options) {
           this.packageInstallId++;
           const request = { kind: "installPackage", ...options, id: this.packageInstallId };
-          const promise2 = new Promise((resolve7, reject) => {
-            (this.packageInstalledPromise ?? (this.packageInstalledPromise = /* @__PURE__ */ new Map())).set(this.packageInstallId, { resolve: resolve7, reject });
+          const promise2 = new Promise((resolve8, reject) => {
+            (this.packageInstalledPromise ?? (this.packageInstalledPromise = /* @__PURE__ */ new Map())).set(this.packageInstallId, { resolve: resolve8, reject });
           });
           this.installer.send(request);
           return promise2;
@@ -210787,7 +210787,7 @@ Additional information: BADCLIENT: Bad error code, ${badCode} not found in range
 
 // extensions/qwen-cli/src/server.ts
 import { realpathSync } from "node:fs";
-import { dirname as dirname4, resolve as resolve6 } from "node:path";
+import { dirname as dirname5, resolve as resolve7 } from "node:path";
 import { fileURLToPath as fileURLToPath3, pathToFileURL } from "node:url";
 
 // node_modules/.pnpm/@modelcontextprotocol+server@2.0.0-beta.5/node_modules/@modelcontextprotocol/server/dist/chunk-Br0eD_fh.mjs
@@ -228485,14 +228485,14 @@ function inputRequiredRoundsExceededMessage(method, maxRounds) {
   return `Multi-round-trip request '${method}' still required input after ${maxRounds} rounds (inputRequired.maxRounds)`;
 }
 function sleep(ms, signal) {
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve8, reject) => {
     if (signal?.aborted) {
       reject(signal.reason instanceof SdkError ? signal.reason : new SdkError(SdkErrorCode.RequestTimeout, String(signal.reason)));
       return;
     }
     const timer = setTimeout(() => {
       signal?.removeEventListener("abort", onAbort);
-      resolve7();
+      resolve8();
     }, ms);
     const onAbort = () => {
       clearTimeout(timer);
@@ -229286,7 +229286,7 @@ var Protocol = class {
     const flowStartedAt = Date.now();
     let onAbort;
     let cleanupMessageId;
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       const earlyReject = (error46) => {
         reject(error46);
       };
@@ -229354,7 +229354,7 @@ var Protocol = class {
         }
         if (decoded.kind === "invalid") return reject(decoded.error);
         if (decoded.kind === "input_required") {
-          if (options?.allowInputRequired === true) return resolve7(manualInputRequiredValue(decoded));
+          if (options?.allowInputRequired === true) return resolve8(manualInputRequiredValue(decoded));
           const flow = {
             codec: codec2,
             request,
@@ -229366,11 +229366,11 @@ var Protocol = class {
               params
             }, resultSchema, legOptions)
           };
-          return resolve7(this._resolveNonCompleteResult(decoded, flow));
+          return resolve8(this._resolveNonCompleteResult(decoded, flow));
         }
         const result = decoded.result;
         validateStandardSchema(resultSchema, result).then((parseResult) => {
-          if (parseResult.success) resolve7(parseResult.data);
+          if (parseResult.success) resolve8(parseResult.data);
           else reject(new SdkError(SdkErrorCode.InvalidResult, `Invalid result for ${request.method}: ${parseResult.error}`));
         }, reject);
       });
@@ -232282,7 +232282,7 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
     ref = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, ref);
     const schOrFunc = root.refs[ref];
     if (schOrFunc) return schOrFunc;
-    let _sch = resolve7.call(this, root, ref);
+    let _sch = resolve8.call(this, root, ref);
     if (_sch === void 0) {
       const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
       const { schemaId } = this.opts;
@@ -232308,7 +232308,7 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
   function sameSchemaEnv(s1, s2) {
     return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
   }
-  function resolve7(root, ref) {
+  function resolve8(root, ref) {
     let sch;
     while (typeof (sch = this.refs[ref]) == "string") ref = sch;
     return sch || this.schemas[ref] || resolveSchema.call(this, root, ref);
@@ -232758,47 +232758,47 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     else if (typeof uri === "object") uri = parse3(serialize(uri, options), options);
     return uri;
   }
-  function resolve7(baseURI, relativeURI, options) {
+  function resolve8(baseURI, relativeURI, options) {
     const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
     const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
     schemelessOptions.skipEscape = true;
     return serialize(resolved, schemelessOptions);
   }
-  function resolveComponent(base2, relative9, options, skipNormalization) {
+  function resolveComponent(base2, relative10, options, skipNormalization) {
     const target = {};
     if (!skipNormalization) {
       base2 = parse3(serialize(base2, options), options);
-      relative9 = parse3(serialize(relative9, options), options);
+      relative10 = parse3(serialize(relative10, options), options);
     }
     options = options || {};
-    if (!options.tolerant && relative9.scheme) {
-      target.scheme = relative9.scheme;
-      target.userinfo = relative9.userinfo;
-      target.host = relative9.host;
-      target.port = relative9.port;
-      target.path = removeDotSegments(relative9.path || "");
-      target.query = relative9.query;
+    if (!options.tolerant && relative10.scheme) {
+      target.scheme = relative10.scheme;
+      target.userinfo = relative10.userinfo;
+      target.host = relative10.host;
+      target.port = relative10.port;
+      target.path = removeDotSegments(relative10.path || "");
+      target.query = relative10.query;
     } else {
-      if (relative9.userinfo !== void 0 || relative9.host !== void 0 || relative9.port !== void 0) {
-        target.userinfo = relative9.userinfo;
-        target.host = relative9.host;
-        target.port = relative9.port;
-        target.path = removeDotSegments(relative9.path || "");
-        target.query = relative9.query;
+      if (relative10.userinfo !== void 0 || relative10.host !== void 0 || relative10.port !== void 0) {
+        target.userinfo = relative10.userinfo;
+        target.host = relative10.host;
+        target.port = relative10.port;
+        target.path = removeDotSegments(relative10.path || "");
+        target.query = relative10.query;
       } else {
-        if (!relative9.path) {
+        if (!relative10.path) {
           target.path = base2.path;
-          if (relative9.query !== void 0) target.query = relative9.query;
+          if (relative10.query !== void 0) target.query = relative10.query;
           else target.query = base2.query;
         } else {
-          if (relative9.path[0] === "/") target.path = removeDotSegments(relative9.path);
+          if (relative10.path[0] === "/") target.path = removeDotSegments(relative10.path);
           else {
-            if ((base2.userinfo !== void 0 || base2.host !== void 0 || base2.port !== void 0) && !base2.path) target.path = "/" + relative9.path;
-            else if (!base2.path) target.path = relative9.path;
-            else target.path = base2.path.slice(0, base2.path.lastIndexOf("/") + 1) + relative9.path;
+            if ((base2.userinfo !== void 0 || base2.host !== void 0 || base2.port !== void 0) && !base2.path) target.path = "/" + relative10.path;
+            else if (!base2.path) target.path = relative10.path;
+            else target.path = base2.path.slice(0, base2.path.lastIndexOf("/") + 1) + relative10.path;
             target.path = removeDotSegments(target.path);
           }
-          target.query = relative9.query;
+          target.query = relative10.query;
         }
         target.userinfo = base2.userinfo;
         target.host = base2.host;
@@ -232806,7 +232806,7 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
       }
       target.scheme = base2.scheme;
     }
-    target.fragment = relative9.fragment;
+    target.fragment = relative10.fragment;
     return target;
   }
   function equal(uriA, uriB, options) {
@@ -232932,7 +232932,7 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   const fastUri = {
     SCHEMES,
     normalize,
-    resolve: resolve7,
+    resolve: resolve8,
     resolveComponent,
     equal,
     serialize,
@@ -237887,7 +237887,7 @@ var StdioServerTransport = class {
   }
   send(message) {
     if (this._closed) return Promise.reject(/* @__PURE__ */ new Error("StdioServerTransport is closed"));
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       const json2 = serializeMessage(message);
       let settled = false;
       const onError = (error46) => {
@@ -237902,14 +237902,14 @@ var StdioServerTransport = class {
         settled = true;
         this._stdout.off("error", onError);
         this._stdout.off("drain", onDrain);
-        resolve7();
+        resolve8();
       };
       this._stdout.once("error", onError);
       if (this._stdout.write(json2)) {
         if (settled) return;
         settled = true;
         this._stdout.off("error", onError);
-        resolve7();
+        resolve8();
       } else if (!settled) this._stdout.once("drain", onDrain);
     });
   }
@@ -237963,14 +237963,14 @@ var StdioConnectionChannel = class {
   */
   async whenRequestsAnswered(timeoutMs) {
     if (this._closed || this._pendingRequests.size === 0) return true;
-    return await new Promise((resolve7) => {
+    return await new Promise((resolve8) => {
       const waiter = () => {
         clearTimeout(timer);
-        resolve7(true);
+        resolve8(true);
       };
       const timer = setTimeout(() => {
         this._drainWaiters = this._drainWaiters.filter((pending) => pending !== waiter);
-        resolve7(false);
+        resolve8(false);
       }, timeoutMs);
       this._drainWaiters.push(waiter);
     });
@@ -244457,6 +244457,300 @@ function flattenErrors(errors) {
   return flattened;
 }
 
+// packages/contracts/src/agentic-run.ts
+var sha256Schema = Type.String({ pattern: "^[a-f0-9]{64}$" });
+var safeRelativePath = Type.String({
+  minLength: 1,
+  pattern: "^(?![\\\\/])(?![A-Za-z]:[\\\\/])(?!.*(?:^|[\\\\/])\\.\\.(?:[\\\\/]|$)).+$"
+});
+var UigAgenticRunStatusSchema = Type.Union([
+  Type.Literal("pending"),
+  Type.Literal("implementation-recorded"),
+  Type.Literal("code-review-recorded"),
+  Type.Literal("browser-review-recorded"),
+  Type.Literal("complete"),
+  Type.Literal("partial-success"),
+  Type.Literal("generated-with-errors"),
+  Type.Literal("blocked"),
+  Type.Literal("cancelled")
+]);
+var UigPrepareBuildInputSchema = closedObject({
+  source: Type.Union([
+    closedObject({
+      kind: Type.Literal("pixso-url"),
+      url: Type.String({ minLength: 1 }),
+      designSystem: Type.String({ minLength: 1 })
+    }),
+    closedObject({
+      kind: Type.Literal("local-dsl"),
+      path: safeRelativePath,
+      designSystem: Type.String({ minLength: 1 })
+    }),
+    closedObject({
+      kind: Type.Literal("stored-run"),
+      runId: Type.String({ minLength: 1 })
+    }),
+    closedObject({
+      kind: Type.Literal("screenshot"),
+      path: safeRelativePath,
+      pageName: Type.String({ minLength: 1 }),
+      designSystem: Type.String({ minLength: 1 })
+    })
+  ]),
+  refreshProjectContext: Type.Optional(Type.Boolean())
+});
+var UigPrepareBuildStageSchema = Type.Union([
+  Type.Literal("fetch"),
+  Type.Literal("normalize"),
+  Type.Literal("summarize"),
+  Type.Literal("plan"),
+  Type.Literal("resolve"),
+  Type.Literal("context"),
+  Type.Literal("store")
+]);
+var UigPrepareBuildDiagnosticSchema = closedObject({
+  code: Type.String({ minLength: 1 }),
+  severity: Type.Union([
+    Type.Literal("info"),
+    Type.Literal("warning"),
+    Type.Literal("error")
+  ]),
+  blocking: Type.Boolean(),
+  stage: UigPrepareBuildStageSchema,
+  message: Type.String({ minLength: 1 })
+});
+var UigPrepareBuildComponentSchema = closedObject({
+  componentId: Type.String({ minLength: 1 }),
+  exportName: Type.String({ minLength: 1 }),
+  importSource: Type.String({ minLength: 1 }),
+  status: Type.Union([
+    Type.Literal("verified"),
+    Type.Literal("mapped"),
+    Type.Literal("pack-owned"),
+    Type.Literal("suggested")
+  ]),
+  semanticRoles: Type.Array(Type.String({ minLength: 1 }), { maxItems: 50 })
+});
+var UigPrepareBuildResultSchema = closedObject({
+  schema: Type.Literal("uig-qwen-prepare-build-result/v1"),
+  status: Type.Union([
+    Type.Literal("ready"),
+    Type.Literal("blocked"),
+    Type.Literal("ready-with-warnings")
+  ]),
+  runId: Type.String({ minLength: 1 }),
+  runPath: safeRelativePath,
+  sourceKind: Type.Union([
+    Type.Literal("pixso-url"),
+    Type.Literal("local-dsl"),
+    Type.Literal("stored-run"),
+    Type.Literal("screenshot")
+  ]),
+  designEvidencePath: safeRelativePath,
+  projectContextPath: safeRelativePath,
+  projectContextFingerprint: Type.Optional(sha256Schema),
+  designSystem: Type.String({ minLength: 1 }),
+  designSystemVersion: Type.Optional(Type.String({ minLength: 1 })),
+  packSha256: Type.Optional(sha256Schema),
+  reusableComponents: Type.Array(UigPrepareBuildComponentSchema, {
+    maxItems: 100
+  }),
+  diagnostics: Type.Array(UigPrepareBuildDiagnosticSchema, { maxItems: 50 })
+});
+var UigRecordImplementationFileSchema = closedObject({
+  path: safeRelativePath,
+  sha256: sha256Schema,
+  kind: Type.Union([
+    Type.Literal("page"),
+    Type.Literal("preview"),
+    Type.Literal("mock"),
+    Type.Literal("style"),
+    Type.Literal("other")
+  ])
+});
+var UigRecordImplementationAssumptionSchema = closedObject({
+  code: Type.String({ minLength: 1 }),
+  description: Type.String({ minLength: 1 }),
+  severity: Type.Union([
+    Type.Literal("info"),
+    Type.Literal("warning"),
+    Type.Literal("error")
+  ])
+});
+var UigRecordImplementationInputSchema = closedObject({
+  runId: Type.String({ minLength: 1 }),
+  status: Type.Union([
+    Type.Literal("written"),
+    Type.Literal("written-with-warnings"),
+    Type.Literal("partial"),
+    Type.Literal("failed")
+  ]),
+  pagePath: safeRelativePath,
+  previewPath: safeRelativePath,
+  previewUrlPath: Type.String({ minLength: 1 }),
+  previewCommand: Type.String({ minLength: 1 }),
+  createdFiles: Type.Array(UigRecordImplementationFileSchema, {
+    maxItems: 200
+  }),
+  modifiedFiles: Type.Array(UigRecordImplementationFileSchema, {
+    maxItems: 200
+  }),
+  importedComponents: Type.Array(
+    closedObject({
+      componentId: Type.String({ minLength: 1 }),
+      importSource: Type.String({ minLength: 1 }),
+      exportName: Type.String({ minLength: 1 })
+    }),
+    { maxItems: 100 }
+  ),
+  assumptions: Type.Array(UigRecordImplementationAssumptionSchema, {
+    maxItems: 50
+  }),
+  residualErrors: Type.Array(
+    closedObject({
+      code: Type.String({ minLength: 1 }),
+      message: Type.String({ minLength: 1 }),
+      path: Type.Optional(safeRelativePath)
+    }),
+    { maxItems: 50 }
+  ),
+  notes: Type.Optional(Type.String({ minLength: 1 }))
+});
+var UigRecordImplementationResultSchema = closedObject({
+  schema: Type.Literal("uig-qwen-record-implementation-result/v1"),
+  runId: Type.String({ minLength: 1 }),
+  runStatus: UigAgenticRunStatusSchema,
+  reportPath: safeRelativePath,
+  reportSha256: sha256Schema,
+  importedComponents: Type.Array(
+    closedObject({
+      componentId: Type.String({ minLength: 1 }),
+      importSource: Type.String({ minLength: 1 }),
+      exportName: Type.String({ minLength: 1 })
+    }),
+    { maxItems: 100 }
+  ),
+  accepted: Type.Boolean(),
+  rejection: Type.Optional(
+    closedObject({
+      code: Type.String({ minLength: 1 }),
+      message: Type.String({ minLength: 1 })
+    })
+  )
+});
+var UigRecordCodeReviewIssueSchema = closedObject({
+  code: Type.String({ minLength: 1 }),
+  severity: Type.Union([
+    Type.Literal("info"),
+    Type.Literal("warning"),
+    Type.Literal("error")
+  ]),
+  path: Type.Optional(safeRelativePath),
+  message: Type.String({ minLength: 1 })
+});
+var UigRecordCodeReviewInputSchema = closedObject({
+  runId: Type.String({ minLength: 1 }),
+  verdict: Type.Union([
+    Type.Literal("approved"),
+    Type.Literal("approved-with-fixes"),
+    Type.Literal("changes-requested")
+  ]),
+  tsc: Type.Union([Type.Literal("passed"), Type.Literal("failed")]),
+  lint: Type.Union([
+    Type.Literal("passed"),
+    Type.Literal("failed"),
+    Type.Literal("not-configured")
+  ]),
+  autoFixed: Type.Array(
+    closedObject({
+      path: safeRelativePath,
+      beforeSha256: sha256Schema,
+      afterSha256: sha256Schema,
+      reason: Type.String({ minLength: 1 })
+    }),
+    { maxItems: 100 }
+  ),
+  remainingIssues: Type.Array(UigRecordCodeReviewIssueSchema, {
+    maxItems: 100
+  }),
+  notes: Type.Optional(Type.String({ minLength: 1 }))
+});
+var UigRecordCodeReviewResultSchema = closedObject({
+  schema: Type.Literal("uig-qwen-record-code-review-result/v1"),
+  runId: Type.String({ minLength: 1 }),
+  runStatus: UigAgenticRunStatusSchema,
+  reportPath: safeRelativePath,
+  reportSha256: sha256Schema,
+  accepted: Type.Boolean(),
+  rejection: Type.Optional(
+    closedObject({
+      code: Type.String({ minLength: 1 }),
+      message: Type.String({ minLength: 1 })
+    })
+  )
+});
+var UigRecordBrowserReviewScreenshotSchema = closedObject({
+  viewport: Type.Union([Type.Literal("desktop"), Type.Literal("narrow")]),
+  path: safeRelativePath,
+  sha256: sha256Schema
+});
+var UigRecordBrowserReviewIssueSchema = closedObject({
+  code: Type.String({ minLength: 1 }),
+  severity: Type.Union([
+    Type.Literal("info"),
+    Type.Literal("warning"),
+    Type.Literal("error")
+  ]),
+  source: Type.Union([
+    Type.Literal("console"),
+    Type.Literal("pageerror"),
+    Type.Literal("network"),
+    Type.Literal("layout")
+  ]),
+  message: Type.String({ minLength: 1 })
+});
+var UigRecordBrowserReviewInputSchema = closedObject({
+  runId: Type.String({ minLength: 1 }),
+  verdict: Type.Union([
+    Type.Literal("ok"),
+    Type.Literal("ok-with-warnings"),
+    Type.Literal("failed")
+  ]),
+  devServerCommand: Type.String({ minLength: 1 }),
+  previewUrl: Type.String({ minLength: 1 }),
+  screenshots: Type.Array(UigRecordBrowserReviewScreenshotSchema, {
+    minItems: 1,
+    maxItems: 4
+  }),
+  unresolvedErrors: Type.Array(UigRecordBrowserReviewIssueSchema, {
+    maxItems: 100
+  }),
+  runtimeFixes: Type.Array(
+    closedObject({
+      path: safeRelativePath,
+      beforeSha256: sha256Schema,
+      afterSha256: sha256Schema,
+      reason: Type.String({ minLength: 1 })
+    }),
+    { maxItems: 100 }
+  ),
+  notes: Type.Optional(Type.String({ minLength: 1 }))
+});
+var UigRecordBrowserReviewResultSchema = closedObject({
+  schema: Type.Literal("uig-qwen-record-browser-review-result/v1"),
+  runId: Type.String({ minLength: 1 }),
+  runStatus: UigAgenticRunStatusSchema,
+  reportPath: safeRelativePath,
+  reportSha256: sha256Schema,
+  accepted: Type.Boolean(),
+  rejection: Type.Optional(
+    closedObject({
+      code: Type.String({ minLength: 1 }),
+      message: Type.String({ minLength: 1 })
+    })
+  )
+});
+
 // packages/contracts/src/diagnostic.ts
 var DiagnosticSeveritySchema = Type.Union([
   Type.Literal("info"),
@@ -249687,7 +249981,7 @@ function defaultWorkerEntrypoint() {
   };
 }
 function awaitWorkerResult(worker, beforePublish) {
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve8, reject) => {
     let settled = false;
     const finish = (action2) => {
       if (!settled) {
@@ -249726,13 +250020,13 @@ function awaitWorkerResult(worker, beforePublish) {
         );
         return;
       }
-      finish(() => resolve7(message));
+      finish(() => resolve8(message));
     });
   });
 }
 async function sendToWorker(worker, message) {
-  await new Promise((resolve7, reject) => {
-    worker.send(message, (error46) => error46 ? reject(error46) : resolve7());
+  await new Promise((resolve8, reject) => {
+    worker.send(message, (error46) => error46 ? reject(error46) : resolve8());
   });
 }
 function identityOf(metadata) {
@@ -250473,8 +250767,8 @@ async function acquireReservation(path) {
   }
 }
 async function waitForRetry() {
-  await new Promise((resolve7) => {
-    setTimeout(resolve7, 5);
+  await new Promise((resolve8) => {
+    setTimeout(resolve8, 5);
   });
 }
 async function writeBundleMap(root, bundle) {
@@ -250669,23 +250963,23 @@ function sameIdentity2(left, right2) {
   return left.dev === right2.dev && left.ino === right2.ino;
 }
 function nextMessage(type) {
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve8, reject) => {
     process.once("message", (message) => {
       if (typeof message !== "object" || message === null || !("type" in message) || message.type !== type) {
         reject(new Error(`Unexpected generate worker message; wanted ${type}`));
         return;
       }
-      resolve7(message);
+      resolve8(message);
     });
   });
 }
 async function send(message) {
-  await new Promise((resolve7, reject) => {
+  await new Promise((resolve8, reject) => {
     if (!process.send) {
       reject(new Error("Generate worker requires an IPC channel"));
       return;
     }
-    process.send(message, (error46) => error46 ? reject(error46) : resolve7());
+    process.send(message, (error46) => error46 ? reject(error46) : resolve8());
   });
 }
 function workerError(error46) {
@@ -254212,14 +254506,14 @@ function inputRequiredRoundsExceededMessage2(method, maxRounds) {
   return `Multi-round-trip request '${method}' still required input after ${maxRounds} rounds (inputRequired.maxRounds)`;
 }
 function sleep2(ms, signal) {
-  return new Promise((resolve7, reject) => {
+  return new Promise((resolve8, reject) => {
     if (signal?.aborted) {
       reject(signal.reason instanceof SdkError2 ? signal.reason : new SdkError2(SdkErrorCode2.RequestTimeout, String(signal.reason)));
       return;
     }
     const timer = setTimeout(() => {
       signal?.removeEventListener("abort", onAbort);
-      resolve7();
+      resolve8();
     }, ms);
     const onAbort = () => {
       clearTimeout(timer);
@@ -255058,7 +255352,7 @@ var Protocol2 = class {
     const flowStartedAt = Date.now();
     let onAbort;
     let cleanupMessageId;
-    return new Promise((resolve7, reject) => {
+    return new Promise((resolve8, reject) => {
       const earlyReject = (error46) => {
         reject(error46);
       };
@@ -255126,7 +255420,7 @@ var Protocol2 = class {
         }
         if (decoded.kind === "invalid") return reject(decoded.error);
         if (decoded.kind === "input_required") {
-          if (options?.allowInputRequired === true) return resolve7(manualInputRequiredValue2(decoded));
+          if (options?.allowInputRequired === true) return resolve8(manualInputRequiredValue2(decoded));
           const flow = {
             codec: codec2,
             request,
@@ -255138,11 +255432,11 @@ var Protocol2 = class {
               params
             }, resultSchema, legOptions)
           };
-          return resolve7(this._resolveNonCompleteResult(decoded, flow));
+          return resolve8(this._resolveNonCompleteResult(decoded, flow));
         }
         const result = decoded.result;
         validateStandardSchema2(resultSchema, result).then((parseResult) => {
-          if (parseResult.success) resolve7(parseResult.data);
+          if (parseResult.success) resolve8(parseResult.data);
           else reject(new SdkError2(SdkErrorCode2.InvalidResult, `Invalid result for ${request.method}: ${parseResult.error}`));
         }, reject);
       });
@@ -258056,7 +258350,7 @@ var require_compile2 = /* @__PURE__ */ __commonJSMin2(((exports) => {
     ref = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, ref);
     const schOrFunc = root.refs[ref];
     if (schOrFunc) return schOrFunc;
-    let _sch = resolve7.call(this, root, ref);
+    let _sch = resolve8.call(this, root, ref);
     if (_sch === void 0) {
       const schema = (_a2 = root.localRefs) === null || _a2 === void 0 ? void 0 : _a2[ref];
       const { schemaId } = this.opts;
@@ -258082,7 +258376,7 @@ var require_compile2 = /* @__PURE__ */ __commonJSMin2(((exports) => {
   function sameSchemaEnv(s1, s2) {
     return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
   }
-  function resolve7(root, ref) {
+  function resolve8(root, ref) {
     let sch;
     while (typeof (sch = this.refs[ref]) == "string") ref = sch;
     return sch || this.schemas[ref] || resolveSchema.call(this, root, ref);
@@ -258532,47 +258826,47 @@ var require_fast_uri2 = /* @__PURE__ */ __commonJSMin2(((exports, module) => {
     else if (typeof uri === "object") uri = parse3(serialize(uri, options), options);
     return uri;
   }
-  function resolve7(baseURI, relativeURI, options) {
+  function resolve8(baseURI, relativeURI, options) {
     const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
     const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
     schemelessOptions.skipEscape = true;
     return serialize(resolved, schemelessOptions);
   }
-  function resolveComponent(base2, relative9, options, skipNormalization) {
+  function resolveComponent(base2, relative10, options, skipNormalization) {
     const target = {};
     if (!skipNormalization) {
       base2 = parse3(serialize(base2, options), options);
-      relative9 = parse3(serialize(relative9, options), options);
+      relative10 = parse3(serialize(relative10, options), options);
     }
     options = options || {};
-    if (!options.tolerant && relative9.scheme) {
-      target.scheme = relative9.scheme;
-      target.userinfo = relative9.userinfo;
-      target.host = relative9.host;
-      target.port = relative9.port;
-      target.path = removeDotSegments(relative9.path || "");
-      target.query = relative9.query;
+    if (!options.tolerant && relative10.scheme) {
+      target.scheme = relative10.scheme;
+      target.userinfo = relative10.userinfo;
+      target.host = relative10.host;
+      target.port = relative10.port;
+      target.path = removeDotSegments(relative10.path || "");
+      target.query = relative10.query;
     } else {
-      if (relative9.userinfo !== void 0 || relative9.host !== void 0 || relative9.port !== void 0) {
-        target.userinfo = relative9.userinfo;
-        target.host = relative9.host;
-        target.port = relative9.port;
-        target.path = removeDotSegments(relative9.path || "");
-        target.query = relative9.query;
+      if (relative10.userinfo !== void 0 || relative10.host !== void 0 || relative10.port !== void 0) {
+        target.userinfo = relative10.userinfo;
+        target.host = relative10.host;
+        target.port = relative10.port;
+        target.path = removeDotSegments(relative10.path || "");
+        target.query = relative10.query;
       } else {
-        if (!relative9.path) {
+        if (!relative10.path) {
           target.path = base2.path;
-          if (relative9.query !== void 0) target.query = relative9.query;
+          if (relative10.query !== void 0) target.query = relative10.query;
           else target.query = base2.query;
         } else {
-          if (relative9.path[0] === "/") target.path = removeDotSegments(relative9.path);
+          if (relative10.path[0] === "/") target.path = removeDotSegments(relative10.path);
           else {
-            if ((base2.userinfo !== void 0 || base2.host !== void 0 || base2.port !== void 0) && !base2.path) target.path = "/" + relative9.path;
-            else if (!base2.path) target.path = relative9.path;
-            else target.path = base2.path.slice(0, base2.path.lastIndexOf("/") + 1) + relative9.path;
+            if ((base2.userinfo !== void 0 || base2.host !== void 0 || base2.port !== void 0) && !base2.path) target.path = "/" + relative10.path;
+            else if (!base2.path) target.path = relative10.path;
+            else target.path = base2.path.slice(0, base2.path.lastIndexOf("/") + 1) + relative10.path;
             target.path = removeDotSegments(target.path);
           }
-          target.query = relative9.query;
+          target.query = relative10.query;
         }
         target.userinfo = base2.userinfo;
         target.host = base2.host;
@@ -258580,7 +258874,7 @@ var require_fast_uri2 = /* @__PURE__ */ __commonJSMin2(((exports, module) => {
       }
       target.scheme = base2.scheme;
     }
-    target.fragment = relative9.fragment;
+    target.fragment = relative10.fragment;
     return target;
   }
   function equal(uriA, uriB, options) {
@@ -258706,7 +259000,7 @@ var require_fast_uri2 = /* @__PURE__ */ __commonJSMin2(((exports, module) => {
   const fastUri = {
     SCHEMES,
     normalize,
-    resolve: resolve7,
+    resolve: resolve8,
     resolveComponent,
     equal,
     serialize,
@@ -263772,14 +264066,14 @@ var ProbeWindow = class ProbeWindow2 {
   */
   async exchange(buildRequest, timeoutMs) {
     const id = `server-discover-probe-${++this._probeCounter}`;
-    return new Promise((resolve7) => {
+    return new Promise((resolve8) => {
       let settled = false;
       const settle = (reply) => {
         if (settled) return;
         settled = true;
         clearTimeout(timer);
         if (this._pending?.id === id) this._pending = void 0;
-        resolve7(reply);
+        resolve8(reply);
       };
       const timer = setTimeout(() => settle({ kind: "timeout" }), timeoutMs);
       this._pending = {
@@ -264984,13 +265278,13 @@ var Client = class extends Protocol2 {
     let onCallerAbort;
     let resolveOpening;
     let rejectOpening;
-    const opening = new Promise((resolve7, reject) => {
-      resolveOpening = resolve7;
+    const opening = new Promise((resolve8, reject) => {
+      resolveOpening = resolve8;
       rejectOpening = reject;
     });
     let resolveClosed;
-    const closed = new Promise((resolve7) => {
-      resolveClosed = resolve7;
+    const closed = new Promise((resolve8) => {
+      resolveClosed = resolve8;
     });
     const settle = (outcome) => {
       if (state === "closed") return;
@@ -270603,8 +270897,269 @@ function boundedDiagnostics(diagnostics2) {
   };
 }
 
+// extensions/qwen-cli/src/agentic-results.ts
+var sha256Schema2 = external_exports.string().regex(/^[a-f0-9]{64}$/);
+var safeRelativePath2 = external_exports.string().min(1).refine(
+  (value) => !value.startsWith("/") && !/^[A-Za-z]:[\\/]/.test(value) && !value.includes("\\") && !value.split("/").includes(".."),
+  "Expected a safe workspace-relative path"
+);
+var componentStatus = external_exports.enum([
+  "verified",
+  "mapped",
+  "pack-owned",
+  "suggested"
+]);
+var componentFileKind = external_exports.enum(["page", "preview", "mock", "style", "other"]);
+var importRecord = external_exports.object({
+  componentId: external_exports.string().min(1),
+  importSource: external_exports.string().min(1),
+  exportName: external_exports.string().min(1)
+});
+var UigPrepareBuildInputSchema2 = external_exports.object({
+  source: external_exports.discriminatedUnion("kind", [
+    external_exports.object({
+      kind: external_exports.literal("pixso-url"),
+      url: external_exports.string().min(1),
+      designSystem: external_exports.string().min(1)
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("local-dsl"),
+      path: safeRelativePath2,
+      designSystem: external_exports.string().min(1)
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("stored-run"),
+      runId: external_exports.string().min(1)
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("screenshot"),
+      path: safeRelativePath2,
+      pageName: external_exports.string().min(1),
+      designSystem: external_exports.string().min(1)
+    }).strict()
+  ]),
+  refreshProjectContext: external_exports.boolean().optional()
+}).strict();
+var UigPrepareBuildResultSchema2 = external_exports.object({
+  schema: external_exports.literal("uig-qwen-prepare-build-result/v1"),
+  status: external_exports.enum(["ready", "blocked", "ready-with-warnings"]),
+  runId: external_exports.string().min(1),
+  runPath: safeRelativePath2,
+  sourceKind: external_exports.enum(["pixso-url", "local-dsl", "stored-run", "screenshot"]),
+  designEvidencePath: safeRelativePath2,
+  projectContextPath: safeRelativePath2,
+  projectContextFingerprint: sha256Schema2.optional(),
+  designSystem: external_exports.string().min(1),
+  designSystemVersion: external_exports.string().min(1).optional(),
+  packSha256: sha256Schema2.optional(),
+  reusableComponents: external_exports.array(
+    external_exports.object({
+      componentId: external_exports.string().min(1),
+      exportName: external_exports.string().min(1),
+      importSource: external_exports.string().min(1),
+      status: componentStatus,
+      semanticRoles: external_exports.array(external_exports.string().min(1)).max(50)
+    }).strict()
+  ).max(100),
+  diagnostics: external_exports.array(
+    external_exports.object({
+      code: external_exports.string().min(1),
+      severity: external_exports.enum(["info", "warning", "error"]),
+      blocking: external_exports.boolean(),
+      stage: external_exports.enum([
+        "fetch",
+        "normalize",
+        "summarize",
+        "plan",
+        "resolve",
+        "context",
+        "store"
+      ]),
+      message: external_exports.string().min(1)
+    }).strict()
+  ).max(50)
+}).strict();
+var UigRecordImplementationInputSchema2 = external_exports.object({
+  runId: external_exports.string().min(1),
+  status: external_exports.enum(["written", "written-with-warnings", "partial", "failed"]),
+  pagePath: safeRelativePath2,
+  previewPath: safeRelativePath2,
+  previewUrlPath: external_exports.string().min(1),
+  previewCommand: external_exports.string().min(1),
+  createdFiles: external_exports.array(
+    external_exports.object({
+      path: safeRelativePath2,
+      sha256: sha256Schema2,
+      kind: componentFileKind
+    }).strict()
+  ).max(200),
+  modifiedFiles: external_exports.array(
+    external_exports.object({
+      path: safeRelativePath2,
+      sha256: sha256Schema2,
+      kind: componentFileKind
+    }).strict()
+  ).max(200),
+  importedComponents: external_exports.array(importRecord).max(100),
+  assumptions: external_exports.array(
+    external_exports.object({
+      code: external_exports.string().min(1),
+      description: external_exports.string().min(1),
+      severity: external_exports.enum(["info", "warning", "error"])
+    }).strict()
+  ).max(50),
+  residualErrors: external_exports.array(
+    external_exports.object({
+      code: external_exports.string().min(1),
+      message: external_exports.string().min(1),
+      path: safeRelativePath2.optional()
+    }).strict()
+  ).max(50),
+  notes: external_exports.string().min(1).optional()
+}).strict();
+var UigRecordImplementationResultSchema2 = external_exports.object({
+  schema: external_exports.literal("uig-qwen-record-implementation-result/v1"),
+  runId: external_exports.string().min(1),
+  runStatus: external_exports.enum([
+    "pending",
+    "implementation-recorded",
+    "code-review-recorded",
+    "browser-review-recorded",
+    "complete",
+    "partial-success",
+    "generated-with-errors",
+    "blocked",
+    "cancelled"
+  ]),
+  reportPath: safeRelativePath2,
+  reportSha256: sha256Schema2,
+  importedComponents: external_exports.array(importRecord).max(100),
+  accepted: external_exports.boolean(),
+  rejection: external_exports.object({
+    code: external_exports.string().min(1),
+    message: external_exports.string().min(1)
+  }).strict().optional()
+}).strict();
+var UigRecordCodeReviewInputSchema2 = external_exports.object({
+  runId: external_exports.string().min(1),
+  verdict: external_exports.enum(["approved", "approved-with-fixes", "changes-requested"]),
+  tsc: external_exports.enum(["passed", "failed"]),
+  lint: external_exports.enum(["passed", "failed", "not-configured"]),
+  autoFixed: external_exports.array(
+    external_exports.object({
+      path: safeRelativePath2,
+      beforeSha256: sha256Schema2,
+      afterSha256: sha256Schema2,
+      reason: external_exports.string().min(1)
+    }).strict()
+  ).max(100),
+  remainingIssues: external_exports.array(
+    external_exports.object({
+      code: external_exports.string().min(1),
+      severity: external_exports.enum(["info", "warning", "error"]),
+      path: safeRelativePath2.optional(),
+      message: external_exports.string().min(1)
+    }).strict()
+  ).max(100),
+  notes: external_exports.string().min(1).optional()
+}).strict();
+var UigRecordCodeReviewResultSchema2 = external_exports.object({
+  schema: external_exports.literal("uig-qwen-record-code-review-result/v1"),
+  runId: external_exports.string().min(1),
+  runStatus: external_exports.enum([
+    "pending",
+    "implementation-recorded",
+    "code-review-recorded",
+    "browser-review-recorded",
+    "complete",
+    "partial-success",
+    "generated-with-errors",
+    "blocked",
+    "cancelled"
+  ]),
+  reportPath: safeRelativePath2,
+  reportSha256: sha256Schema2,
+  accepted: external_exports.boolean(),
+  rejection: external_exports.object({
+    code: external_exports.string().min(1),
+    message: external_exports.string().min(1)
+  }).strict().optional()
+}).strict();
+var UigRecordBrowserReviewInputSchema2 = external_exports.object({
+  runId: external_exports.string().min(1),
+  verdict: external_exports.enum(["ok", "ok-with-warnings", "failed"]),
+  devServerCommand: external_exports.string().min(1),
+  previewUrl: external_exports.string().min(1),
+  screenshots: external_exports.array(
+    external_exports.object({
+      viewport: external_exports.enum(["desktop", "narrow"]),
+      path: safeRelativePath2,
+      sha256: sha256Schema2
+    }).strict()
+  ).min(1).max(4),
+  unresolvedErrors: external_exports.array(
+    external_exports.object({
+      code: external_exports.string().min(1),
+      severity: external_exports.enum(["info", "warning", "error"]),
+      source: external_exports.enum(["console", "pageerror", "network", "layout"]),
+      message: external_exports.string().min(1)
+    }).strict()
+  ).max(100),
+  runtimeFixes: external_exports.array(
+    external_exports.object({
+      path: safeRelativePath2,
+      beforeSha256: sha256Schema2,
+      afterSha256: sha256Schema2,
+      reason: external_exports.string().min(1)
+    }).strict()
+  ).max(100),
+  notes: external_exports.string().min(1).optional()
+}).strict();
+var UigRecordBrowserReviewResultSchema2 = external_exports.object({
+  schema: external_exports.literal("uig-qwen-record-browser-review-result/v1"),
+  runId: external_exports.string().min(1),
+  runStatus: external_exports.enum([
+    "pending",
+    "implementation-recorded",
+    "code-review-recorded",
+    "browser-review-recorded",
+    "complete",
+    "partial-success",
+    "generated-with-errors",
+    "blocked",
+    "cancelled"
+  ]),
+  reportPath: safeRelativePath2,
+  reportSha256: sha256Schema2,
+  accepted: external_exports.boolean(),
+  rejection: external_exports.object({
+    code: external_exports.string().min(1),
+    message: external_exports.string().min(1)
+  }).strict().optional()
+}).strict();
+
+// extensions/qwen-cli/src/agentic-tools.ts
+import { createHash as createHash8, randomUUID as randomUUID5 } from "node:crypto";
+import {
+  access,
+  lstat as lstat8,
+  mkdir as mkdir5,
+  readdir as readdir4,
+  readFile as readFile8,
+  readlink as readlink3,
+  realpath as realpath8,
+  writeFile as writeFile5
+} from "node:fs/promises";
+import { join as join15, relative as relative9, resolve as resolve6, sep as sep10 } from "node:path";
+
+// extensions/qwen-cli/src/tools.ts
+import { createHash as createHash7 } from "node:crypto";
+import { constants as constants2 } from "node:fs";
+import { lstat as lstat7, open as open2, readlink as readlink2, realpath as realpath7 } from "node:fs/promises";
+import { basename as basename3, join as join14, resolve as resolve5, sep as sep9 } from "node:path";
+
 // extensions/qwen-cli/src/results.ts
-var sha256Schema = external_exports.string().regex(/^[a-f0-9]{64}$/);
+var sha256Schema3 = external_exports.string().regex(/^[a-f0-9]{64}$/);
 var relativeArtifactPathSchema = external_exports.string().min(1).refine(
   (path) => !path.startsWith("/") && !path.includes("\\") && !path.split("/").includes(".."),
   "Expected a safe relative artifact path"
@@ -270644,7 +271199,7 @@ var UigPlanResultSchema = external_exports.object({
   target: external_exports.object({
     designSystem: external_exports.string().min(1),
     designSystemVersion: external_exports.string().min(1),
-    packSha256: sha256Schema
+    packSha256: sha256Schema3
   }).strict(),
   summary: external_exports.object({
     reuse: external_exports.number().int().nonnegative(),
@@ -270663,7 +271218,7 @@ var UigGenerateResultSchema = external_exports.object({
   files: external_exports.array(
     external_exports.object({
       path: relativeArtifactPathSchema,
-      sha256: sha256Schema
+      sha256: sha256Schema3
     }).strict()
   ),
   imports: external_exports.array(
@@ -270776,294 +271331,7 @@ function compareText(left, right2) {
   return left < right2 ? -1 : left > right2 ? 1 : 0;
 }
 
-// extensions/qwen-cli/src/project-context-results.ts
-var sha2563 = external_exports.string().regex(/^[a-f0-9]{64}$/);
-var safePath = external_exports.string().min(1).refine(
-  (value) => !value.startsWith("/") && !/^[A-Za-z]:[\\/]/.test(value) && !value.includes("\\") && !value.split("/").includes(".."),
-  "Expected a safe workspace-relative path"
-);
-var identifier = external_exports.string().min(1).max(256);
-var boundedStrings = external_exports.array(identifier).max(50);
-var PublicRootSchema2 = external_exports.object({
-  path: safePath,
-  entry: safePath,
-  importSource: identifier
-}).strict();
-var UiContextConfigInputSchema = external_exports.object({
-  schema: external_exports.literal("ui-context-config/v1"),
-  framework: external_exports.literal("react"),
-  language: external_exports.literal("typescript"),
-  designSystemPacks: external_exports.array(external_exports.string().regex(/^[a-z0-9][a-z0-9._-]*$/)).max(20),
-  componentRoots: external_exports.array(PublicRootSchema2).max(100),
-  iconRoots: external_exports.array(PublicRootSchema2).max(100),
-  workspacePackages: external_exports.object({ discovery: external_exports.literal("public-exports") }).strict(),
-  ignore: external_exports.array(safePath).max(100)
-}).strict();
-var ProjectScanInputSchema = external_exports.object({
-  acceptDiscoveredConfig: external_exports.boolean().optional(),
-  discoveryId: sha2563.optional(),
-  acceptedConfig: UiContextConfigInputSchema.optional()
-}).strict().superRefine((value, context) => {
-  if (value.acceptDiscoveredConfig === true && (!value.discoveryId || !value.acceptedConfig)) {
-    context.addIssue({
-      code: "custom",
-      message: "discoveryId and acceptedConfig are required when accepting configuration"
-    });
-  }
-});
-var ProjectComponentSearchInputSchema = external_exports.object({
-  query: external_exports.string().trim().min(1).max(200).optional(),
-  semanticRole: identifier.optional(),
-  status: external_exports.enum(["suggested", "mapped", "pack-owned"]).optional(),
-  limit: external_exports.number().int().min(1).max(50).optional()
-}).strict();
-var ComponentContractInputSchema = external_exports.object({ componentId: identifier }).strict();
-var IconPathsInputSchema = external_exports.object({ names: external_exports.array(identifier).min(1).max(50) }).strict();
-var MappingChangeSchema = external_exports.object({
-  componentId: identifier,
-  semanticRoles: boundedStrings,
-  capabilities: boundedStrings,
-  formAdapters: boundedStrings
-}).strict();
-var MappingMutationInputSchema = external_exports.object({
-  catalogFingerprint: sha2563,
-  mappings: external_exports.array(MappingChangeSchema).min(1).max(50)
-}).strict();
-var EmptyInputSchema = external_exports.object({}).strict();
-var diagnostic = external_exports.object({
-  severity: external_exports.enum(["info", "warning", "error", "fatal"]),
-  code: identifier,
-  message: external_exports.string().min(1).max(1e3),
-  path: safePath.optional(),
-  componentId: identifier.optional()
-}).strict();
-var diagnostics = external_exports.object({
-  total: external_exports.number().int().nonnegative(),
-  returned: external_exports.array(diagnostic).max(50),
-  truncated: external_exports.boolean()
-}).strict();
-var summary = external_exports.object({
-  verifiedComponents: external_exports.number().int().nonnegative(),
-  verifiedIcons: external_exports.number().int().nonnegative(),
-  mappedRoles: external_exports.number().int().nonnegative(),
-  suggestedRoles: external_exports.number().int().nonnegative(),
-  warnings: external_exports.number().int().nonnegative()
-}).strict();
-var ProjectScanResultSchema = external_exports.discriminatedUnion("status", [
-  external_exports.object({
-    status: external_exports.literal("needs-configuration"),
-    discoveryId: sha2563,
-    proposedConfig: UiContextConfigInputSchema,
-    diagnostics: external_exports.array(diagnostic).max(50)
-  }).strict(),
-  external_exports.object({
-    status: external_exports.literal("completed"),
-    catalog: external_exports.object({ path: safePath, sha256: sha2563, fingerprint: sha2563 }).strict(),
-    summary,
-    diagnostics
-  }).strict(),
-  external_exports.object({
-    status: external_exports.literal("blocked"),
-    stage: external_exports.literal("project-scan"),
-    diagnostics,
-    artifactPath: safePath
-  }).strict()
-]);
-var verifiedImport = external_exports.object({
-  source: identifier,
-  export: identifier,
-  style: external_exports.enum(["named", "default"])
-}).strict();
-var semantic = external_exports.object({
-  role: identifier,
-  status: external_exports.enum(["suggested", "mapped", "pack-owned"]),
-  confidence: external_exports.number().min(0).max(1),
-  source: safePath
-}).strict();
-var namedBinding = external_exports.object({
-  name: identifier,
-  status: external_exports.enum(["suggested", "mapped", "pack-owned"]),
-  confidence: external_exports.number().min(0).max(1),
-  source: safePath
-}).strict();
-var ProjectComponentSearchResultSchema = external_exports.object({
-  catalogFingerprint: sha2563,
-  catalogPath: safePath,
-  totalCount: external_exports.number().int().nonnegative(),
-  returnedCount: external_exports.number().int().nonnegative().max(50),
-  truncated: external_exports.boolean(),
-  results: external_exports.array(
-    external_exports.object({
-      componentId: identifier,
-      exportName: identifier,
-      import: verifiedImport,
-      score: external_exports.number().nonnegative(),
-      semantics: external_exports.array(semantic).max(50)
-    }).strict()
-  ).max(50)
-}).strict();
-var contractRef = external_exports.union([
-  external_exports.object({ artifact: external_exports.literal("public-components"), id: identifier }).strict(),
-  external_exports.object({
-    artifact: external_exports.literal("installed-packages"),
-    package: identifier,
-    export: identifier
-  }).strict()
-]);
-var normalizedType = external_exports.lazy(
-  () => external_exports.union([
-    external_exports.object({
-      kind: external_exports.enum([
-        "string",
-        "number",
-        "boolean",
-        "void",
-        "react-node",
-        "react-element"
-      ])
-    }).strict(),
-    external_exports.object({
-      kind: external_exports.literal("enum"),
-      values: external_exports.array(external_exports.union([external_exports.string(), external_exports.number(), external_exports.boolean()]))
-    }).strict(),
-    external_exports.object({ kind: external_exports.literal("array"), element: normalizedType }).strict(),
-    external_exports.object({ kind: external_exports.literal("tuple"), elements: external_exports.array(normalizedType) }).strict(),
-    external_exports.object({
-      kind: external_exports.literal("object"),
-      properties: external_exports.array(
-        external_exports.object({
-          name: identifier,
-          required: external_exports.boolean(),
-          type: normalizedType
-        }).strict()
-      )
-    }).strict(),
-    external_exports.object({
-      kind: external_exports.literal("function"),
-      parameters: external_exports.array(
-        external_exports.object({ name: identifier, type: normalizedType }).strict()
-      ),
-      returns: normalizedType
-    }).strict(),
-    external_exports.object({ kind: external_exports.literal("reference"), name: identifier }).strict(),
-    external_exports.object({
-      kind: external_exports.literal("opaque"),
-      displayName: identifier,
-      reason: external_exports.string().min(1)
-    }).strict()
-  ])
-);
-var exactContract = external_exports.object({
-  propsType: identifier,
-  acceptsChildren: external_exports.boolean(),
-  props: external_exports.array(
-    external_exports.object({
-      name: identifier,
-      required: external_exports.boolean(),
-      type: normalizedType,
-      description: external_exports.string().min(1).optional(),
-      deprecated: external_exports.boolean()
-    }).strict()
-  ).max(200),
-  summary: external_exports.string().min(1).optional(),
-  deprecated: external_exports.boolean().optional()
-}).strict();
-var evidence = external_exports.array(
-  external_exports.union([
-    external_exports.object({
-      kind: external_exports.literal("public-export"),
-      path: safePath,
-      export: identifier
-    }).strict(),
-    external_exports.object({
-      kind: external_exports.literal("typescript-contract"),
-      path: safePath,
-      symbol: identifier
-    }).strict()
-  ])
-).max(50);
-var ComponentContractResultSchema = external_exports.object({
-  componentId: identifier,
-  import: verifiedImport,
-  contractRef,
-  semantics: external_exports.array(semantic).max(50),
-  capabilities: external_exports.array(namedBinding).max(50),
-  formAdapters: external_exports.array(namedBinding).max(50),
-  annotations: boundedStrings,
-  restrictions: boundedStrings,
-  deprecated: external_exports.boolean(),
-  contract: exactContract.optional(),
-  evidence: evidence.optional(),
-  catalogFingerprint: sha2563,
-  catalogPath: safePath
-}).strict();
-var iconResult = external_exports.union([
-  external_exports.object({
-    name: identifier,
-    status: external_exports.literal("resolved"),
-    import: verifiedImport,
-    componentId: identifier
-  }).strict(),
-  external_exports.object({
-    name: identifier,
-    status: external_exports.literal("ambiguous"),
-    candidates: external_exports.array(
-      external_exports.object({ componentId: identifier, import: verifiedImport }).strict()
-    ).max(50)
-  }).strict(),
-  external_exports.object({
-    name: identifier,
-    status: external_exports.literal("unresolved"),
-    suggestions: boundedStrings
-  }).strict()
-]);
-var IconPathsResultSchema = external_exports.object({
-  catalogFingerprint: sha2563,
-  catalogPath: safePath,
-  results: external_exports.array(iconResult).max(50)
-}).strict();
-var MappingMutationResultSchema = external_exports.object({
-  mappingPath: safePath,
-  catalogPath: safePath,
-  catalogSha256: sha2563,
-  catalogFingerprint: sha2563,
-  summary
-}).strict();
-var ProjectStatusResultSchema = external_exports.object({
-  status: external_exports.enum(["missing", "ready", "stale", "blocked"]),
-  changed: boundedStrings,
-  catalog: external_exports.object({ path: safePath, fingerprint: sha2563 }).strict().optional()
-}).strict();
-function compactProjectScanResult(result) {
-  if (result.status === "needs-configuration") {
-    return ProjectScanResultSchema.parse({
-      ...result,
-      diagnostics: result.diagnostics.slice(0, 50).map(compactDiagnostic)
-    });
-  }
-  return ProjectScanResultSchema.parse({
-    ...result,
-    diagnostics: {
-      ...result.diagnostics,
-      returned: result.diagnostics.returned.slice(0, 50).map(compactDiagnostic)
-    }
-  });
-}
-function compactDiagnostic(value) {
-  return {
-    severity: value.severity,
-    code: value.code,
-    message: value.message,
-    ...value.path ? { path: value.path } : {},
-    ...value.componentId ? { componentId: value.componentId } : {}
-  };
-}
-
 // extensions/qwen-cli/src/tools.ts
-import { createHash as createHash7 } from "node:crypto";
-import { constants as constants2 } from "node:fs";
-import { lstat as lstat7, open as open2, readlink as readlink2, realpath as realpath7 } from "node:fs/promises";
-import { basename as basename3, join as join14, resolve as resolve5, sep as sep9 } from "node:path";
 var UigToolError = class extends Error {
   constructor(code, message) {
     super(message);
@@ -271399,6 +271667,1038 @@ function providerFailure(error46) {
   );
 }
 
+// extensions/qwen-cli/src/agentic-tools.ts
+var AGENTIC_DIR = "agentic";
+var MAX_TREE_ENTRIES = 50;
+var AGENTIC_REPORT_LIMIT = 50;
+function createAgenticTools(dependencies) {
+  return {
+    async prepareBuild(input) {
+      const parsed = validateWithSchema(UigPrepareBuildInputSchema, input);
+      await assertSafeWorkspace(dependencies.workspaceDir);
+      const source = parsed.source;
+      let run;
+      let designSystem;
+      let packSha256;
+      let designSystemVersion;
+      let planFromRun;
+      switch (source.kind) {
+        case "pixso-url": {
+          const token = requireToken2(dependencies.token);
+          let client;
+          try {
+            client = dependencies.createPixsoClient(token);
+          } catch (error46) {
+            throw providerFailure2(error46);
+          }
+          const packPath = await resolvePackPath2(
+            dependencies.extensionRoot,
+            source.designSystem
+          );
+          try {
+            run = await planFromUrl({
+              url: source.url,
+              designSystemPackPath: packPath,
+              workspaceDir: dependencies.workspaceDir,
+              pixsoClient: client,
+              now: dependencies.now
+            });
+          } catch (error46) {
+            if (error46 instanceof PixsoProviderError) {
+              throw providerFailure2(error46);
+            }
+            throw new UigToolError(
+              "UIG_PROVIDER_FAILED",
+              `Pixso planning failed: ${error46.message ?? "unknown"}`
+            );
+          }
+          designSystem = source.designSystem;
+          break;
+        }
+        case "local-dsl": {
+          await assertSafeWorkspaceFile(dependencies.workspaceDir, source.path);
+          const packPath = await resolvePackPath2(
+            dependencies.extensionRoot,
+            source.designSystem
+          );
+          const artifactId = await storeLocalDsl(
+            dependencies.workspaceDir,
+            source.path
+          );
+          run = await planFromSnapshot({
+            artifactId,
+            designSystemPackPath: packPath,
+            workspaceDir: dependencies.workspaceDir,
+            now: dependencies.now,
+            fetchCompleted: true
+          });
+          designSystem = source.designSystem;
+          break;
+        }
+        case "stored-run": {
+          const selected = await readSelectedRun2(
+            dependencies.workspaceDir,
+            source.runId
+          );
+          run = selected.run;
+          planFromRun = await readResolutionPlan(selected.runDir);
+          designSystem = planFromRun.target.designSystem;
+          packSha256 = planFromRun.target.packSha256;
+          designSystemVersion = planFromRun.target.designSystemVersion;
+          break;
+        }
+        case "screenshot": {
+          await assertSafeWorkspaceFile(dependencies.workspaceDir, source.path);
+          const runId = buildRunId(dependencies.now());
+          run = await writeScreenshotStumpRun({
+            workspaceDir: dependencies.workspaceDir,
+            now: dependencies.now(),
+            runId,
+            pageName: source.pageName,
+            screenshotPath: source.path
+          });
+          designSystem = source.designSystem;
+          break;
+        }
+      }
+      const plan = planFromRun ?? (source.kind === "screenshot" ? null : await readResolutionPlanFromRun(
+        dependencies.workspaceDir,
+        run.runId
+      ));
+      if (plan && !packSha256) {
+        packSha256 = plan.target.packSha256;
+        designSystemVersion = plan.target.designSystemVersion;
+      }
+      const diagnostics2 = source.kind === "screenshot" || !plan ? [
+        {
+          code: "UIG_SOURCE_KIND_SCREENSHOT",
+          severity: "warning",
+          blocking: false,
+          stage: "normalize",
+          message: "Screenshot source: design evidence is incomplete; the UI builder must rely on the user-supplied image"
+        }
+      ] : collectPrepareDiagnostics(run, plan);
+      const blocking = diagnostics2.some(
+        (diagnostic2) => diagnostic2.severity === "error" && diagnostic2.blocking
+      );
+      const warning2 = diagnostics2.some(
+        (diagnostic2) => diagnostic2.severity === "warning"
+      );
+      const projectContext = await refreshProjectContext(
+        dependencies.workspaceDir,
+        dependencies.projectContextService,
+        parsed.refreshProjectContext === true
+      );
+      const reusable = projectContext ? buildReusableComponents(projectContext.catalog) : [];
+      const result = validateWithSchema(UigPrepareBuildResultSchema, {
+        schema: "uig-qwen-prepare-build-result/v1",
+        status: blocking ? "blocked" : warning2 ? "ready-with-warnings" : "ready",
+        runId: run.runId,
+        runPath: `.uig/runs/${run.runId}`,
+        sourceKind: source.kind,
+        designEvidencePath: `.uig/runs/${run.runId}/design-evidence.json`,
+        projectContextPath: projectContext ? projectContext.catalogPath : ".ui-context/missing",
+        ...projectContext?.fingerprint ? { projectContextFingerprint: projectContext.fingerprint } : {},
+        designSystem,
+        ...designSystemVersion ? { designSystemVersion } : {},
+        ...packSha256 ? { packSha256 } : {},
+        reusableComponents: reusable,
+        diagnostics: diagnostics2
+      });
+      await writePrepareBuildArtifact({
+        workspaceDir: dependencies.workspaceDir,
+        runId: run.runId,
+        result,
+        projectContext
+      });
+      if (blocking) {
+        throw new UigToolError(
+          "UIG_RUN_INVALID",
+          "Prepare build returned a blocked run; see diagnostics"
+        );
+      }
+      return result;
+    },
+    async recordImplementation(input) {
+      const parsed = validateWithSchema(
+        UigRecordImplementationInputSchema,
+        input
+      );
+      await assertSafeWorkspace(dependencies.workspaceDir);
+      const selected = await readSelectedRun2(
+        dependencies.workspaceDir,
+        parsed.runId
+      );
+      const artifactPath = await writeImplementationReport(
+        dependencies.workspaceDir,
+        selected.run.runId,
+        parsed
+      );
+      const accepted = await assertImplementationScope(
+        dependencies.workspaceDir,
+        parsed
+      );
+      const status = rollupStatusAfterImplementation(parsed, accepted);
+      await writeAgenticStatus(dependencies.workspaceDir, selected.run.runId, {
+        status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        updatedAt: dependencies.now().toISOString()
+      });
+      return validateWithSchema(UigRecordImplementationResultSchema, {
+        schema: "uig-qwen-record-implementation-result/v1",
+        runId: selected.run.runId,
+        runStatus: status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        reportSha256: await sha256File(artifactPath),
+        importedComponents: parsed.importedComponents,
+        accepted,
+        ...accepted ? {} : {
+          rejection: {
+            code: "UIG_IMPLEMENTATION_OUT_OF_SCOPE",
+            message: "Implementation touched files outside the recorded write scope"
+          }
+        }
+      });
+    },
+    async recordCodeReview(input) {
+      const parsed = validateWithSchema(UigRecordCodeReviewInputSchema, input);
+      await assertSafeWorkspace(dependencies.workspaceDir);
+      const selected = await readSelectedRun2(
+        dependencies.workspaceDir,
+        parsed.runId
+      );
+      const artifactPath = await writeCodeReviewReport(
+        dependencies.workspaceDir,
+        selected.run.runId,
+        parsed
+      );
+      const previous = await readAgenticStatus(
+        dependencies.workspaceDir,
+        selected.run.runId
+      );
+      const status = rollupStatusAfterCodeReview(parsed, previous);
+      await writeAgenticStatus(dependencies.workspaceDir, selected.run.runId, {
+        status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        updatedAt: dependencies.now().toISOString()
+      });
+      return validateWithSchema(UigRecordCodeReviewResultSchema, {
+        schema: "uig-qwen-record-code-review-result/v1",
+        runId: selected.run.runId,
+        runStatus: status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        reportSha256: await sha256File(artifactPath),
+        accepted: true
+      });
+    },
+    async recordBrowserReview(input) {
+      const parsed = validateWithSchema(
+        UigRecordBrowserReviewInputSchema,
+        input
+      );
+      await assertSafeWorkspace(dependencies.workspaceDir);
+      const selected = await readSelectedRun2(
+        dependencies.workspaceDir,
+        parsed.runId
+      );
+      const artifactPath = await writeBrowserReviewReport(
+        dependencies.workspaceDir,
+        selected.run.runId,
+        parsed
+      );
+      const previous = await readAgenticStatus(
+        dependencies.workspaceDir,
+        selected.run.runId
+      );
+      const status = rollupStatusAfterBrowserReview(parsed, previous);
+      await writeAgenticStatus(dependencies.workspaceDir, selected.run.runId, {
+        status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        updatedAt: dependencies.now().toISOString()
+      });
+      return validateWithSchema(UigRecordBrowserReviewResultSchema, {
+        schema: "uig-qwen-record-browser-review-result/v1",
+        runId: selected.run.runId,
+        runStatus: status,
+        reportPath: relative9(dependencies.workspaceDir, artifactPath),
+        reportSha256: await sha256File(artifactPath),
+        accepted: true
+      });
+    }
+  };
+}
+async function refreshProjectContext(workspaceDir, service, refresh) {
+  if (refresh) {
+    const scan = await service.scan({});
+    if (scan.status === "completed") {
+      const catalog2 = await readCatalogFromWorkspace(
+        workspaceDir,
+        scan.catalog.path
+      );
+      return {
+        catalogPath: scan.catalog.path,
+        fingerprint: scan.catalog.fingerprint,
+        catalog: catalog2
+      };
+    }
+    return null;
+  }
+  const status = await service.status();
+  if (status.status !== "ready" || !status.catalog) {
+    return null;
+  }
+  const catalog = await readCatalogFromWorkspace(
+    workspaceDir,
+    status.catalog.path
+  );
+  return {
+    catalogPath: status.catalog.path,
+    fingerprint: status.catalog.fingerprint,
+    catalog
+  };
+}
+async function readCatalogFromWorkspace(workspaceDir, relativePath2) {
+  const absolute = resolve6(workspaceDir, relativePath2);
+  const text = await readFile8(absolute, "utf8");
+  const value = JSON.parse(text);
+  return validateWithSchema(EffectiveComponentCatalogV1Schema, value);
+}
+function buildReusableComponents(catalog) {
+  return catalog.components.slice(0, MAX_TREE_ENTRIES).map((component) => {
+    const status = pickComponentStatus(component);
+    return {
+      componentId: component.id,
+      exportName: component.import.export,
+      importSource: component.import.source,
+      status,
+      semanticRoles: component.semantics.map((entry) => entry.role).slice(0, 50)
+    };
+  });
+}
+function pickComponentStatus(component) {
+  if (component.semantics.some((entry) => entry.status === "pack-owned")) {
+    return "pack-owned";
+  }
+  if (component.semantics.some((entry) => entry.status === "mapped")) {
+    return "mapped";
+  }
+  if (component.semantics.length > 0) {
+    return "suggested";
+  }
+  return "verified";
+}
+function collectPrepareDiagnostics(run, plan) {
+  const out = [];
+  const stages = run.stages;
+  for (const key of Object.keys(stages)) {
+    const value = stages[key];
+    if (value === "blocked") {
+      out.push({
+        code: `STAGE_${String(key).toUpperCase()}_BLOCKED`,
+        severity: "error",
+        blocking: true,
+        stage: stageForKey(key),
+        message: `Stage ${String(key)} is blocked`
+      });
+    }
+  }
+  for (const diagnostic2 of plan.diagnostics) {
+    if (out.length >= AGENTIC_REPORT_LIMIT) break;
+    if (diagnostic2.severity === "info") continue;
+    out.push({
+      code: diagnostic2.code,
+      severity: diagnostic2.severity === "error" ? "error" : "warning",
+      blocking: diagnostic2.blocking,
+      stage: "resolve",
+      message: diagnostic2.message
+    });
+  }
+  return out;
+}
+function stageForKey(key) {
+  switch (key) {
+    case "fetch":
+      return "fetch";
+    case "normalize":
+      return "normalize";
+    case "summarize":
+      return "summarize";
+    case "plan":
+      return "plan";
+    case "resolve":
+      return "resolve";
+  }
+}
+async function writePrepareBuildArtifact(input) {
+  const runDir = join15(input.workspaceDir, ".uig", "runs", input.runId);
+  const dir = join15(runDir, AGENTIC_DIR);
+  await mkdir5(dir, { recursive: true });
+  const file2 = join15(dir, "build-prep.json");
+  const snapshot = {
+    schema: "uig-qwen-build-prep/v1",
+    capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+    result: input.result,
+    projectContext: input.projectContext ? {
+      catalogPath: input.projectContext.catalogPath,
+      fingerprint: input.projectContext.fingerprint,
+      summary: input.projectContext.catalog.summary
+    } : null
+  };
+  await writeFile5(file2, JSON.stringify(snapshot, null, 2), "utf8");
+  const evidenceFile = join15(runDir, "design-evidence.json");
+  await writeFile5(
+    evidenceFile,
+    JSON.stringify(
+      {
+        schema: "uig-qwen-design-evidence/v1",
+        capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        result: input.result
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+}
+async function writeImplementationReport(workspaceDir, runId, payload) {
+  const file2 = await joinAgentic(workspaceDir, runId, "implementation.json");
+  await writeFile5(
+    file2,
+    JSON.stringify(
+      {
+        schema: "uig-qwen-implementation-report/v1",
+        capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        payload
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  return file2;
+}
+async function writeCodeReviewReport(workspaceDir, runId, payload) {
+  const file2 = await joinAgentic(workspaceDir, runId, "code-review.json");
+  await writeFile5(
+    file2,
+    JSON.stringify(
+      {
+        schema: "uig-qwen-code-review-report/v1",
+        capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        payload
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  return file2;
+}
+async function writeBrowserReviewReport(workspaceDir, runId, payload) {
+  const file2 = await joinAgentic(workspaceDir, runId, "browser-review.json");
+  await writeFile5(
+    file2,
+    JSON.stringify(
+      {
+        schema: "uig-qwen-browser-review-report/v1",
+        capturedAt: (/* @__PURE__ */ new Date()).toISOString(),
+        payload
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  return file2;
+}
+async function joinAgentic(workspaceDir, runId, name) {
+  const dir = join15(workspaceDir, ".uig", "runs", runId, AGENTIC_DIR);
+  await mkdir5(dir, { recursive: true });
+  return join15(dir, name);
+}
+async function writeAgenticStatus(workspaceDir, runId, status) {
+  const file2 = await joinAgentic(workspaceDir, runId, "status.json");
+  await writeFile5(file2, JSON.stringify(status, null, 2), "utf8");
+}
+async function readAgenticStatus(workspaceDir, runId) {
+  const file2 = join15(
+    workspaceDir,
+    ".uig",
+    "runs",
+    runId,
+    AGENTIC_DIR,
+    "status.json"
+  );
+  try {
+    const bytes2 = await readFile8(file2, "utf8");
+    return JSON.parse(bytes2);
+  } catch {
+    return null;
+  }
+}
+function rollupStatusAfterImplementation(payload, accepted) {
+  if (!accepted) {
+    return "blocked";
+  }
+  if (payload.status === "failed") {
+    return "generated-with-errors";
+  }
+  if (payload.status === "partial") {
+    return "partial-success";
+  }
+  return "implementation-recorded";
+}
+function rollupStatusAfterCodeReview(payload, previous) {
+  if (payload.verdict === "changes-requested") {
+    return "generated-with-errors";
+  }
+  if (previous?.status === "implementation-recorded" || previous?.status === "code-review-recorded") {
+    return "code-review-recorded";
+  }
+  return "code-review-recorded";
+}
+function rollupStatusAfterBrowserReview(payload, previous) {
+  const cameFromImplementation = previous?.status === "code-review-recorded" || previous?.status === "implementation-recorded";
+  if (payload.verdict === "ok") {
+    return cameFromImplementation ? "complete" : "complete";
+  }
+  if (payload.verdict === "ok-with-warnings") {
+    return cameFromImplementation ? "partial-success" : "partial-success";
+  }
+  return "generated-with-errors";
+}
+async function assertImplementationScope(workspaceDir, payload) {
+  const workspaceRoot = resolve6(workspaceDir);
+  for (const file2 of [...payload.createdFiles, ...payload.modifiedFiles]) {
+    if (file2.path.startsWith(".uig/") || file2.path.startsWith(".ui-context/") || file2.path.includes("..")) {
+      return false;
+    }
+    const absolute = resolve6(workspaceRoot, file2.path);
+    if (!absolute.startsWith(`${workspaceRoot}${sep10}`) && absolute !== workspaceRoot) {
+      return false;
+    }
+    try {
+      const stat2 = await lstat8(absolute);
+      if (stat2.isSymbolicLink()) {
+        const target = await readlink3(absolute);
+        if (target.includes("..")) {
+          return false;
+        }
+      }
+    } catch {
+    }
+  }
+  return true;
+}
+async function writeScreenshotStumpRun(input) {
+  const runDir = join15(input.workspaceDir, ".uig", "runs", input.runId);
+  await mkdir5(runDir, { recursive: true });
+  const nodeId = input.pageName.replace(/[^A-Za-z0-9_-]+/g, "-");
+  const run = {
+    schema: "generation-run/v1",
+    runId: input.runId,
+    status: "completed-with-warnings",
+    stages: {
+      fetch: "completed",
+      normalize: "skipped",
+      summarize: "skipped",
+      plan: "skipped",
+      resolve: "skipped"
+    },
+    artifacts: {
+      snapshot: "screenshot.json",
+      designIr: "screenshot.design-ir.json",
+      designSummary: "screenshot.design-summary.json",
+      uiManifest: "screenshot.ui-manifest.json",
+      resolutionPlan: "screenshot.resolution-plan.json",
+      diagnostics: "diagnostics.json"
+    }
+  };
+  await writeFile5(
+    join15(runDir, "run.json"),
+    JSON.stringify(run, null, 2),
+    "utf8"
+  );
+  const screenshotBytes = await readFile8(
+    join15(input.workspaceDir, input.screenshotPath)
+  );
+  await writeFile5(
+    join15(runDir, "screenshot.json"),
+    JSON.stringify(
+      {
+        schema: "design-screenshot/v1",
+        runId: input.runId,
+        pageName: input.pageName,
+        nodeId,
+        path: input.screenshotPath,
+        sha256: createHash8("sha256").update(screenshotBytes).digest("hex"),
+        byteLength: screenshotBytes.byteLength
+      },
+      null,
+      2
+    ),
+    "utf8"
+  );
+  const diagnostics2 = [
+    {
+      severity: "warning",
+      blocking: false,
+      stage: "normalize",
+      code: "UIG_SOURCE_KIND_SCREENSHOT",
+      message: "Screenshot source: design evidence is incomplete; the UI builder must rely on the user-supplied image"
+    }
+  ];
+  await writeFile5(
+    join15(runDir, "diagnostics.json"),
+    JSON.stringify(diagnostics2, null, 2),
+    "utf8"
+  );
+  return run;
+}
+async function storeLocalDsl(workspaceDir, relativePath2) {
+  const absolute = resolve6(workspaceDir, relativePath2);
+  const bytes2 = await readFile8(absolute);
+  const parsed = JSON.parse(
+    new TextDecoder("utf8", { fatal: true }).decode(bytes2)
+  );
+  const documentId = typeof parsed?.dsl?.fileKey === "string" ? parsed.dsl.fileKey : "local";
+  const nodeId = typeof parsed?.dsl?.nodeId === "string" ? parsed.dsl.nodeId : "local";
+  const store = createArtifactStore(join15(workspaceDir, ".uig"));
+  const stored = await store.put({
+    provider: "pixso",
+    documentId,
+    nodeId,
+    bytes: bytes2
+  });
+  return stored.artifactId;
+}
+async function readSelectedRun2(workspaceDir, runId) {
+  const canonical = await realpath8(workspaceDir);
+  const runsRoot = await realpath8(join15(workspaceDir, ".uig", "runs"));
+  if (!runsRoot.startsWith(`${canonical}${sep10}`)) {
+    throw new UigToolError(
+      "UIG_FILESYSTEM_FAILED",
+      "Runs root escapes workspace"
+    );
+  }
+  const selected = join15(workspaceDir, ".uig", "runs", runId);
+  const stat2 = await lstat8(selected);
+  if (!stat2.isDirectory() || stat2.isSymbolicLink()) {
+    throw new UigToolError(
+      "UIG_RUN_INVALID",
+      "Run path is not an ordinary directory"
+    );
+  }
+  const runDir = await realpath8(selected);
+  if (!runDir.startsWith(`${runsRoot}${sep10}`)) {
+    throw new UigToolError(
+      "UIG_FILESYSTEM_FAILED",
+      "Run directory escapes runs root"
+    );
+  }
+  const run = validateWithSchema(
+    GenerationRunSchema,
+    JSON.parse(await readFile8(join15(runDir, "run.json"), "utf8"))
+  );
+  if (run.runId !== runId) {
+    throw new UigToolError("UIG_RUN_INVALID", "Run ID mismatch");
+  }
+  return { runDir, run };
+}
+async function readResolutionPlanFromRun(workspaceDir, runId) {
+  const selected = await readSelectedRun2(workspaceDir, runId);
+  return readResolutionPlan(selected.runDir);
+}
+async function readResolutionPlan(runDir) {
+  const entries = await readdir4(runDir);
+  const file2 = entries.find(
+    (entry) => entry.startsWith("resolution-plan.") && entry.endsWith(".json")
+  );
+  if (!file2) {
+    throw new UigToolError(
+      "UIG_RUN_INVALID",
+      "Resolution plan artifact missing"
+    );
+  }
+  const value = JSON.parse(await readFile8(join15(runDir, file2), "utf8"));
+  return validateWithSchema(ResolutionPlanV2Schema, value);
+}
+async function sha256File(path) {
+  const bytes2 = await readFile8(path);
+  return createHash8("sha256").update(bytes2).digest("hex");
+}
+async function assertSafeWorkspaceFile(workspaceDir, relativePath2) {
+  if (relativePath2.includes("..") || relativePath2.startsWith("/")) {
+    throw new UigToolError(
+      "UIG_INPUT_INVALID",
+      "Source path escapes the workspace"
+    );
+  }
+  const absolute = resolve6(workspaceDir, relativePath2);
+  if (!absolute.startsWith(`${resolve6(workspaceDir)}${sep10}`) && absolute !== resolve6(workspaceDir)) {
+    throw new UigToolError(
+      "UIG_INPUT_INVALID",
+      "Source path escapes the workspace"
+    );
+  }
+  try {
+    await access(absolute);
+  } catch {
+    throw new UigToolError(
+      "UIG_INPUT_INVALID",
+      `Source path is unreadable: ${relativePath2}`
+    );
+  }
+}
+async function assertSafeWorkspace(workspaceDir) {
+  try {
+    await ensureContainedDirectoryTree(workspaceDir, [
+      ".uig",
+      join15(".uig", "agentic"),
+      join15(".uig", "cache"),
+      join15(".uig", "cache", "sha256"),
+      join15(".uig", "artifacts"),
+      join15(".uig", "runs")
+    ]);
+  } catch {
+    throw new UigToolError(
+      "UIG_FILESYSTEM_FAILED",
+      "Workspace storage path is unsafe"
+    );
+  }
+}
+function requireToken2(token) {
+  if (!token || token.trim().length === 0) {
+    throw new UigToolError(
+      "UIG_PROVIDER_CONFIG_MISSING",
+      "Pixso access token is not configured"
+    );
+  }
+  return token;
+}
+function buildRunId(now) {
+  const timestamp = now.toISOString().replace(/[-:.]/g, "").replace("Z", "Z");
+  return `run_${timestamp}_${randomUUID5().slice(0, 8)}`;
+}
+async function resolvePackPath2(extensionRoot, designSystem) {
+  const packsRoot2 = resolve6(extensionRoot, "design-system-packs");
+  const candidate2 = resolve6(packsRoot2, designSystem);
+  if (candidate2 === packsRoot2 || !candidate2.startsWith(`${packsRoot2}${sep10}`)) {
+    throw new UigToolError("UIG_INPUT_INVALID", "Unsafe design-system ID");
+  }
+  try {
+    const canonicalExtensionRoot = await realpath8(extensionRoot);
+    const canonicalPacksRoot = await realpath8(packsRoot2);
+    if (canonicalPacksRoot !== canonicalExtensionRoot && !canonicalPacksRoot.startsWith(`${canonicalExtensionRoot}${sep10}`)) {
+      throw new Error("Pack root escapes the extension");
+    }
+    const metadata = await lstat8(candidate2);
+    if (!metadata.isDirectory() || metadata.isSymbolicLink()) {
+      throw new Error("Pack is not an ordinary directory");
+    }
+    const canonicalCandidate = await realpath8(candidate2);
+    if (!canonicalCandidate.startsWith(`${canonicalPacksRoot}${sep10}`)) {
+      throw new Error("Pack resolves outside the pack root");
+    }
+    return canonicalCandidate;
+  } catch {
+    throw new UigToolError(
+      "UIG_PACK_INVALID",
+      `Design-system pack ${JSON.stringify(designSystem)} is unavailable`
+    );
+  }
+}
+function providerFailure2(error46) {
+  const providerCode = error46 instanceof PixsoProviderError ? error46.code : "PIXSO_REQUEST_FAILED";
+  return new UigToolError(
+    "UIG_PROVIDER_FAILED",
+    `Pixso planning failed with ${providerCode}`
+  );
+}
+
+// extensions/qwen-cli/src/project-context-results.ts
+var sha2563 = external_exports.string().regex(/^[a-f0-9]{64}$/);
+var safePath = external_exports.string().min(1).refine(
+  (value) => !value.startsWith("/") && !/^[A-Za-z]:[\\/]/.test(value) && !value.includes("\\") && !value.split("/").includes(".."),
+  "Expected a safe workspace-relative path"
+);
+var identifier = external_exports.string().min(1).max(256);
+var boundedStrings = external_exports.array(identifier).max(50);
+var PublicRootSchema2 = external_exports.object({
+  path: safePath,
+  entry: safePath,
+  importSource: identifier
+}).strict();
+var UiContextConfigInputSchema = external_exports.object({
+  schema: external_exports.literal("ui-context-config/v1"),
+  framework: external_exports.literal("react"),
+  language: external_exports.literal("typescript"),
+  designSystemPacks: external_exports.array(external_exports.string().regex(/^[a-z0-9][a-z0-9._-]*$/)).max(20),
+  componentRoots: external_exports.array(PublicRootSchema2).max(100),
+  iconRoots: external_exports.array(PublicRootSchema2).max(100),
+  workspacePackages: external_exports.object({ discovery: external_exports.literal("public-exports") }).strict(),
+  ignore: external_exports.array(safePath).max(100)
+}).strict();
+var ProjectScanInputSchema = external_exports.object({
+  acceptDiscoveredConfig: external_exports.boolean().optional(),
+  discoveryId: sha2563.optional(),
+  acceptedConfig: UiContextConfigInputSchema.optional()
+}).strict().superRefine((value, context) => {
+  if (value.acceptDiscoveredConfig === true && (!value.discoveryId || !value.acceptedConfig)) {
+    context.addIssue({
+      code: "custom",
+      message: "discoveryId and acceptedConfig are required when accepting configuration"
+    });
+  }
+});
+var ProjectComponentSearchInputSchema = external_exports.object({
+  query: external_exports.string().trim().min(1).max(200).optional(),
+  semanticRole: identifier.optional(),
+  status: external_exports.enum(["suggested", "mapped", "pack-owned"]).optional(),
+  limit: external_exports.number().int().min(1).max(50).optional()
+}).strict();
+var ComponentContractInputSchema = external_exports.object({ componentId: identifier }).strict();
+var IconPathsInputSchema = external_exports.object({ names: external_exports.array(identifier).min(1).max(50) }).strict();
+var MappingChangeSchema = external_exports.object({
+  componentId: identifier,
+  semanticRoles: boundedStrings,
+  capabilities: boundedStrings,
+  formAdapters: boundedStrings
+}).strict();
+var MappingMutationInputSchema = external_exports.object({
+  catalogFingerprint: sha2563,
+  mappings: external_exports.array(MappingChangeSchema).min(1).max(50)
+}).strict();
+var EmptyInputSchema = external_exports.object({}).strict();
+var diagnostic = external_exports.object({
+  severity: external_exports.enum(["info", "warning", "error", "fatal"]),
+  code: identifier,
+  message: external_exports.string().min(1).max(1e3),
+  path: safePath.optional(),
+  componentId: identifier.optional()
+}).strict();
+var diagnostics = external_exports.object({
+  total: external_exports.number().int().nonnegative(),
+  returned: external_exports.array(diagnostic).max(50),
+  truncated: external_exports.boolean()
+}).strict();
+var summary = external_exports.object({
+  verifiedComponents: external_exports.number().int().nonnegative(),
+  verifiedIcons: external_exports.number().int().nonnegative(),
+  mappedRoles: external_exports.number().int().nonnegative(),
+  suggestedRoles: external_exports.number().int().nonnegative(),
+  warnings: external_exports.number().int().nonnegative()
+}).strict();
+var ProjectScanResultSchema = external_exports.discriminatedUnion("status", [
+  external_exports.object({
+    status: external_exports.literal("needs-configuration"),
+    discoveryId: sha2563,
+    proposedConfig: UiContextConfigInputSchema,
+    diagnostics: external_exports.array(diagnostic).max(50)
+  }).strict(),
+  external_exports.object({
+    status: external_exports.literal("completed"),
+    catalog: external_exports.object({ path: safePath, sha256: sha2563, fingerprint: sha2563 }).strict(),
+    summary,
+    diagnostics
+  }).strict(),
+  external_exports.object({
+    status: external_exports.literal("blocked"),
+    stage: external_exports.literal("project-scan"),
+    diagnostics,
+    artifactPath: safePath
+  }).strict()
+]);
+var verifiedImport = external_exports.object({
+  source: identifier,
+  export: identifier,
+  style: external_exports.enum(["named", "default"])
+}).strict();
+var semantic = external_exports.object({
+  role: identifier,
+  status: external_exports.enum(["suggested", "mapped", "pack-owned"]),
+  confidence: external_exports.number().min(0).max(1),
+  source: safePath
+}).strict();
+var namedBinding = external_exports.object({
+  name: identifier,
+  status: external_exports.enum(["suggested", "mapped", "pack-owned"]),
+  confidence: external_exports.number().min(0).max(1),
+  source: safePath
+}).strict();
+var ProjectComponentSearchResultSchema = external_exports.object({
+  catalogFingerprint: sha2563,
+  catalogPath: safePath,
+  totalCount: external_exports.number().int().nonnegative(),
+  returnedCount: external_exports.number().int().nonnegative().max(50),
+  truncated: external_exports.boolean(),
+  results: external_exports.array(
+    external_exports.object({
+      componentId: identifier,
+      exportName: identifier,
+      import: verifiedImport,
+      score: external_exports.number().nonnegative(),
+      semantics: external_exports.array(semantic).max(50)
+    }).strict()
+  ).max(50)
+}).strict();
+var contractRef = external_exports.union([
+  external_exports.object({ artifact: external_exports.literal("public-components"), id: identifier }).strict(),
+  external_exports.object({
+    artifact: external_exports.literal("installed-packages"),
+    package: identifier,
+    export: identifier
+  }).strict()
+]);
+var normalizedType = external_exports.lazy(
+  () => external_exports.union([
+    external_exports.object({
+      kind: external_exports.enum([
+        "string",
+        "number",
+        "boolean",
+        "void",
+        "react-node",
+        "react-element"
+      ])
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("enum"),
+      values: external_exports.array(external_exports.union([external_exports.string(), external_exports.number(), external_exports.boolean()]))
+    }).strict(),
+    external_exports.object({ kind: external_exports.literal("array"), element: normalizedType }).strict(),
+    external_exports.object({ kind: external_exports.literal("tuple"), elements: external_exports.array(normalizedType) }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("object"),
+      properties: external_exports.array(
+        external_exports.object({
+          name: identifier,
+          required: external_exports.boolean(),
+          type: normalizedType
+        }).strict()
+      )
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("function"),
+      parameters: external_exports.array(
+        external_exports.object({ name: identifier, type: normalizedType }).strict()
+      ),
+      returns: normalizedType
+    }).strict(),
+    external_exports.object({ kind: external_exports.literal("reference"), name: identifier }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("opaque"),
+      displayName: identifier,
+      reason: external_exports.string().min(1)
+    }).strict()
+  ])
+);
+var exactContract = external_exports.object({
+  propsType: identifier,
+  acceptsChildren: external_exports.boolean(),
+  props: external_exports.array(
+    external_exports.object({
+      name: identifier,
+      required: external_exports.boolean(),
+      type: normalizedType,
+      description: external_exports.string().min(1).optional(),
+      deprecated: external_exports.boolean()
+    }).strict()
+  ).max(200),
+  summary: external_exports.string().min(1).optional(),
+  deprecated: external_exports.boolean().optional()
+}).strict();
+var evidence = external_exports.array(
+  external_exports.union([
+    external_exports.object({
+      kind: external_exports.literal("public-export"),
+      path: safePath,
+      export: identifier
+    }).strict(),
+    external_exports.object({
+      kind: external_exports.literal("typescript-contract"),
+      path: safePath,
+      symbol: identifier
+    }).strict()
+  ])
+).max(50);
+var ComponentContractResultSchema = external_exports.object({
+  componentId: identifier,
+  import: verifiedImport,
+  contractRef,
+  semantics: external_exports.array(semantic).max(50),
+  capabilities: external_exports.array(namedBinding).max(50),
+  formAdapters: external_exports.array(namedBinding).max(50),
+  annotations: boundedStrings,
+  restrictions: boundedStrings,
+  deprecated: external_exports.boolean(),
+  contract: exactContract.optional(),
+  evidence: evidence.optional(),
+  catalogFingerprint: sha2563,
+  catalogPath: safePath
+}).strict();
+var iconResult = external_exports.union([
+  external_exports.object({
+    name: identifier,
+    status: external_exports.literal("resolved"),
+    import: verifiedImport,
+    componentId: identifier
+  }).strict(),
+  external_exports.object({
+    name: identifier,
+    status: external_exports.literal("ambiguous"),
+    candidates: external_exports.array(
+      external_exports.object({ componentId: identifier, import: verifiedImport }).strict()
+    ).max(50)
+  }).strict(),
+  external_exports.object({
+    name: identifier,
+    status: external_exports.literal("unresolved"),
+    suggestions: boundedStrings
+  }).strict()
+]);
+var IconPathsResultSchema = external_exports.object({
+  catalogFingerprint: sha2563,
+  catalogPath: safePath,
+  results: external_exports.array(iconResult).max(50)
+}).strict();
+var MappingMutationResultSchema = external_exports.object({
+  mappingPath: safePath,
+  catalogPath: safePath,
+  catalogSha256: sha2563,
+  catalogFingerprint: sha2563,
+  summary
+}).strict();
+var ProjectStatusResultSchema = external_exports.object({
+  status: external_exports.enum(["missing", "ready", "stale", "blocked"]),
+  changed: boundedStrings,
+  catalog: external_exports.object({ path: safePath, fingerprint: sha2563 }).strict().optional()
+}).strict();
+function compactProjectScanResult(result) {
+  if (result.status === "needs-configuration") {
+    return ProjectScanResultSchema.parse({
+      ...result,
+      diagnostics: result.diagnostics.slice(0, 50).map(compactDiagnostic)
+    });
+  }
+  return ProjectScanResultSchema.parse({
+    ...result,
+    diagnostics: {
+      ...result.diagnostics,
+      returned: result.diagnostics.returned.slice(0, 50).map(compactDiagnostic)
+    }
+  });
+}
+function compactDiagnostic(value) {
+  return {
+    severity: value.severity,
+    code: value.code,
+    message: value.message,
+    ...value.path ? { path: value.path } : {},
+    ...value.componentId ? { componentId: value.componentId } : {}
+  };
+}
+
 // extensions/qwen-cli/src/project-context-tools.ts
 function createProjectContextTools(service) {
   return {
@@ -271542,11 +272842,12 @@ function createUigMcpServer(input) {
     },
     async (arguments_) => toolResponse(() => input.tools.generate(arguments_))
   );
+  registerAgenticTools(server2, input.tools);
   return server2;
 }
 async function runQwenAdapter() {
   const adapterModulePath = fileURLToPath3(import.meta.url);
-  const extensionRoot = resolve6(dirname4(adapterModulePath), "..");
+  const extensionRoot = resolve7(dirname5(adapterModulePath), "..");
   const dependencies = {
     workspaceDir: process.cwd(),
     extensionRoot,
@@ -271561,14 +272862,34 @@ async function runQwenAdapter() {
     generateFromRun
   };
   const tools = createUigTools(dependencies);
-  const projectContextTools = createProjectContextTools(
-    createProjectContextService({
-      workspaceDir: process.cwd(),
-      extensionRoot
-    })
-  );
+  const projectContextService = createProjectContextService({
+    workspaceDir: process.cwd(),
+    extensionRoot
+  });
+  const projectContextTools = createProjectContextTools(projectContextService);
+  const agenticTools = createAgenticTools({
+    workspaceDir: process.cwd(),
+    extensionRoot,
+    adapterModulePath,
+    token: process.env.PIXSO_ACCESS_TOKEN,
+    now: () => /* @__PURE__ */ new Date(),
+    createPixsoClient: (token) => createRemotePixsoDslClient({
+      endpoint: new URL("https://pixso.net/api/mcp/mcp"),
+      token
+    }),
+    projectContextService
+  });
   serveStdio(
-    () => createUigMcpServer({ tools: { ...tools, ...projectContextTools } }),
+    () => createUigMcpServer({
+      tools: {
+        ...tools,
+        ...projectContextTools,
+        prepareBuild: agenticTools.prepareBuild,
+        recordImplementation: agenticTools.recordImplementation,
+        recordCodeReview: agenticTools.recordCodeReview,
+        recordBrowserReview: agenticTools.recordBrowserReview
+      }
+    }),
     {
       onerror: () => {
         process.stderr.write("uig adapter protocol error\n");
@@ -271677,6 +272998,48 @@ function registerProjectContextTools(server2, tools) {
       outputSchema: ProjectStatusResultSchema
     },
     async (arguments_) => toolResponse(() => tools.getProjectUiContextStatus(arguments_))
+  );
+}
+function registerAgenticTools(server2, tools) {
+  server2.registerTool(
+    "uig_prepare_build",
+    {
+      title: "Prepare an agentic Pixso-to-React build",
+      description: "Validate a Pixso URL, local DSL, screenshot, or stored run and create a durable design-evidence artifact for the agentic build",
+      inputSchema: UigPrepareBuildInputSchema2,
+      outputSchema: UigPrepareBuildResultSchema2
+    },
+    async (arguments_) => toolResponse(() => tools.prepareBuild(arguments_))
+  );
+  server2.registerTool(
+    "uig_record_implementation",
+    {
+      title: "Record UI builder implementation",
+      description: "Persist the implementation report from the ui-builder agent for one durable run",
+      inputSchema: UigRecordImplementationInputSchema2,
+      outputSchema: UigRecordImplementationResultSchema2
+    },
+    async (arguments_) => toolResponse(() => tools.recordImplementation(arguments_))
+  );
+  server2.registerTool(
+    "uig_record_code_review",
+    {
+      title: "Record code-review verdict",
+      description: "Persist the code-review report from the code-reviewer agent for one durable run",
+      inputSchema: UigRecordCodeReviewInputSchema2,
+      outputSchema: UigRecordCodeReviewResultSchema2
+    },
+    async (arguments_) => toolResponse(() => tools.recordCodeReview(arguments_))
+  );
+  server2.registerTool(
+    "uig_record_browser_review",
+    {
+      title: "Record browser-review verdict",
+      description: "Persist the browser-review report from the browser-reviewer agent for one durable run",
+      inputSchema: UigRecordBrowserReviewInputSchema2,
+      outputSchema: UigRecordBrowserReviewResultSchema2
+    },
+    async (arguments_) => toolResponse(() => tools.recordBrowserReview(arguments_))
   );
 }
 function isMainModule() {

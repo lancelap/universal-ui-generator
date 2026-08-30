@@ -69,7 +69,22 @@ describe("direct service and MCP adapter parity", () => {
       }),
     );
     const server = createUigMcpServer({
-      tools: { ...tools, ...projectContextTools },
+      tools: {
+        ...tools,
+        ...projectContextTools,
+        prepareBuild: async () => ({
+          schema: "uig-qwen-prepare-build-result/v1",
+        }),
+        recordImplementation: async () => ({
+          schema: "uig-qwen-record-implementation-result/v1",
+        }),
+        recordCodeReview: async () => ({
+          schema: "uig-qwen-record-code-review-result/v1",
+        }),
+        recordBrowserReview: async () => ({
+          schema: "uig-qwen-record-browser-review-result/v1",
+        }),
+      },
     });
     const [clientTransport, serverTransport] =
       InMemoryTransport.createLinkedPair();

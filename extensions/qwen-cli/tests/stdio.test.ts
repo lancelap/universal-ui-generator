@@ -50,7 +50,7 @@ describe("Qwen adapter bundle", () => {
     expect(repoRoot).not.toBe("");
   });
 
-  it("serves exactly nine tools over stdio and forks itself for generation", async () => {
+  it("serves exactly thirteen tools over stdio and forks itself for generation", async () => {
     const workspace = await mkdtemp(join(tmpdir(), "uig-qwen-stdio-"));
     const stderr: Buffer[] = [];
     const transportErrors: string[] = [];
@@ -90,6 +90,10 @@ describe("Qwen adapter bundle", () => {
         "scan_project_components",
         "uig_generate",
         "uig_plan",
+        "uig_prepare_build",
+        "uig_record_browser_review",
+        "uig_record_code_review",
+        "uig_record_implementation",
       ]);
       for (const tool of listed.tools) {
         expect(tool.inputSchema).toBeDefined();
