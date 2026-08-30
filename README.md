@@ -205,14 +205,33 @@ qwen extensions settings set \
 The default design system is `sber-space-ui`. The extension adds:
 
 ```text
-/uig:plan <pixso-url> [design-system]
-/uig:generate <run-id>
 /uig:pixso-to-react <pixso-url> [design-system]
+/uig:pixso-to-react <local-dsl-path> [design-system]
+/uig:pixso-to-react screenshot <path> <page-name> [design-system]
+/uig:pixso-to-react run <run-id>
+/uig:plan <pixso-url> [design-system]   (legacy deterministic)
+/uig:generate <run-id>                  (legacy deterministic)
 /uig:scan
 /uig:components <query or role:semantic-role>
 /uig:map <add|remove> <component> <semantic-role>
 /uig:status
 ```
+
+`/uig:pixso-to-react` is the combined agentic workflow. It calls four MCP
+tools (`uig_prepare_build`, `uig_record_implementation`,
+`uig_record_code_review`, `uig_record_browser_review`) and three bundled
+subagents (`ui-builder`, `code-reviewer`, `browser-reviewer`). The
+legacy `/uig:plan` and `/uig:generate` commands are still available for
+regression tests, debugging, and the reproducible benchmark, but they
+are not the default path of the combined command.
+
+The agentic pipeline starts as soon as the source is valid; there is no
+plan-confirmation step. The orchestrator runs up to three local fix
+loops between the `code-reviewer` and the `browser-reviewer`. When the
+budget is exhausted, the run is saved with the honest residual errors.
+The final status is one of `complete`, `partial-success`,
+`generated-with-errors`, `blocked`, or `cancelled` and is rolled up from
+the last successful `uig_record_*` call.
 
 `/uig:plan` creates a durable checkpoint and stops. A ready result contains
 the run path, pack proof, resolution counts, and compact diagnostics:

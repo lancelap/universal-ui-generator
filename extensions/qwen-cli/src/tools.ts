@@ -23,6 +23,7 @@ import { type PixsoDslClient, PixsoProviderError } from "@uig/provider-pixso";
 import { ZodError } from "zod";
 import type { ProjectContextErrorCode } from "@uig/project-context";
 
+import { type AgenticToolHandlers } from "./agentic-tools.js";
 import {
   buildGenerateResult,
   buildPlanResult,

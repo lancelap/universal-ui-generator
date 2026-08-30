@@ -8,6 +8,7 @@
   },
   "exports": {
     "./plan-from-url": "./src/plan-from-url.ts",
+    "./plan-from-snapshot": "./src/plan-from-snapshot.ts",
     "./generate-from-run": "./src/generate-from-run.ts",
     "./generate-from-run-worker": "./src/generate-from-run-worker.ts"
   },

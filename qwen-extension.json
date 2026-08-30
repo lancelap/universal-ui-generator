@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "contextFileName": "QWEN.md",
   "commands": "commands",
+  "agents": "agents",
   "mcpServers": {
     "uig": {
       "command": "node",

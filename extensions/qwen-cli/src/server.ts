@@ -11,13 +11,19 @@ import { createRemotePixsoDslClient } from "@uig/provider-pixso";
 import { createProjectContextService } from "@uig/project-context";
 
 import {
-  type UigGenerateResult,
-  UigGenerateInputSchema,
-  UigGenerateResultSchema,
-  type UigPlanResult,
-  UigPlanInputSchema,
-  UigPlanResultSchema,
-} from "./results.js";
+  UigPrepareBuildInputSchema,
+  UigPrepareBuildResultSchema,
+  UigRecordBrowserReviewInputSchema,
+  UigRecordBrowserReviewResultSchema,
+  UigRecordCodeReviewInputSchema,
+  UigRecordCodeReviewResultSchema,
+  UigRecordImplementationInputSchema,
+  UigRecordImplementationResultSchema,
+} from "./agentic-results.js";
+import {
+  createAgenticTools,
+  type AgenticToolHandlers,
+} from "./agentic-tools.js";
 import {
   ComponentContractInputSchema,
   ComponentContractResultSchema,
@@ -34,6 +40,14 @@ import {
 } from "./project-context-results.js";
 import { createProjectContextTools } from "./project-context-tools.js";
 import {
+  type UigGenerateResult,
+  UigGenerateInputSchema,
+  UigGenerateResultSchema,
+  type UigPlanResult,
+  UigPlanInputSchema,
+  UigPlanResultSchema,
+} from "./results.js";
+import {
   createUigTools,
   UigToolError,
   type UigToolDependencies,
@@ -44,6 +58,10 @@ export interface UigMcpToolHandlers extends ReturnType<
 > {
   plan(input: unknown): Promise<UigPlanResult>;
   generate(input: unknown): Promise<UigGenerateResult>;
+  prepareBuild(input: unknown): Promise<unknown>;
+  recordImplementation(input: unknown): Promise<unknown>;
+  recordCodeReview(input: unknown): Promise<unknown>;
+  recordBrowserReview(input: unknown): Promise<unknown>;
 }
 
 export function createUigMcpServer(input: {
@@ -87,6 +105,8 @@ export function createUigMcpServer(input: {
     async (arguments_) => toolResponse(() => input.tools.generate(arguments_)),
   );
 
+  registerAgenticTools(server, input.tools);
+
   return server;
 }
 
@@ -108,14 +128,36 @@ export async function runQwenAdapter(): Promise<void> {
     generateFromRun,
   };
   const tools = createUigTools(dependencies);
-  const projectContextTools = createProjectContextTools(
-    createProjectContextService({
-      workspaceDir: process.cwd(),
-      extensionRoot,
-    }),
-  );
+  const projectContextService = createProjectContextService({
+    workspaceDir: process.cwd(),
+    extensionRoot,
+  });
+  const projectContextTools = createProjectContextTools(projectContextService);
+  const agenticTools: AgenticToolHandlers = createAgenticTools({
+    workspaceDir: process.cwd(),
+    extensionRoot,
+    adapterModulePath,
+    token: process.env.PIXSO_ACCESS_TOKEN,
+    now: () => new Date(),
+    createPixsoClient: (token) =>
+      createRemotePixsoDslClient({
+        endpoint: new URL("https://pixso.net/api/mcp/mcp"),
+        token,
+      }),
+    projectContextService,
+  });
   serveStdio(
-    () => createUigMcpServer({ tools: { ...tools, ...projectContextTools } }),
+    () =>
+      createUigMcpServer({
+        tools: {
+          ...tools,
+          ...projectContextTools,
+          prepareBuild: agenticTools.prepareBuild,
+          recordImplementation: agenticTools.recordImplementation,
+          recordCodeReview: agenticTools.recordCodeReview,
+          recordBrowserReview: agenticTools.recordBrowserReview,
+        },
+      }),
     {
       onerror: () => {
         process.stderr.write("uig adapter protocol error\n");
@@ -124,7 +166,9 @@ export async function runQwenAdapter(): Promise<void> {
   );
 }
 
-async function toolResponse<T extends object>(action: () => Promise<T>) {
+async function toolResponse<T extends object | unknown>(
+  action: () => Promise<T>,
+) {
   try {
     const result = await action();
     return {
@@ -238,6 +282,59 @@ function registerProjectContextTools(
     },
     async (arguments_) =>
       toolResponse(() => tools.getProjectUiContextStatus(arguments_)),
+  );
+}
+
+function registerAgenticTools(
+  server: McpServer,
+  tools: UigMcpToolHandlers,
+): void {
+  server.registerTool(
+    "uig_prepare_build",
+    {
+      title: "Prepare an agentic Pixso-to-React build",
+      description:
+        "Validate a Pixso URL, local DSL, screenshot, or stored run and create a durable design-evidence artifact for the agentic build",
+      inputSchema: UigPrepareBuildInputSchema,
+      outputSchema: UigPrepareBuildResultSchema,
+    },
+    async (arguments_) => toolResponse(() => tools.prepareBuild(arguments_)),
+  );
+  server.registerTool(
+    "uig_record_implementation",
+    {
+      title: "Record UI builder implementation",
+      description:
+        "Persist the implementation report from the ui-builder agent for one durable run",
+      inputSchema: UigRecordImplementationInputSchema,
+      outputSchema: UigRecordImplementationResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.recordImplementation(arguments_)),
+  );
+  server.registerTool(
+    "uig_record_code_review",
+    {
+      title: "Record code-review verdict",
+      description:
+        "Persist the code-review report from the code-reviewer agent for one durable run",
+      inputSchema: UigRecordCodeReviewInputSchema,
+      outputSchema: UigRecordCodeReviewResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.recordCodeReview(arguments_)),
+  );
+  server.registerTool(
+    "uig_record_browser_review",
+    {
+      title: "Record browser-review verdict",
+      description:
+        "Persist the browser-review report from the browser-reviewer agent for one durable run",
+      inputSchema: UigRecordBrowserReviewInputSchema,
+      outputSchema: UigRecordBrowserReviewResultSchema,
+    },
+    async (arguments_) =>
+      toolResponse(() => tools.recordBrowserReview(arguments_)),
   );
 }
 

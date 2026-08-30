@@ -15,6 +15,9 @@ const extensionFiles = [
   "commands/uig/components.md",
   "commands/uig/map.md",
   "commands/uig/status.md",
+  "agents/ui-builder.md",
+  "agents/code-reviewer.md",
+  "agents/browser-reviewer.md",
 ] as const;
 
 describe("Qwen extension manifest and commands", () => {
@@ -48,6 +51,7 @@ describe("Qwen extension manifest and commands", () => {
       version: "0.1.0",
       contextFileName: "QWEN.md",
       commands: "commands",
+      agents: "agents",
       mcpServers: {
         uig: {
           command: "node",
@@ -67,7 +71,7 @@ describe("Qwen extension manifest and commands", () => {
     expect(manifest).not.toHaveProperty("trust");
   });
 
-  it("ships invariant context and exactly seven safe commands", async () => {
+  it("ships invariant context, three agent specs, and seven safe commands", async () => {
     await Promise.all(
       extensionFiles.map((path) => access(join(repoRoot, path))),
     );
@@ -91,7 +95,7 @@ describe("Qwen extension manifest and commands", () => {
       await access(join(repoRoot, "agents"))
         .then(() => true)
         .catch(() => false),
-    ).toBe(false);
+    ).toBe(true);
 
     const plan = contents.find(
       (entry) => entry.path === "commands/uig/plan.md",
@@ -106,9 +110,10 @@ describe("Qwen extension manifest and commands", () => {
     expect(plan).not.toContain("uig_generate");
     expect(generate).toContain("uig_generate");
     expect(generate).not.toContain("uig_plan");
-    expect(combinedCommand.indexOf("uig_plan")).toBeLessThan(
-      combinedCommand.indexOf("uig_generate"),
-    );
+    expect(combinedCommand).toContain("uig_prepare_build");
+    expect(combinedCommand).toContain("uig_record_implementation");
+    expect(combinedCommand).toContain("uig_record_code_review");
+    expect(combinedCommand).toContain("uig_record_browser_review");
 
     const scan = contents.find(
       (entry) => entry.path === "commands/uig/scan.md",
@@ -140,6 +145,10 @@ describe("Qwen extension manifest and commands", () => {
     expect(status).toContain("Do not run a scan automatically");
 
     const qwen = contents.find((entry) => entry.path === "QWEN.md")!.text;
+    expect(qwen).toContain("uig_prepare_build");
+    expect(qwen).toContain("uig_record_implementation");
+    expect(qwen).toContain("uig_record_code_review");
+    expect(qwen).toContain("uig_record_browser_review");
     expect(qwen).toContain("uig_plan");
     expect(qwen).toContain("uig_generate");
     expect(qwen).toContain("Never call Pixso Remote MCP directly");
@@ -148,6 +157,23 @@ describe("Qwen extension manifest and commands", () => {
     expect(qwen).toContain("`suggested` mappings are not generation authority");
     expect(qwen).toContain("`/uig:status` is read-only");
     expect(qwen).toContain("Never read `.ui-context/generated` files directly");
+
+    const uiBuilder = contents.find(
+      (entry) => entry.path === "agents/ui-builder.md",
+    )!.text;
+    const codeReviewer = contents.find(
+      (entry) => entry.path === "agents/code-reviewer.md",
+    )!.text;
+    const browserReviewer = contents.find(
+      (entry) => entry.path === "agents/browser-reviewer.md",
+    )!.text;
+    expect(uiBuilder).toContain("uig_record_implementation");
+    expect(codeReviewer).toContain("uig_record_code_review");
+    expect(browserReviewer).toContain("uig_record_browser_review");
+    for (const agentText of [uiBuilder, codeReviewer, browserReviewer]) {
+      expect(agentText).not.toMatch(/PIXSO_ACCESS_TOKEN\s*=/);
+      expect(agentText).toContain("Never edit `.ui-context/*.json`");
+    }
   });
 
   it("documents installation, lifecycle, usage, and boundaries", async () => {
