@@ -1,6 +1,6 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 import type { PixsoDslClient } from "@uig/provider-pixso";
@@ -271,6 +271,28 @@ describe("createAgenticTools", () => {
     });
     expect(result.status).toBe("ready-with-warnings");
     expect(result.sourceKind).toBe("screenshot");
+  });
+
+  it("prepares a local-dsl source by extracting guid and fileKey from the DSL", async () => {
+    const workspace = await temporaryWorkspace(roots);
+    const sourcePath = "fixtures/pixso/modal-4-314/source.json";
+    const sourceAbsolute = join(workspace, sourcePath);
+    await mkdir(dirname(sourceAbsolute), { recursive: true });
+    const sourceBytes = await readFile(
+      join(repoRoot, "fixtures", "pixso", "modal-4-314", "source.json"),
+    );
+    await writeFile(sourceAbsolute, sourceBytes);
+    const tools = makeTools(workspace);
+    const result = await tools.prepareBuild({
+      source: {
+        kind: "local-dsl",
+        path: sourcePath,
+        designSystem: "sber-space-ui",
+      },
+    });
+    expect(result.status).not.toBe("blocked");
+    expect(result.runId).toMatch(/^run_/);
+    expect(result.runPath).toBe(`.uig/runs/${result.runId}`);
   });
 });
 

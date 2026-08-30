@@ -272261,8 +272261,14 @@ async function storeLocalDsl(workspaceDir, relativePath2) {
   const parsed = JSON.parse(
     new TextDecoder("utf8", { fatal: true }).decode(bytes2)
   );
-  const documentId = typeof parsed?.dsl?.fileKey === "string" ? parsed.dsl.fileKey : "local";
-  const nodeId = typeof parsed?.dsl?.nodeId === "string" ? parsed.dsl.nodeId : "local";
+  const dslRoot = parsed?.dsl;
+  const firstNode = Array.isArray(dslRoot?.pixTreeDslNodes) ? dslRoot.pixTreeDslNodes[0] : void 0;
+  const fallbackIdPart = createHash8("sha256").update(bytes2).digest("hex").slice(0, 12);
+  const documentId = typeof dslRoot?.fileKey === "string" && dslRoot.fileKey.length > 0 ? dslRoot.fileKey : typeof firstNode?.fileKey === "string" && firstNode.fileKey.length > 0 ? firstNode.fileKey : `_local_${fallbackIdPart}`;
+  const nodeId = typeof dslRoot?.nodeId === "string" && dslRoot.nodeId.length > 0 ? dslRoot.nodeId : typeof firstNode?.guid === "string" && firstNode.guid.length > 0 ? firstNode.guid : (() => {
+    const exported = Array.isArray(dslRoot?.exportedRootNodeIds) ? dslRoot.exportedRootNodeIds : Array.isArray(dslRoot?.exportedRootNodeId) ? [dslRoot.exportedRootNodeId] : [];
+    return exported[0] ?? "local";
+  })();
   const store = createArtifactStore(join15(workspaceDir, ".uig"));
   const stored = await store.put({
     provider: "pixso",
